@@ -157,7 +157,7 @@
     )
 )
 
-;(script-fu-bhax-mandala "Bátfai Norbert" "BHAX" "Ruge Boogie" 120 1920 1080 '(255 0 0) "Shadow 3")
+;(script-fu-bhax-mandala "Bátfai Norbert" "BHAX" "Ruge Boogie" 120 1920 1080 '(255 0 0) "Shadows 3")
 
 (script-fu-register "script-fu-bhax-mandala"
     "Mandala9"
