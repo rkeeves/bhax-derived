@@ -139,7 +139,8 @@
     (gimp-image-insert-layer image gradient-layer 0 -1)
 	(gimp-image-select-item image CHANNEL-OP-REPLACE textfs)
 	(gimp-context-set-gradient gradient) 
-	(gimp-edit-blend gradient-layer BLEND-CUSTOM LAYER-MODE-NORMAL-LEGACY GRADIENT-RADIAL 100 0 REPEAT-NONE FALSE TRUE 5 .1 TRUE 500 500 (+ (+ 500 (/ textfs-width 2)) 8) 500)
+	(gimp-edit-blend gradient-layer BLEND-CUSTOM LAYER-MODE-NORMAL-LEGACY GRADIENT-RADIAL 100 0 
+	REPEAT-TRIANGULAR FALSE TRUE 5 .1 TRUE (/ width 2) (/ height 2) (+ (+ (/ width 2) (/ textfs-width 2)) 8) (/ height 2))
 	
 	(plug-in-sel2path RUN-NONINTERACTIVE image textfs)
 
@@ -156,7 +157,7 @@
     )
 )
 
-;(script-fu-bhax-mandala "Bátfai Norbert" "BHAX" "Sans" 100 1000 1000 '(255 0 0) "Deep Sea")
+;(script-fu-bhax-mandala "Bátfai Norbert" "BHAX" "Ruge Boogie" 120 1920 1080 '(255 0 0) "Shadow 3")
 
 (script-fu-register "script-fu-bhax-mandala"
     "Mandala9"
