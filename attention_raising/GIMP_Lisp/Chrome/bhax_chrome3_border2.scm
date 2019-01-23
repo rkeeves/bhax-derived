@@ -129,7 +129,7 @@
     ;step 9       
     (gimp-curves-spline layer2 HISTOGRAM-VALUE 8 (color-curve))
             
-    (gimp-image-scale image new-width (/ (* new-width height) width))
+    (gimp-image-scale image new-width (/ (* new-width (+ height (/ text-height 2))) width))
       
     (gimp-display-new image)
     (gimp-image-clean-all image)
@@ -137,6 +137,8 @@
 )
 
 ;(script-fu-bhax-chrome-border "Bátf41 Haxor Stream" "Sans" 160 1920 1080 400 '(255 0 0) "Crown molding" 7)
+;(script-fu-bhax-chrome-border "Programozás" "Sans" 160 768 576 300 '(255 0 0) "Crown molding" 14)
+
 
 (script-fu-register "script-fu-bhax-chrome-border"
     "Chrome3-Border2"
