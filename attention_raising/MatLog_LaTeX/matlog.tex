@@ -1,0 +1,162 @@
+% http://detexify.kirelabs.org/classify.html
+
+\documentclass{article}
+
+% magyar betűk ebben a forrásban. hogy ne kelljen \'a, hanem elég legyen az á
+\usepackage[utf8]{inputenc}
+% legyen pl. magyar elválasztása a sorvégén a szavaknak:
+\usepackage[magyar]{babel}
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{url}
+
+\title{K\"onyvolvas\'as}
+\date{\today}
+\author{N\'andi B\'atfai \and Gr\'eta B\'atfai  \and Matyi B\'atfai  \and Norbi B\'atfai }
+
+\begin{document}
+
+\maketitle
+
+\section{MatLog}
+
+A Péter Rózsa: Játék a végtelennel című könyvével kezdtünk. A 261. oldal 3. bekezdésétől kb. a 265. oldalig jeleltük le:
+
+\begin{itemize}
+\item
+Bevezetés a matematikai logikába 1., \url{https://youtu.be/j1IBkFO3UNk}
+ \end{itemize}
+ 
+Majd Dragálin Albert: Bevezetés a matematikai logikába című könyvének jelöléseivel (használva közben a \url{http://detexify.kirelabs.org/classify.html} lapot a legmegfelelőbb logikai szimbólumok megtalálásához) próbálkoztunk latex-ben:
+\begin{itemize}
+\item
+Második TeXelés, \url{https://youtu.be/qly_9ECViBM}
+ \end{itemize}
+
+Aztán a Dragálin könyv 44. oldalával folytattuk, a természetes nyelvű mondatok matlog átíratával.
+
+\subsection{Természetes nyelvű mondatok matlog átírata}
+
+Dragálin Albert: Bevezetés a matematikai logikába, 44. oldal.
+
+\subsubsection{A könyv példái} 
+ 
+Első stream.
+ 
+\begin{itemize}
+\item
+ Minden hal, kivéve a cápát, szereti a gyerekeket. \\
+$\forall x ( \neg \text{Cápa}(x) \supset \text{SzeretiGyerekek}(x))$
+
+\item
+ Minden ember, kivéve a pacifistákat, szereti a fegyvereket. \\
+$\forall x ( \neg \text{pacifista}(x) \supset \text{Szeretifegyver}(x))$
+
+\item
+Péter akkor szellemes, ha részeg\\
+$ \text{PéterRészeg} \supset  \text{PéterSzellemes}$
+
+\item
+Péter \textbf{csak} akkor szellemes, ha részeg.\\
+$ \text{PéterSzellemes} \supset  \text{PéterRészeg}$
+
+\item
+Péter ha részeg, akkor szellemes.\\
+$ \text{PéterRészeg} \supset  \text{PéterSzellemes}$
+
+
+\item
+Péter \textbf{akkor és csak} akkor szellemes, ha részeg.\\
+$( \text{PéterRészeg} \supset  \text{PéterSzellemes})\wedge( \text{PéterSzellemes} \supset  \text{PéterRészeg})$
+
+ \end{itemize}
+
+Második stream.
+
+\begin{itemize}
+\item
+ Minden ember szeret valakit. \\
+$\forall x \exists y Szeret(x, y)$
+
+\item
+Senki nem szeret mindenkit. \\
+$\neg \exists x \forall y  Szeret(x, y)$
+
+\item
+Valaki szeret mindenkit. \\
+$\exists x \forall y  Szeret(x, y)$
+
+
+\item
+Valaki senkit sem szeret. \\
+$\exists x  \forall y  \neg  Szeret (x, y)$
+
+\item
+Mindenki szeret valakit vagy valaki szeret mindenkit. \\
+$ \forall x \exists y Szeret(x, y) \vee \exists x \forall y  Szeret(x, y)$
+
+ \end{itemize}
+ 
+\subsection{A matlog nyelv}
+
+A matematikai logikai (matlog) nyelv a beszélt nyelvnél pontosabb kifejező eszköz. A beszélt nyelv szavakból és mondatokból épül, még a matlog nyelv termekből és formulákból. A termek változókból és függvényekből épülnek.Term például az az x változó, ami befutotta az embereket. A formulák termekből és prédikátumokból épülnek. Formula például a korábban használt Szeret(x, y) két változós prédikátum. Illetve a logikai jelekkel a formulákból további formulák építhetőek fel. Ha A és B formula, akkor a
+\begin{itemize}
+\item
+$(A \wedge B)$ is az,  olvasva "A és B"
+\item
+$(A \vee B)$ is az,  olvasva "A vagy B"
+\item
+$(A \supset B)$ is az,  olvasva "A-ból következik B"
+\item
+$\neg A$ is az, olvasva "Nem A"
+\item
+$\exists x A$ is az,  olvasva "Van olyan x, hogy A"
+\item
+$ \forall x A$ is az, olvasva "Minden x-re A"
+ \end{itemize}
+
+\subsubsection{Az Ar matlog nyelv}
+
+A $0$, $x$, $y$, $z \dots$ változók természetes szám típusúak (a 0 egy konstans, azaz nem változó változó, a 0 természetes szám jele).
+
+Az $S$, $+$, $\cdot$ függvények. 
+
+A termek építésének kódja:
+\begin{enumerate}
+\item
+minden változó neve term, például $0$, $x$
+\item
+ha $t$ term, akkor $St$ is az, például $Sx$, $SSS0$, $S(0+x)$
+\item
+ha $t$, $v$ termek, akkor $(t+v)$ és $(t \cdot v)$ is termek, például $(x+0)$, $(Sx+SSS0)$.
+ \end{enumerate}
+
+Formulák építéséhez egyetlen prédikátum van, az $\text{Egyenlő(t, v)}$, amit olvashatóbban így írunk $(t=v)$.
+Például az $((x+0) = SSS0)$ egy formula. Ez a formula az $x=3$ kiértékelés mellett igaz egyébként hamis.
+Mikor igaz az $(x+y = Sx+x)$ formula? Mikor igaz az $(x = SSy)$ formula?
+
+\begin{itemize}
+\item
+$ (x \le y) \leftrightharpoons \exists z(z+x=y)$ 
+
+\item
+$ (x \neq y) \leftrightharpoons  \neg (x=y)$ 
+
+\item
+$ (x < y) \leftrightharpoons \exists z(z+x=y) \wedge \neg (x=y)$ 
+
+\item
+$ (x < y) \leftrightharpoons  (x \le y )\wedge ( x \neq y)$ 
+
+\item
+$ x \vert y \leftrightharpoons \exists z ( z \cdot x=y )\wedge ( x \neq 0)$ 
+
+\item
+$ (x \text{-prím}) \leftrightharpoons  (\forall z( z \vert x )\supset ( z = x \vee z=S0))\wedge ( x \neq 0)\wedge ( x \neq S0)$ 
+
+ \end{itemize}
+
+Olvassuk el a most feldolgozott, Dragálin könyv 15-19 oldalait!
+
+\end{document}
