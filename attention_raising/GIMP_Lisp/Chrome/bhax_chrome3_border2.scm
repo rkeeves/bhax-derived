@@ -137,7 +137,7 @@
 )
 
 ;(script-fu-bhax-chrome-border "Bátf41 Haxor Stream" "Sans" 160 1920 1080 400 '(255 0 0) "Crown molding" 7)
-;(script-fu-bhax-chrome-border "Programozás" "Sans" 160 768 576 300 '(255 0 0) "Crown molding" 14)
+;(script-fu-bhax-chrome-border "Programozás" "Sans" 110 768 576 300 '(255 0 0) "Crown molding" 6)
 
 
 (script-fu-register "script-fu-bhax-chrome-border"
