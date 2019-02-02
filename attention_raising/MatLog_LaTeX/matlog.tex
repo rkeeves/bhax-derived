@@ -82,7 +82,7 @@ $\forall x \exists y Szeret(x, y)$
 
 \item
 Valakit minden ember szeret. \\
-$\dots$ \textit{vegyük észre, hogy mi a különbség az előző formulával összehasonlítva: a kvantokrok sorrendje számít!}
+$\exists y \forall x  Szeret(x, y)$ \textit{vegyük észre, hogy mi a különbség az előző formulával összehasonlítva: a kvantokrok sorrendje számít!}
 
 \item
 Senki nem szeret mindenkit. \\
@@ -159,26 +159,28 @@ $ (x < y) \leftrightharpoons  (x \le y )\wedge ( x \neq y)$
 $(x \vert y) \leftrightharpoons \exists z ( z \cdot x=y )\wedge ( x \neq 0)$ 
 
 \item
-$ (x \text{ páros}) \leftrightharpoons \dots$ 
+$ (x \text{ páros}) \leftrightharpoons (SS0 \vert x)$ 
 
 \item
-$ (\infty \text{ sok szám van}) \leftrightharpoons \dots$ 
+$ (\infty \text{ sok szám van}) \leftrightharpoons (\forall x \exists y (x<y))$ 
 
 \item
-$ (\text{véges sok szám van}) \leftrightharpoons \dots$ 
+$ (\text{véges sok szám van}) \leftrightharpoons ( \exists y \forall x (x<y))$ 
 
 \item
 $ (x \text{ prím}) \leftrightharpoons  (\forall z( z \vert x )\supset ( z = x \vee z=S0))\wedge ( x \neq 0)\wedge ( x \neq S0)$ 
 
 \item
-$ (\infty \text{ sok prímszám van}) \leftrightharpoons  \dots $ 
+$ (\infty \text{ sok prímszám van}) \leftrightharpoons (\forall x \exists y ((x<y)\wedge(y \text{ prím}))) $ 
 
 \item
-$ (\infty \text{ sok iker-prímszám van}) \leftrightharpoons  \dots $ 
+$ (\infty \text{ sok iker-prímszám van}) \leftrightharpoons   (\forall x \exists y ((x<y)\wedge(y \text{ prím})\wedge(SSy \text{ prím})))$ 
 
 \item
-$ (\text{véges sok prímszám van}) \leftrightharpoons  \dots $ 
+$ (\text{véges sok prímszám van}) \leftrightharpoons   ( \exists y \forall x (x \text{ prím}) \supset (x<y)) $ 
 
+\item
+$ (\text{véges sok prímszám van}) \leftrightharpoons   ( \exists y \forall x (y<x) \supset \neg (x \text{ prím})) $ 
 
  \end{itemize}
 
