@@ -10,6 +10,7 @@
 \usepackage{amsmath}
 \usepackage{amssymb}
 \usepackage{url}
+\usepackage{listings}
 
 \title{K\"onyvolvas\'as}
 \date{\today}
@@ -107,17 +108,18 @@ $ \forall x \exists y Szeret(x, y) \vee \exists x \forall y  Szeret(x, y)$
 A matematikai logikai (matlog) nyelv a beszélt nyelvnél pontosabb kifejező eszköz. A beszélt nyelv szavakból és mondatokból épül, még a matlog nyelv termekből és formulákból. A termek változókból és függvényekből épülnek.Term például az az x változó, ami befutotta az embereket. A formulák termekből és prédikátumokból épülnek. Formula például a korábban használt Szeret(x, y) két változós prédikátum. Illetve a logikai jelekkel a formulákból további formulák építhetőek fel. Ha A és B formula, akkor a
 \begin{itemize}
 \item
-$(A \wedge B)$ is az,  olvasva "A és B"
+$(A \wedge B)$ is az,  olvasva "A és B", \LaTeX -ben leírva: \verb!$(A \wedge B)$!
+
 \item
-$(A \vee B)$ is az,  olvasva "A vagy B"
+$(A \vee B)$ is az,  olvasva "A vagy B", \LaTeX -ben leírva: \verb!$(A \vee B)$!
 \item
-$(A \supset B)$ is az,  olvasva "A-ból következik B"
+$(A \supset B)$ is az,  olvasva "A-ból következik B", \LaTeX -ben leírva: \verb!$(A \supset B)$!
 \item
-$\neg A$ is az, olvasva "Nem A"
+$\neg A$ is az, olvasva "Nem A", \LaTeX -ben leírva: \verb!$\neg A$!
 \item
-$\exists x A$ is az,  olvasva "Van olyan x, hogy A"
+$\exists x A$ is az,  olvasva "Van olyan x, hogy A", \LaTeX -ben leírva: \verb!$\exists x A$!
 \item
-$ \forall x A$ is az, olvasva "Minden x-re A"
+$ \forall x A$ is az, olvasva "Minden x-re A", \LaTeX -ben leírva: \verb!$\forall x A$!
  \end{itemize}
 
 \subsubsection{Az Ar matlog nyelv}
