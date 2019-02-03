@@ -142,6 +142,10 @@ Formulák építéséhez egyetlen prédikátum van, az $\text{Egyenlő(t, v)}$, 
 Például az $((x+0) = SSS0)$ egy formula. Ez a formula az $x=3$ kiértékelés mellett igaz egyébként hamis.
 Mikor igaz az $(x+y = Sx+x)$ formula? Mikor igaz az $(x = SSy)$ formula?
 
+\paragraph{Alapozzuk meg a következő formulákat!} 
+
+Lásd a \url{https://www.twitch.tv/nbatfai} csatornán közvetített élő adások archívumát a \url{https://www.youtube.com/c/nbatfai} YTB csatornán, konkrétan például: \url{https://youtu.be/ZexiPy3ZxsA} és \url{https://youtu.be/DUGPRlXk_2w}.
+
 \begin{itemize}
 \item
 $ (x \le y) \leftrightharpoons \exists z(z+x=y)$ 
@@ -159,22 +163,22 @@ $ (x < y) \leftrightharpoons  (x \le y )\wedge ( x \neq y)$
 $(x \vert y) \leftrightharpoons \exists z ( z \cdot x=y )\wedge ( x \neq 0)$ 
 
 \item
-$ (x \text{ páros}) \leftrightharpoons (SS0 \vert x)$ 
+$(x \text{ páros}) \leftrightharpoons (SS0 \vert x)$ 
 
 \item
-$ (\infty \text{ sok szám van}) \leftrightharpoons (\forall x \exists y (x<y))$ 
+$(\infty \text{ sok szám van}) \leftrightharpoons (\forall x \exists y (x<y))$ 
 
 \item
-$ (\text{véges sok szám van}) \leftrightharpoons ( \exists y \forall x (x<y))$ 
+$(\text{véges sok szám van}) \leftrightharpoons ( \exists y \forall x (x<y))$ 
 
 \item
-$ (x \text{ prím}) \leftrightharpoons  (\forall z( z \vert x )\supset ( z = x \vee z=S0))\wedge ( x \neq 0)\wedge ( x \neq S0)$ 
+$(x \text{ prím}) \leftrightharpoons  (\forall z( z \vert x )\supset ( z = x \vee z=S0))\wedge ( x \neq 0)\wedge ( x \neq S0)$ 
 
 \item
-$ (\infty \text{ sok prímszám van}) \leftrightharpoons (\forall x \exists y ((x<y)\wedge(y \text{ prím}))) $ 
+$(\infty \text{ sok prímszám van}) \leftrightharpoons (\forall x \exists y ((x<y)\wedge(y \text{ prím}))) $ 
 
 \item
-$ (\infty \text{ sok iker-prímszám van}) \leftrightharpoons   (\forall x \exists y ((x<y)\wedge(y \text{ prím})\wedge(SSy \text{ prím})))$ 
+$(\infty \text{ sok iker-prímszám van}) \leftrightharpoons   (\forall x \exists y ((x<y)\wedge(y \text{ prím})\wedge(SSy \text{ prím})))$ 
 
 \item
 $ (\text{véges sok prímszám van}) \leftrightharpoons   ( \exists y \forall x (x \text{ prím}) \supset (x<y)) $ 
@@ -185,5 +189,33 @@ $ (\text{véges sok prímszám van}) \leftrightharpoons   ( \exists y \forall x 
  \end{itemize}
 
 Olvassuk el a most feldolgozott, Dragálin könyv 15-19 oldalait!
+
+\paragraph{"Hol a tagadás lábát megveti"}
+
+Felmerült, hogy a $(\text{véges sok prímszám van})$ kifejezhető lenne a $(\infty \text{ sok prímszám van})$ tagadásaként, azaz
+$(\text{véges sok prímszám van}) \leftrightharpoons   \neg(\infty \text{ sok prímszám van})$ 
+
+Tagadjuk az egyik végességet kifejező formulánkat!
+
+
+ \begin{align*}
+ \neg \exists y \forall x &((y<x) \supset \neg (x \text{ prím}))\\
+ \forall y \neg\forall x &((y<x) \supset \neg (x \text{ prím}))\\
+ \forall y \exists x \neg&((y<x) \supset \neg (x \text{ prím}))\\
+ \forall y \exists x &((y<x) \wedge \neg\neg (x \text{ prím}))\\
+ \forall y \exists x &((y<x) \wedge (x \text{ prím}))
+ \end{align*} 
+ 
+ az eredmény éppen a végtelenséges formulánk volt!
+ 
+ Ismételjük meg ezt a számítást a másik formulával!
+
+ \begin{align*}
+ \neg \exists y \forall x ((x \text{ prím}) \supset (x<y))\\
+ \end{align*} 
+
+
+
+
 
 \end{document}
