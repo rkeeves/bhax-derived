@@ -1,6 +1,6 @@
 // Verzio: 3.1.3.cpp
 // Forditas:
-// g++ 3.1.3.cpp -lpng -O3 -o 3.1.2
+// g++ 3.1.3.cpp -lpng -O3 -o 3.1.3
 // Futtatas:
 // ./3.1.3 bmorf.png 800 800 10 -2 2 -2 2 .285 0
 //
@@ -67,7 +67,6 @@ main ( int argc, char *argv[] )
 
     double dx = ( b - a ) / szelesseg;
     double dy = ( d - c ) / magassag;
-    double reZ, imZ;
 
     std::complex<double> cc ( reC, imC );
 
@@ -81,8 +80,8 @@ main ( int argc, char *argv[] )
         for ( int k = 0; k < szelesseg; ++k )
         {
 
-            reZ = a + k * dx;
-            imZ = d - j * dy;
+            double reZ = a + k * dx;
+            double imZ = d - j * dy;
             std::complex<double> z_n ( reZ, imZ );
 
             int iteracio = 0;
@@ -90,7 +89,7 @@ main ( int argc, char *argv[] )
             {
 
                 z_n = std::pow(z_n, z_n) + std::pow(z_n, 6) + cc;
-                //z_n = std::pow(z_n, 3) + c;
+                //z_n = std::pow(z_n, 3) + cc;
                 //z_n = std::pow(z_n, 2) + std::sin(z_n) + cc;
                 if(std::real ( z_n ) > 10 || std::imag ( z_n ) > 10)
                 {
