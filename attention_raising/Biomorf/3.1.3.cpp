@@ -2,7 +2,7 @@
 // Forditas:
 // g++ 3.1.3.cpp -lpng -O3 -o 3.1.3
 // Futtatas:
-// ./3.1.3 bmorf.png 800 800 10 -2 2 -2 2 .285 0
+// ./3.1.3 bmorf.png 800 800 10 -2 2 -2 2 .285 0 10
 //
 // BHAX Biomorphs
 // Copyright (C) 2019
@@ -43,8 +43,9 @@ main ( int argc, char *argv[] )
     double c = -1.3;
     double d = 1.3;
     double reC = .285, imC = 0;
+    double R = 10.0;
 
-    if ( argc == 11 )
+    if ( argc == 12 )
     {
         szelesseg = atoi ( argv[2] );
         magassag =  atoi ( argv[3] );
@@ -55,11 +56,12 @@ main ( int argc, char *argv[] )
         d = atof ( argv[8] );
         reC = atof ( argv[9] );
         imC = atof ( argv[10] );
+        R = atof ( argv[11] );
 
     }
     else
     {
-        std::cout << "Hasznalat: ./3.1.2 fajlnev szelesseg magassag n a b c d reC imC" << std::endl;
+        std::cout << "Hasznalat: ./3.1.2 fajlnev szelesseg magassag n a b c d reC imC R" << std::endl;
         return -1;
     }
 
@@ -91,7 +93,7 @@ main ( int argc, char *argv[] )
                 z_n = std::pow(z_n, z_n) + std::pow(z_n, 6) + cc;
                 //z_n = std::pow(z_n, 3) + cc;
                 //z_n = std::pow(z_n, 2) + std::sin(z_n) + cc;
-                if(std::real ( z_n ) > 10 || std::imag ( z_n ) > 10)
+                if(std::real ( z_n ) > R || std::imag ( z_n ) > R)
                 {
                     iteracio = i;
                     break;
