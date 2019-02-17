@@ -128,8 +128,9 @@ false]]></screen>
     <section>
         <title>Labdapattogás</title>
         <para>
-            Írj olyan C programot, amely felcseréli két változó értékét, bármiféle logikai utasítás vagy kifejezés
-            nasználata nélkül!
+            Először if-ekkel, majd bármiféle logikai utasítás vagy kifejezés
+            nasználata nélkül írj egy olyan programot, ami egy labdát pattogtat a karakteres konzolon! (Hogy mit értek
+            pattogtatás alatt, alább láthatod a videókon.)
         </para>
         <para>
             Megoldás videó: <link xlink:href="https://bhaxor.blog.hu/2018/08/28/labdapattogas">https://bhaxor.blog.hu/2018/08/28/labdapattogas</link>
@@ -145,8 +146,8 @@ false]]></screen>
     <section>
         <title>Szóhossz és a Linus Torvalds féle BogoMIPS</title>
         <para>
-            Írj olyan C programot, amely felcseréli két változó értékét, bármiféle logikai utasítás vagy kifejezés
-            nasználata nélkül!
+            Írj egy programot, ami megnézi, hogy hány bites a szó a gépeden, azaz mekkora az <type>int</type> mérete.
+            Használd ugyanazt a while ciklus fejet, amit Linus Torvalds a BogoMIPS rutinjában! 
         </para>
         <para>
             Megoldás videó: <link xlink:href=""></link>
@@ -155,7 +156,7 @@ false]]></screen>
             Megoldás forrása: <link xlink:href=""></link>
         </para>
         <para>
-            Tanulságok, tapasztalatok, magyarázat...
+            Tanulságok, tapasztalatok, magyarázat... 
         </para>
     </section>                     
 
