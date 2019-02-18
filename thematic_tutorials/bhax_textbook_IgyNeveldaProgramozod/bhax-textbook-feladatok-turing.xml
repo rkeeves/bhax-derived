@@ -337,10 +337,23 @@ plot(x,y,type="b")
         
         <programlisting language="R">
 <![CDATA[sum(rt1plust2)]]>
-        </programlisting>        
+        </programlisting>    
+<screen>
+<![CDATA[>   sum(rt1plust2)
+[1] 1.044023
+]]>
+        </screen>            
         <para>
-            
+            A következő ábra azt mutatja, hogy a szumma értéke, hogyan nő, egy határértékhez tart, a 
+             B<subscript>2</subscript> Brun konstanshoz. Ezt ezzel a csipettel rajzoltuk ki, ahol először a fenti 
+             számítást 13-ig végezzük, majd 10013, majd 20013-ig, egészen 990013-ig, azaz közel 1 millióig.
+             Vegyük észre, hogy az ábra első köre, a 13 értékhez tartozó 1.044023.
         </para>
+        <programlisting language="R">
+<![CDATA[x=seq(13, 1000000, by=10000)
+y=sapply(x, FUN = stp)
+plot(x,y,type="b")]]>
+        </programlisting>          
         <figure>
             <title>A B<subscript>2</subscript> konstans közelítése</title>
             <mediaobject>
