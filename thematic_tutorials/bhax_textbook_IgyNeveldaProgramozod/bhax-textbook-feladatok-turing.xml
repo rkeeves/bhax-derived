@@ -176,20 +176,7 @@ false]]></screen>
             Tanulságok, tapasztalatok, magyarázat...
         </para>
     </section>
-
-    <section xml:id="Brun">
-        <title>100 éves a Brun tétel</title>
-        <para>
-            Írj R szimulációt a Brun tétel demonstrálására!
-        </para>
-        <para>
-            Megoldás videó: <link xlink:href="https://youtu.be/xbYhp9G6VqQ">https://youtu.be/xbYhp9G6VqQ</link>
-        </para>
-        <para>
-            Megoldás forrása: <link xlink:href="https://gitlab.com/nbatfai/bhax/blob/master/attention_raising/Primek_R">https://gitlab.com/nbatfai/bhax/blob/master/attention_raising/Primek_R</link>
-        </para>
-    </section>
-    
+                                                                                                                                                                                                                                                                                                                                                        
     <section xml:id="bhax-textbook-feladatok-turing.MontyHall">
         <title>A Monty Hall probléma</title>
         <para>
@@ -204,6 +191,88 @@ false]]></screen>
         <para>
             Tanulságok, tapasztalatok, magyarázat...
         </para>
+    </section>
+
+    <section xml:id="Brun">
+        <title>100 éves a Brun tétel</title>
+        <para>
+            Írj R szimulációt a Brun tétel demonstrálására!
+        </para>
+        <para>
+            Megoldás videó: <link xlink:href="https://youtu.be/xbYhp9G6VqQ">https://youtu.be/xbYhp9G6VqQ</link>
+        </para>
+        <para>
+            Megoldás forrása: <link xlink:href="https://gitlab.com/nbatfai/bhax/blob/master/attention_raising/Primek_R">https://gitlab.com/nbatfai/bhax/blob/master/attention_raising/Primek_R</link>
+        </para>
+        <para>
+Prím, ikerprím            
+        </para>
+        <para>
+            A repó <filename>bhax/attention_raising/Primek_R/stp.r</filename> állománya kiszámolja az ikerprímeket, összegzi
+            a reciprokaikat és vizualizálja a kapott részeredményt.
+        </para>
+        <programlisting language="c++">
+<![CDATA[ primes = primes(13)]]>
+        </programlisting>        
+        <para>
+           Kiszámoja a megadott számig a primeket.             
+        </para>
+<screen>
+<![CDATA[> primes=primes(13)
+> primes
+[1]  2  3  5  7 11 13
+]]>
+        </screen>
+                
+        <programlisting language="c++">
+<![CDATA[ diff = primes[2:length(primes)]-primes[1:length(primes)-1]]]>
+        </programlisting>        
+        <para>
+          Kiszámolja kétszer a prímeket és az egymást követő prímek kivonását képzi.
+        </para>
+        <programlisting language="c++">
+<![CDATA[idx = which(diff==2)]]>
+        </programlisting>        
+        <para>
+           Megnézi a <varname>diff</varname>-ben, hogy mejiknél lett kettő az eredmény.
+        </para>
+        <programlisting language="c++">
+<![CDATA[t1primes = primes[idx]]]>
+        </programlisting>        
+        <para>
+            Kivette a primes-ból a párok első tagját. 
+        </para>
+        <programlisting language="c++">
+<![CDATA[ t2primes = primes[idx]+2]]>
+        </programlisting>        
+        <para>
+            Kivette a primes-ból a párok első tagját és hozzáadott kettőt
+        </para>
+        <programlisting language="c++">
+<![CDATA[rt1plust2 = 1/t1primes+1/t2primes]]>
+        </programlisting>        
+        <para>
+            
+        </para>
+        <programlisting language="c++">
+<![CDATA[]]>
+        </programlisting>        
+        <para>
+            
+        </para>
+                <figure>
+                    <title>A B<subscript>2</subscript> konstans közelítése</title>
+                <mediaobject>
+                    <imageobject>
+                        <imagedata fileref="img/BrunKorok.png" scale="50" />
+                    </imageobject>
+                    <textobject>
+                        <phrase>A B<subscript>2</subscript> konstans közelítése</phrase>
+                    </textobject>
+                </mediaobject>
+                </figure>                             
+
+
     </section>
 
 </chapter>                
