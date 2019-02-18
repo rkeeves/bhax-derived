@@ -205,72 +205,153 @@ false]]></screen>
             Megoldás forrása: <link xlink:href="https://gitlab.com/nbatfai/bhax/blob/master/attention_raising/Primek_R">https://gitlab.com/nbatfai/bhax/blob/master/attention_raising/Primek_R</link>
         </para>
         <para>
-Prím, ikerprím            
+            A Brun tétel azt mondja, hogy az ikerprímszámok reciprokaiból képzett összeg konvergens, ami azt jelenti, hogy ezek
+            a törtek összeadva egy határig mennek, ami határ számot B<subscript>2</subscript> Brun konstansnak neveznek. Persze ez
+            nem dönti el a több ezer éve nyitott kérdést, hogy az ikerprímszámok halmaza végtelen-e? Hiszen ha véges sok van és ezek
+            reciprokait összeadjuk, akkor ugyanúgy nem lépjük át a B<subscript>2</subscript> Brun konstans értékét, mintha végtelen 
+            sok lenne, de ezek már csak annyival járulnának hozzá a végtelen sor összegéhez, hogy így sem lépik át a Brun konstans értékét.     
         </para>
         <para>
-            A repó <filename>bhax/attention_raising/Primek_R/stp.r</filename> állománya kiszámolja az ikerprímeket, összegzi
+            Ebben a példában egy olyan programot készítettünk, amely közelíteni próbálja a Brun konstans értékét.
+            A repó <filename>bhax/attention_raising/Primek_R/stp.r</filename> mevű állománya kiszámolja az ikerprímeket, összegzi
             a reciprokaikat és vizualizálja a kapott részeredményt.
         </para>
-        <programlisting language="c++">
+        <programlisting language="R">
+<![CDATA[#   Copyright (C) 2019  Dr. Norbert Bátfai, nbatfai@gmail.com
+#
+#   This program is free software: you can redistribute it and/or modify
+#   it under the terms of the GNU General Public License as published by
+#   the Free Software Foundation, either version 3 of the License, or
+#   (at your option) any later version.
+#
+#   This program is distributed in the hope that it will be useful,
+#   but WITHOUT ANY WARRANTY; without even the implied warranty of
+#   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#   GNU General Public License for more details.
+#
+#   You should have received a copy of the GNU General Public License
+#   along with this program.  If not, see <http://www.gnu.org/licenses/>
+
+library(matlab)
+
+stp <- function(x){
+
+    primes = primes(x)
+    diff = primes[2:length(primes)]-primes[1:length(primes)-1]
+    idx = which(diff==2)
+    t1primes = primes[idx]
+    t2primes = primes[idx]+2
+    rt1plust2 = 1/t1primes+1/t2primes
+    return(sum(rt1plust2))
+}
+
+x=seq(13, 1000000, by=10000)
+y=sapply(x, FUN = stp)
+plot(x,y,type="b")
+]]>
+        </programlisting>        
+        <para>
+            Soronként értelemezzük ezt a programot:
+        </para>                
+        <programlisting language="R">
 <![CDATA[ primes = primes(13)]]>
         </programlisting>        
         <para>
-           Kiszámoja a megadott számig a primeket.             
+            Kiszámolja a megadott számig a prímeket.             
         </para>
-<screen>
+        <screen>
 <![CDATA[> primes=primes(13)
 > primes
 [1]  2  3  5  7 11 13
 ]]>
         </screen>
                 
-        <programlisting language="c++">
+        <programlisting language="R">
 <![CDATA[ diff = primes[2:length(primes)]-primes[1:length(primes)-1]]]>
         </programlisting>        
+        <screen>
+<![CDATA[> diff = primes[2:length(primes)]-primes[1:length(primes)-1]
+> diff
+[1] 1 2 2 4 2
+]]>
+        </screen>        
         <para>
-          Kiszámolja kétszer a prímeket és az egymást követő prímek kivonását képzi.
+            Az egymást követő prímek különbségét képzi, tehát 3-2, 5-3, 7-5, 11-7, 13-11.
         </para>
-        <programlisting language="c++">
+        <programlisting language="R">
 <![CDATA[idx = which(diff==2)]]>
         </programlisting>        
+<screen>
+<![CDATA[> idx = which(diff==2)
+> idx
+[1] 2 3 5
+]]>
+        </screen>              
         <para>
-           Megnézi a <varname>diff</varname>-ben, hogy mejiknél lett kettő az eredmény.
+            Megnézi a <varname>diff</varname>-ben, hogy melyiknél lett kettő az eredmény, mert azok az ikerprím párok, ahol ez igaz.
+            Ez a <varname>diff</varname>-ben lévő 3-2, 5-3, 7-5, 11-7, 13-11 külünbségek közül ez a 2., 3. és 5. indexűre teljesül.
         </para>
-        <programlisting language="c++">
+        <programlisting language="R">
 <![CDATA[t1primes = primes[idx]]]>
-        </programlisting>        
+        </programlisting>  
         <para>
             Kivette a primes-ból a párok első tagját. 
         </para>
-        <programlisting language="c++">
-<![CDATA[ t2primes = primes[idx]+2]]>
+        <programlisting language="R">
+<![CDATA[t2primes = primes[idx]+2]]>
         </programlisting>        
         <para>
-            Kivette a primes-ból a párok első tagját és hozzáadott kettőt
+            A párok második tagját az első tagok kettő hozzáadásával képezzük.
         </para>
-        <programlisting language="c++">
+        <programlisting language="R">
 <![CDATA[rt1plust2 = 1/t1primes+1/t2primes]]>
         </programlisting>        
         <para>
-            
+            Az 1/t1primes a t1primes 3,5,11 értékéből az alábbi reciprokokat képzi:
         </para>
-        <programlisting language="c++">
-<![CDATA[]]>
+<screen>
+<![CDATA[> 1/t1primes
+[1] 0.33333333 0.20000000 0.09090909
+]]>
+        </screen>                      
+        <para>
+            Az 1/t2primes a t2primes 5,7,13 értékéből az alábbi reciprokokat képzi:
+        </para>
+<screen>
+<![CDATA[> 1/t2primes
+[1] 0.20000000 0.14285714 0.07692308
+]]>
+        </screen>                      
+        <para>
+            Az 1/t1primes + 1/t2primes pedig ezeket a törteket rendre összeadja.
+        </para>
+<screen>
+<![CDATA[> 1/t1primes+1/t2primes
+[1] 0.5333333 0.3428571 0.1678322
+]]>
+        </screen>                      
+        <para>
+            Nincs más dolgunk, mint ezeket a törteket összeadni a 
+            <function>sum</function> függvénnyel.
+        </para>
+        
+        <programlisting language="R">
+<![CDATA[sum(rt1plust2)]]>
         </programlisting>        
         <para>
             
         </para>
-                <figure>
-                    <title>A B<subscript>2</subscript> konstans közelítése</title>
-                <mediaobject>
-                    <imageobject>
-                        <imagedata fileref="img/BrunKorok.png" scale="50" />
-                    </imageobject>
-                    <textobject>
-                        <phrase>A B<subscript>2</subscript> konstans közelítése</phrase>
-                    </textobject>
-                </mediaobject>
-                </figure>                             
+        <figure>
+            <title>A B<subscript>2</subscript> konstans közelítése</title>
+            <mediaobject>
+                <imageobject>
+                    <imagedata fileref="img/BrunKorok.png" scale="50" />
+                </imageobject>
+                <textobject>
+                    <phrase>A B<subscript>2</subscript> konstans közelítése</phrase>
+                </textobject>
+            </mediaobject>
+        </figure>                             
 
 
     </section>

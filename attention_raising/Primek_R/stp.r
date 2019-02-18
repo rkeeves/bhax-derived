@@ -26,6 +26,6 @@ stp <- function(x){
     return(sum(rt1plust2))
 }
 
-x=seq(10, 1000000, by=10000)
+x=seq(13, 1000000, by=10000)
 y=sapply(x, FUN = stp)
 plot(x,y,type="b")
