@@ -3,10 +3,12 @@
 // g++ 3.1.3.cpp -lpng -O3 -o 3.1.3
 // Futtatas:
 // ./3.1.3 bmorf.png 800 800 10 -2 2 -2 2 .285 0 10
-//
+// Nyomtatas:
+// a2ps 3.1.3.cpp -o 3.1.3.cpp.pdf -1 --line-numbers=1  --left-footer="BATF41 HAXOR STR34M" --right-footer="https://bhaxor.blog.hu/" --pro=color
+// 
 // BHAX Biomorphs
 // Copyright (C) 2019
-// Norbert Bátfai, batfai.norbert@inf.unideb.hu
+// Norbert Batfai, batfai.norbert@inf.unideb.hu
 //
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -90,8 +92,7 @@ main ( int argc, char *argv[] )
             for (int i=0; i < iteraciosHatar; ++i)
             {
 
-                z_n = std::pow(z_n, z_n) + std::pow(z_n, 6) + cc;
-                //z_n = std::pow(z_n, 3) + cc;
+                z_n = std::pow(z_n, 3) + cc;
                 //z_n = std::pow(z_n, 2) + std::sin(z_n) + cc;
                 if(std::real ( z_n ) > R || std::imag ( z_n ) > R)
                 {
