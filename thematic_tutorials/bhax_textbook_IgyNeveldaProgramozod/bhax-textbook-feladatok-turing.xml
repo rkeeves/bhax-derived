@@ -281,7 +281,7 @@ plot(x,y,type="b")
         <programlisting language="R">
 <![CDATA[idx = which(diff==2)]]>
         </programlisting>        
-<screen>
+        <screen>
 <![CDATA[> idx = which(diff==2)
 > idx
 [1] 2 3 5
@@ -309,7 +309,7 @@ plot(x,y,type="b")
         <para>
             Az 1/t1primes a t1primes 3,5,11 értékéből az alábbi reciprokokat képzi:
         </para>
-<screen>
+        <screen>
 <![CDATA[> 1/t1primes
 [1] 0.33333333 0.20000000 0.09090909
 ]]>
@@ -317,7 +317,7 @@ plot(x,y,type="b")
         <para>
             Az 1/t2primes a t2primes 5,7,13 értékéből az alábbi reciprokokat képzi:
         </para>
-<screen>
+        <screen>
 <![CDATA[> 1/t2primes
 [1] 0.20000000 0.14285714 0.07692308
 ]]>
@@ -325,7 +325,7 @@ plot(x,y,type="b")
         <para>
             Az 1/t1primes + 1/t2primes pedig ezeket a törteket rendre összeadja.
         </para>
-<screen>
+        <screen>
 <![CDATA[> 1/t1primes+1/t2primes
 [1] 0.5333333 0.3428571 0.1678322
 ]]>
@@ -338,16 +338,16 @@ plot(x,y,type="b")
         <programlisting language="R">
 <![CDATA[sum(rt1plust2)]]>
         </programlisting>    
-<screen>
+        <screen>
 <![CDATA[>   sum(rt1plust2)
 [1] 1.044023
 ]]>
         </screen>            
         <para>
             A következő ábra azt mutatja, hogy a szumma értéke, hogyan nő, egy határértékhez tart, a 
-             B<subscript>2</subscript> Brun konstanshoz. Ezt ezzel a csipettel rajzoltuk ki, ahol először a fenti 
-             számítást 13-ig végezzük, majd 10013, majd 20013-ig, egészen 990013-ig, azaz közel 1 millióig.
-             Vegyük észre, hogy az ábra első köre, a 13 értékhez tartozó 1.044023.
+            B<subscript>2</subscript> Brun konstanshoz. Ezt ezzel a csipettel rajzoltuk ki, ahol először a fenti 
+            számítást 13-ig végezzük, majd 10013, majd 20013-ig, egészen 990013-ig, azaz közel 1 millióig.
+            Vegyük észre, hogy az ábra első köre, a 13 értékhez tartozó 1.044023.
         </para>
         <programlisting language="R">
 <![CDATA[x=seq(13, 1000000, by=10000)
@@ -365,8 +365,21 @@ plot(x,y,type="b")]]>
                 </textobject>
             </mediaobject>
         </figure>                             
-
-
+        <tip>
+            <title>Werkfilm</title>
+            <itemizedlist>
+                <listitem>
+                    <para>
+                        <link xlink:href="https://youtu.be/VkMFrgBhN1g">https://youtu.be/VkMFrgBhN1g</link>
+                    </para>    
+                </listitem>                
+                <listitem>
+                    <para>
+                        <link xlink:href="https://youtu.be/aF4YK6mBwf4">https://youtu.be/aF4YK6mBwf4</link>
+                    </para>    
+                </listitem>                
+            </itemizedlist>                
+        </tip>
     </section>
 
 </chapter>                
