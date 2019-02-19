@@ -40,10 +40,10 @@ main ( int argc, char *argv[] )
     int szelesseg = 1920;
     int magassag = 1080;
     int iteraciosHatar = 255;
-    double a = -1.9;
-    double b = 0.7;
-    double c = -1.3;
-    double d = 1.3;
+    double xmin = -1.9;
+    double xmax = 0.7;
+    double ymin = -1.3;
+    double ymax = 1.3;
     double reC = .285, imC = 0;
     double R = 10.0;
 
@@ -52,10 +52,10 @@ main ( int argc, char *argv[] )
         szelesseg = atoi ( argv[2] );
         magassag =  atoi ( argv[3] );
         iteraciosHatar =  atoi ( argv[4] );
-        a = atof ( argv[5] );
-        b = atof ( argv[6] );
-        c = atof ( argv[7] );
-        d = atof ( argv[8] );
+        xmin = atof ( argv[5] );
+        xmax = atof ( argv[6] );
+        ymin = atof ( argv[7] );
+        ymax = atof ( argv[8] );
         reC = atof ( argv[9] );
         imC = atof ( argv[10] );
         R = atof ( argv[11] );
@@ -69,8 +69,8 @@ main ( int argc, char *argv[] )
 
     png::image < png::rgb_pixel > kep ( szelesseg, magassag );
 
-    double dx = ( b - a ) / szelesseg;
-    double dy = ( d - c ) / magassag;
+    double dx = ( xmax - xmin ) / szelesseg;
+    double dy = ( ymax - ymin ) / magassag;
 
     std::complex<double> cc ( reC, imC );
 
@@ -84,8 +84,8 @@ main ( int argc, char *argv[] )
         for ( int k = 0; k < szelesseg; ++k )
         {
 
-            double reZ = a + k * dx;
-            double imZ = d - j * dy;
+            double reZ = xmin + k * dx;
+            double imZ = ymax - j * dy;
             std::complex<double> z_n ( reZ, imZ );
 
             int iteracio = 0;
