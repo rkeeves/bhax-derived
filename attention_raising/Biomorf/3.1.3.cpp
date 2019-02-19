@@ -77,15 +77,15 @@ main ( int argc, char *argv[] )
     std::cout << "Szamitas\n";
 
     // j megy a sorokon
-    for ( int j = 0; j < magassag; ++j )
+    for ( int y = 0; y < magassag; ++y )
     {
         // k megy az oszlopokon
 
-        for ( int k = 0; k < szelesseg; ++k )
+        for ( int x = 0; x < szelesseg; ++x )
         {
 
-            double reZ = xmin + k * dx;
-            double imZ = ymax - j * dy;
+            double reZ = xmin + x * dx;
+            double imZ = ymax - y * dy;
             std::complex<double> z_n ( reZ, imZ );
 
             int iteracio = 0;
@@ -101,11 +101,11 @@ main ( int argc, char *argv[] )
                 }
             }
 
-            kep.set_pixel ( k, j,
+            kep.set_pixel ( x, y,
                             png::rgb_pixel ( (iteracio*20)%255, (iteracio*40)%255, (iteracio*60)%255 ));
         }
 
-        int szazalek = ( double ) j / ( double ) magassag * 100.0;
+        int szazalek = ( double ) y / ( double ) magassag * 100.0;
         std::cout << "\r" << szazalek << "%" << std::flush;
     }
 
