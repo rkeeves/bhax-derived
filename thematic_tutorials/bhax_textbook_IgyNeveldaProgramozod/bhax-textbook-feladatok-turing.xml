@@ -204,16 +204,80 @@ false]]></screen>
         <para>
             Megoldás forrása: <link xlink:href="https://gitlab.com/nbatfai/bhax/blob/master/attention_raising/Primek_R">https://gitlab.com/nbatfai/bhax/blob/master/attention_raising/Primek_R</link>
         </para>
+
         <para>
-            A Brun tétel azt mondja, hogy az ikerprímszámok reciprokaiból képzett összeg konvergens, ami azt jelenti, hogy ezek
-            a törtek összeadva egy határig mennek, ami határ számot B<subscript>2</subscript> Brun konstansnak neveznek. Persze ez
-            nem dönti el a több ezer éve nyitott kérdést, hogy az ikerprímszámok halmaza végtelen-e? Hiszen ha véges sok van és ezek
-            reciprokait összeadjuk, akkor ugyanúgy nem lépjük át a B<subscript>2</subscript> Brun konstans értékét, mintha végtelen 
-            sok lenne, de ezek már csak annyival járulnának hozzá a végtelen sor összegéhez, hogy így sem lépik át a Brun konstans értékét.     
+            A természetes számok építőelemei a prímszámok. Abban az értelemben, 
+            hogy minden természetes szám előállítható prímszámok szorzataként.
+            Például 12=2*2*3, vagy például 33=3*11.
+        </para>
+        <para>
+            Prímszám az a természetes szám, amely csak önmagával és eggyel 
+            osztható. Eukleidész görög matematikus már Krisztus előtt tudta, 
+            hogy végtelen sok prímszám van, de ma sem tudja senki, hogy 
+            végtelen sok ikerprím van-e. Két prím ikerprím, ha különbségük 2.
+        </para>
+        <para>
+            Két egymást követő páratlan prím között a legkisebb távolság a 2, 
+            a legnagyobb távolság viszont bármilyen nagy lehet! Ez utóbbit 
+            könnyű bebizonyítani. Legyen n egy tetszőlegesen nagy szám. 
+            Akkor szorozzuk össze n+1-ig a számokat, azaz számoljuk ki az 
+            1*2*3*… *(n-1)*n*(n+1) szorzatot, aminek a neve (n+1) faktoriális, 
+            jele (n+1)!.
+        </para>
+        <para>
+            Majd vizsgáljuk meg az a sorozatot:
+        </para>    
+        <para>
+            (n+1)!+2, (n+1)!+3,… , (n+1)!+n, (n+1)!+ (n+1) ez n db egymást követő azám, ezekre (a jól ismert
+            bizonyítás szerint) rendre igaz, hogy            
+        </para>    
+        <itemizedlist>
+            <listitem>
+                <para>(n+1)!+2=1*2*3*… *(n-1)*n*(n+1)+2, azaz 2*valamennyi+2, 2 többszöröse, így ami osztható kettővel</para>
+            </listitem>
+            <listitem>
+                <para>(n+1)!+3=1*2*3*… *(n-1)*n*(n+1)+3, azaz 3*valamennyi+3, ami osztható hárommal</para>
+            </listitem>
+            <listitem>
+                <para>...</para>
+            </listitem>
+            <listitem>
+                <para>(n+1)!+(n-1)=1*2*3*… *(n-1)*n*(n+1)+(n-1), azaz (n-1)*valamennyi+(n-1), ami osztható (n-1)-el</para>
+            </listitem>
+            <listitem>
+                <para>(n+1)!+n=1*2*3*… *(n-1)*n*(n+1)+n, azaz n*valamennyi+n-, ami osztható n-el</para>
+            </listitem>
+            <listitem>
+                <para>(n+1)!+(n+1)=1*2*3*… *(n-1)*n*(n+1)+(n-1), azaz (n+1)*valamennyi+(n+1), ami osztható (n+1)-el</para>
+            </listitem>
+        </itemizedlist>
+        <para>
+            tehát ebben a sorozatban egy prim nincs, akkor a (n+1)!+2-nél 
+            kisebb első prim és a (n+1)!+ (n+1)-nél nagyobb első 
+            prim között a távolság legalább n!            
+        </para>    
+        <para>
+            Az ikerprímszám sejtés azzal foglalkozik, amikor a prímek közötti 
+            távolság 2. Azt mondja, hogy az egymástól 2 távolságra lévő prímek
+            végtelen sokan vannak.
+        </para>    
+        <para>
+            A Brun tétel azt mondja, hogy az ikerprímszámok reciprokaiból képzett sor összege, azaz
+            a (1/3+1/5)+ (1/5+1/7)+ (1/11+1/13)+... véges vagy végtelen sor konvergens, ami azt jelenti, hogy ezek
+            a törtek összeadva egy határt adnak ki pontosan vagy azt át nem lépve növekednek, 
+            ami határ számot B<subscript>2</subscript> Brun konstansnak neveznek. Tehát ez
+            nem dönti el a több ezer éve nyitott kérdést, hogy az ikerprímszámok halmaza végtelen-e? 
+            Hiszen ha véges sok van és ezek
+            reciprokait összeadjuk, akkor ugyanúgy nem lépjük át a B<subscript>2</subscript> Brun konstans értékét, 
+            mintha végtelen 
+            sok lenne, de ezek már csak olyan csökkenő mértékben járulnának hozzá a végtelen sor összegéhez, 
+            hogy így sem lépnék át a Brun konstans értékét.     
         </para>
         <para>
             Ebben a példában egy olyan programot készítettünk, amely közelíteni próbálja a Brun konstans értékét.
-            A repó <filename>bhax/attention_raising/Primek_R/stp.r</filename> mevű állománya kiszámolja az ikerprímeket, összegzi
+            A repó <link xlink:href="../../../bhax/attention_raising/Primek_R/stp.r">
+                <filename>bhax/attention_raising/Primek_R/stp.r</filename>
+            </link> mevű állománya kiszámolja az ikerprímeket, összegzi
             a reciprokaikat és vizualizálja a kapott részeredményt.
         </para>
         <programlisting language="R">

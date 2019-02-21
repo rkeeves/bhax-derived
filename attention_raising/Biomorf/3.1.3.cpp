@@ -5,6 +5,7 @@
 // ./3.1.3 bmorf.png 800 800 10 -2 2 -2 2 .285 0 10
 // Nyomtatas:
 // a2ps 3.1.3.cpp -o 3.1.3.cpp.pdf -1 --line-numbers=1  --left-footer="BATF41 HAXOR STR34M" --right-footer="https://bhaxor.blog.hu/" --pro=color
+// ps2pdf 3.1.3.cpp.pdf 3.1.3.cpp.pdf.pdf
 // 
 // BHAX Biomorphs
 // Copyright (C) 2019
