@@ -254,7 +254,7 @@ false]]></screen>
         <para>
             tehát ebben a sorozatban egy prim nincs, akkor a (n+1)!+2-nél 
             kisebb első prim és a (n+1)!+ (n+1)-nél nagyobb első 
-            prim között a távolság legalább n!            
+            prim között a távolság legalább n.            
         </para>    
         <para>
             Az ikerprímszám sejtés azzal foglalkozik, amikor a prímek közötti 
