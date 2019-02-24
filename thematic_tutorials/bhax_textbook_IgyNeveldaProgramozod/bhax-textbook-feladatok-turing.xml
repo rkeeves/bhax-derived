@@ -17,9 +17,42 @@
         <para>
             Megoldás forrása:                
         </para>
+        <programlisting language="c"><![CDATA[int
+main ()
+{
+  for (;;);
+
+  return 0;
+}
+]]>
+        </programlisting>        
+        
+        <programlisting language="c"><![CDATA[]]>
+        </programlisting>        
+                
         <para>
-            Tanulságok, tapasztalatok, magyarázat...
+            Számos módon hozhatunk és hozunk létre végtelen ciklusokat. 
+            Vannak esetek, amikor ez a célunk, például egy szerverfolyamat fusson folyamatosan és van amikor egy
+            bug, mert ott lesz végtelen ciklus, ahol nem akartunk. Saját péláinkban ilyen amikor a PageRank algoritmus
+            rázza az 1 liter vizet az internetben, de az iteráció csak nem akar konvergálni...
         </para>            
+        <para>
+            Azért érdemes a for(;;) hagyományos formát használni, mert ez minden C szabvánnyal lefordul, másrészt
+            a többi programozó azonnal látja, hogy az a végtelen ciklus szándékunk szerint végtelen és nem szoftverhiba. 
+            Mert ugye, ha a while-al trükközünk egy nem triviális 1 vagy true feltétellel, akkor ott egy másik forrás
+            olvasó nem látja azonnal a szándékunkat.
+        </para>            
+        <para>
+            Egyébként a fordító a for-os és while-os ciklusból ugyanazt az assembly kódot fordítja:
+        </para>            
+            <screen><![CDATA[$ gcc -S -o infty-f.S infty-f.c 
+$ gcc -S -o infty-w.S infty-w.c 
+$ diff infty-w.S infty-f.S 
+1c1
+< 	.file	"infty-w.c"
+---
+> 	.file	"infty-f.c"
+]]></screen>  
     </section>        
         
     <section>
