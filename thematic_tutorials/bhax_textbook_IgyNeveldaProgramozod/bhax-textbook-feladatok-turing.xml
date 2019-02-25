@@ -12,10 +12,24 @@
             100 százalékban minden magot!
         </para>
         <para>
-            Megoldás videó:
+            Megoldás videó: <link xlink:href="https://youtu.be/lvmi6tyz-nI">https://youtu.be/lvmi6tyz-nI</link>
         </para>
         <para>
-            Megoldás forrása:                
+            Megoldás forrása: <link xlink:href="Turing/infty-f.c">
+                <filename>bhax/thematic_tutorials/bhax_textbook_IgyNeveldaProgramozod/Turing/infty-f.c</filename>
+            </link>, 
+            <link xlink:href="Turing/infty-w.c">
+                <filename>bhax/thematic_tutorials/bhax_textbook_IgyNeveldaProgramozod/Turing/infty-w.c</filename>
+            </link>.
+        </para>
+        <para>
+            Számos módon hozhatunk és hozunk létre végtelen ciklusokat. 
+            Vannak esetek, amikor ez a célunk, például egy szerverfolyamat fusson folyamatosan és van amikor egy
+            bug, mert ott lesz végtelen ciklus, ahol nem akartunk. Saját péláinkban ilyen amikor a PageRank algoritmus
+            rázza az 1 liter vizet az internetben, de az iteráció csak nem akar konvergálni...
+        </para>                    
+        <para>
+            Egy mag 100 százalékban:               
         </para>
         <programlisting language="c"><![CDATA[int
 main ()
@@ -26,26 +40,32 @@ main ()
 }
 ]]>
         </programlisting>        
-        
-        <programlisting language="c"><![CDATA[]]>
+        <para>        
+        vagy az olvashatóbb, de a programozók és fordítók (szabványok) között kevésbé hordozható
+        </para>
+        <programlisting language="c"><![CDATA[int
+#include <stdbool.h>
+main ()
+{
+  while(true);
+
+  return 0;
+}
+]]>
         </programlisting>        
-                
         <para>
-            Számos módon hozhatunk és hozunk létre végtelen ciklusokat. 
-            Vannak esetek, amikor ez a célunk, például egy szerverfolyamat fusson folyamatosan és van amikor egy
-            bug, mert ott lesz végtelen ciklus, ahol nem akartunk. Saját péláinkban ilyen amikor a PageRank algoritmus
-            rázza az 1 liter vizet az internetben, de az iteráció csak nem akar konvergálni...
-        </para>            
-        <para>
-            Azért érdemes a for(;;) hagyományos formát használni, mert ez minden C szabvánnyal lefordul, másrészt
+            Azért érdemes a <literal>for(;;)</literal> hagyományos formát használni, 
+            mert ez minden C szabvánnyal lefordul, másrészt
             a többi programozó azonnal látja, hogy az a végtelen ciklus szándékunk szerint végtelen és nem szoftverhiba. 
-            Mert ugye, ha a while-al trükközünk egy nem triviális 1 vagy true feltétellel, akkor ott egy másik forrás
-            olvasó nem látja azonnal a szándékunkat.
+            Mert ugye, ha a <literal>while</literal>-al trükközünk egy nem triviális 
+            <literal>1</literal> vagy <literal>true</literal> feltétellel, akkor ott egy másik, a forrást
+            olvasó programozó nem látja azonnal a szándékunkat.
         </para>            
         <para>
-            Egyébként a fordító a for-os és while-os ciklusból ugyanazt az assembly kódot fordítja:
+            Egyébként a fordító a <literal>for</literal>-os és 
+            <literal>while</literal>-os ciklusból ugyanazt az assembly kódot fordítja:
         </para>            
-            <screen><![CDATA[$ gcc -S -o infty-f.S infty-f.c 
+        <screen><![CDATA[$ gcc -S -o infty-f.S infty-f.c 
 $ gcc -S -o infty-w.S infty-w.c 
 $ diff infty-w.S infty-f.S 
 1c1
@@ -53,6 +73,67 @@ $ diff infty-w.S infty-f.S
 ---
 > 	.file	"infty-f.c"
 ]]></screen>  
+        <para>
+            Egy mag 0 százalékban:               
+        </para>        
+        <programlisting language="c"><![CDATA[#include <unistd.h>
+int
+main ()
+{
+  for (;;)
+    sleep(1);
+    
+  return 0;
+}
+]]>
+        </programlisting>        
+        <para>
+            Minden mag 100 százalékban:               
+        </para>
+
+        <programlisting language="c"><![CDATA[#include <omp.h>
+int
+main ()
+{
+#pragma omp parallel
+{
+  for (;;);
+}
+  return 0;
+}
+]]>
+        </programlisting>        
+        <para>
+            A <command>gcc infty-f.c -o infty-f -fopenmp</command> parancssorral készítve a futtathatót, majd futtatva,               
+            közben egy másik terminálban a <command>top</command> parancsot kiadva tanulmányozzuk, mennyi CPU-t használunk:            
+        </para>
+        <screen><![CDATA[top - 20:09:06 up  3:35,  1 user,  load average: 5,68, 2,91, 1,38
+Tasks: 329 total,   2 running, 256 sleeping,   0 stopped,   1 zombie
+%Cpu0  :100,0 us,  0,0 sy,  0,0 ni,  0,0 id,  0,0 wa,  0,0 hi,  0,0 si,  0,0 st
+%Cpu1  : 99,7 us,  0,3 sy,  0,0 ni,  0,0 id,  0,0 wa,  0,0 hi,  0,0 si,  0,0 st
+%Cpu2  :100,0 us,  0,0 sy,  0,0 ni,  0,0 id,  0,0 wa,  0,0 hi,  0,0 si,  0,0 st
+%Cpu3  : 99,7 us,  0,3 sy,  0,0 ni,  0,0 id,  0,0 wa,  0,0 hi,  0,0 si,  0,0 st
+%Cpu4  :100,0 us,  0,0 sy,  0,0 ni,  0,0 id,  0,0 wa,  0,0 hi,  0,0 si,  0,0 st
+%Cpu5  :100,0 us,  0,0 sy,  0,0 ni,  0,0 id,  0,0 wa,  0,0 hi,  0,0 si,  0,0 st
+%Cpu6  :100,0 us,  0,0 sy,  0,0 ni,  0,0 id,  0,0 wa,  0,0 hi,  0,0 si,  0,0 st
+%Cpu7  :100,0 us,  0,0 sy,  0,0 ni,  0,0 id,  0,0 wa,  0,0 hi,  0,0 si,  0,0 st
+KiB Mem : 16373532 total, 11701240 free,  2254256 used,  2418036 buff/cache
+KiB Swap: 16724988 total, 16724988 free,        0 used. 13751608 avail Mem 
+
+  PID USER      PR  NI    VIRT    RES    SHR S  %CPU %MEM     TIME+ COMMAND     
+ 5850 batfai    20   0   68360    932    836 R 798,3  0,0   8:14.23 infty-f     
+]]></screen>  
+                                
+        <tip>
+            <title>Werkfilm</title>
+            <itemizedlist>
+                <listitem>
+                    <para>
+                        <link xlink:href="https://youtu.be/lvmi6tyz-nI">https://youtu.be/lvmi6tyz-nI</link>
+                    </para>    
+                </listitem>                
+            </itemizedlist>                
+        </tip>
     </section>        
         
     <section>
