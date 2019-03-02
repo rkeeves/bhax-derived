@@ -13,15 +13,15 @@
         </info>
         <section>
             <title>Mi a programozás?</title>
-            <para>                  
-                          
+            <para>
+                Ne cifrázzuk: programok írása. Mik akkor a programok? Mit jelent az írásuk?
             </para>
         </section>
         <section>
             <title>Milyen doksikat olvassak el?</title>
             <itemizedlist>
                 <listitem>
-                    <para></para>                        
+                    <para>Kezd ezzel: <link xlink:href="http://esr.fsf.hu/hacker-howto.html">http://esr.fsf.hu/hacker-howto.html</link>!</para>                        
                 </listitem>
                 <listitem>
                     <para>Olvasgasd aztán a kézikönyv lapjait, kezd a <command>man man</command> parancs kiadásával. A C programozásban
@@ -48,7 +48,7 @@
                 </listitem>
                 <listitem>
                     <para>Az R kódok olvasása kis általános tapasztalat után automatikusan, erőfeszítés nélkül menni fog. 
-                        A Python nincs ennyire a spektrum végén, ezért ahhoz olvasd el a  
+                        A Python nincs ennyire a spektrum magától értetődő végén, ezért ahhoz olvasd el a  
                         <citation>BMECPP</citation> könyv - 20 oldalas gyorstalpaló részét.
                     </para>                        
                 </listitem>
@@ -61,6 +61,48 @@
                     <para>21 - Las Vegas ostroma, 
                         <link xlink:href="https://www.imdb.com/title/tt0478087/">https://www.imdb.com/title/tt0478087/</link>,
                         benne a <link xlink:href="#bhax-textbook-feladatok-turing.MontyHall">Monty Hall probléma</link> bemutatása.
+                    </para>                        
+                </listitem>
+                <listitem>
+                    <para>Kódjátszma, 
+                        <link xlink:href="https://www.imdb.com/title/tt2084970">https://www.imdb.com/title/tt2084970</link>,
+                        benne a <link xlink:href="#bhax-textbook-feladatok-caesar.EXOR-toro">kódtörő feladat</link> élménye.
+                    </para>                        
+                </listitem>
+                <listitem>
+                    <para>, 
+                        <link xlink:href=""></link>,
+                        benne a <link xlink:href="#"></link> bemutatása.
+                    </para>                        
+                </listitem>
+                <listitem>
+                    <para>, 
+                        <link xlink:href=""></link>,
+                        benne a <link xlink:href="#"></link> bemutatása.
+                    </para>                        
+                </listitem>
+                <listitem>
+                    <para>, 
+                        <link xlink:href=""></link>,
+                        benne a <link xlink:href="#"></link> bemutatása.
+                    </para>                        
+                </listitem>
+                <listitem>
+                    <para>, 
+                        <link xlink:href=""></link>,
+                        benne a <link xlink:href="#"></link> bemutatása.
+                    </para>                        
+                </listitem>
+                <listitem>
+                    <para>, 
+                        <link xlink:href=""></link>,
+                        benne a <link xlink:href="#"></link> bemutatása.
+                    </para>                        
+                </listitem>
+                <listitem>
+                    <para>, 
+                        <link xlink:href=""></link>,
+                        benne a <link xlink:href="#"></link> bemutatása.
                     </para>                        
                 </listitem>
             </itemizedlist> 

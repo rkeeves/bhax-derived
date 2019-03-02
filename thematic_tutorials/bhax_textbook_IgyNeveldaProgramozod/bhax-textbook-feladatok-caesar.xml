@@ -50,7 +50,7 @@
             Tanulságok, tapasztalatok, magyarázat...
         </para>            
     </section>        
-    <section>
+    <section xml:id="bhax-textbook-feladatok-caesar.EXOR-toro">
         <title>C EXOR törő</title>
         <para>
             Írj egy olyan C programot, amely megtöri az első feladatban előállított titkos szövegeket!
