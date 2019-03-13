@@ -11,10 +11,13 @@
             Írj olyan C programot, amely kiszámolja a Mandelbrot halmazt!     
         </para>
         <para>
-            Megoldás videó:
+            Megoldás videó: <link xlink:href="https://youtu.be/gvaqijHlRUs">https://youtu.be/gvaqijHlRUs</link>
         </para>
         <para>
             Megoldás forrása:                
+ <link xlink:href="../../../bhax/attention_raising/CUDA/mandelpngt.c++">
+                <filename>bhax/attention_raising/CUDA/mandelpngt.c++</filename>
+            </link> nevű állománya.            
         </para>
                 <figure>
             <title>A Mandelbrot halmaz a komplex síkon</title>
@@ -99,7 +102,7 @@
             Írj olyan C++ programot, amely kiszámolja a Mandelbrot halmazt!                     
         </para>
         <para>
-            Megoldás videó:
+            Megoldás videó: <link xlink:href="https://youtu.be/gvaqijHlRUs">https://youtu.be/gvaqijHlRUs</link>
         </para>
         <para>
             Megoldás forrása:                
@@ -108,7 +111,7 @@
 A <link xlink:href="#bhax-textbook-feladatok-mandelbrot.Mandelbrot">Mandelbrot halmaz</link> pontban vázolt
 ismert algoritmust valósítja meg a repó <link xlink:href="../../../bhax/attention_raising/Mandelbrot/3.1.2.cpp">
                 <filename>bhax/attention_raising/Mandelbrot/3.1.2.cpp</filename>
-            </link> mevű állománya.
+            </link> nevű állománya.
         </para>
         
         <programlisting language="c++">
@@ -427,10 +430,13 @@ main ( int argc, char *argv[] )
         <para>
         </para>
         <para>
-            Megoldás videó: 
+            Megoldás videó: <link xlink:href="https://youtu.be/gvaqijHlRUs">https://youtu.be/gvaqijHlRUs</link>
         </para>
         <para>
-            Megoldás forrása:  
+            Megoldás forrása:                
+ <link xlink:href="../../../bhax/attention_raising/CUDA/mandelpngc_60x60_100.cu">
+                <filename>bhax/attention_raising/CUDA/mandelpngc_60x60_100.cu</filename>
+            </link> nevű állománya.            
         </para>
     </section>                     
 
@@ -440,22 +446,23 @@ main ( int argc, char *argv[] )
             Építs GUI-t a Mandelbrot algoritmusra, lehessen egérrel nagyítani egy területet, illetve egy pontot
             egérrel kiválasztva vizualizálja onnan a komplex iteréció bejárta z<subscript>n</subscript> komplex számokat!
         </para>
-            
         <para>
-            Megoldás forrása:  
-        </para>
-
-        <para>
-            Megoldás videó: 
+            Megoldás videó: <link xlink:href=""></link>
         </para>
         <para>
-            Megoldás forrása:  
+            Megoldás forrása: <link xlink:href=""></link>
         </para>
     </section>                     
                                                                                                                                                                             
     <section>
         <title>Mandelbrot nagyító és utazó Java nyelven</title>
         <para>
+        </para>
+        <para>
+            Megoldás videó: <link xlink:href=""></link>
+        </para>
+        <para>
+            Megoldás forrása: <link xlink:href="https://www.tankonyvtar.hu/hu/tartalom/tkt/javat-tanitok-javat/apbs02.html#id570518">https://www.tankonyvtar.hu/hu/tartalom/tkt/javat-tanitok-javat/apbs02.html#id570518</link>
         </para>
     </section>
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         
