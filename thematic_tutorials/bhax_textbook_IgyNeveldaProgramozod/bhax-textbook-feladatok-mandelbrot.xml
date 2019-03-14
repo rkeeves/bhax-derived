@@ -236,7 +236,9 @@ main ( int argc, char *argv[] )
             Megoldás forrása: <link xlink:href="https://gitlab.com/nbatfai/bhax/tree/master/attention_raising/Biomorf">https://gitlab.com/nbatfai/bhax/tree/master/attention_raising/Biomorf</link>
         </para>
         <para>
-            Történeti háttér... 2 mondat.
+            A biomorfokra (a Julia halmazokat rajzoló bug-os programjával) 
+            rátaláló Clifford Pickover azt hitte természeti törvényre 
+            bukkant: <link xlink:href="https://www.emis.de/journals/TJNSA/includes/files/articles/Vol9_Iss5_2305--2315_Biomorphs_via_modified_iterations.pdf">https://www.emis.de/journals/TJNSA/includes/files/articles/Vol9_Iss5_2305--2315_Biomorphs_via_modified_iterations.pdf</link> (lásd a 2307. oldal aljától).
         </para>       
         <para>
             A különbség a <link xlink:href="#bhax-textbook-feladatok-mandelbrot.Mandelbrot">Mandelbrot halmaz</link>
@@ -448,7 +450,7 @@ main ( int argc, char *argv[] )
         </para>
         <para>
             Megoldás videó: <link xlink:href=""></link>
-        </para>
+            Illetve <link xlink:href="https://bhaxor.blog.hu/2018/09/02/ismerkedes_a_mandelbrot_halmazzal">https://bhaxor.blog.hu/2018/09/02/ismerkedes_a_mandelbrot_halmazzal</link>.        </para>
         <para>
             Megoldás forrása: <link xlink:href=""></link>
         </para>
@@ -459,7 +461,8 @@ main ( int argc, char *argv[] )
         <para>
         </para>
         <para>
-            Megoldás videó: <link xlink:href=""></link>
+            Megoldás videó: <link xlink:href="https://youtu.be/Ui3B6IJnssY">https://youtu.be/Ui3B6IJnssY</link>, 4:27-től.
+            Illetve <link xlink:href="https://bhaxor.blog.hu/2018/09/02/ismerkedes_a_mandelbrot_halmazzal">https://bhaxor.blog.hu/2018/09/02/ismerkedes_a_mandelbrot_halmazzal</link>.
         </para>
         <para>
             Megoldás forrása: <link xlink:href="https://www.tankonyvtar.hu/hu/tartalom/tkt/javat-tanitok-javat/apbs02.html#id570518">https://www.tankonyvtar.hu/hu/tartalom/tkt/javat-tanitok-javat/apbs02.html#id570518</link>
