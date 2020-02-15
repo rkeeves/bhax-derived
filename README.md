@@ -1,6 +1,12 @@
 # BHAX
 
-A BHAX csatorna forráskódjai. 
-(Élő adások: https://www.twitch.tv/nbatfai, archívum: https://www.youtube.com/c/nbatfai)
-A csatorna célja a szervezett számítógépes játék és a programozás népszerűsítése, tanítása, különös tekintettel a mesterséges intelligenciára! 
-Hosszabb távon utánpótlás esport csapatok szervezésének tartalmi támogatása. 
+## History
+
+This repo is part of de-pti curriculum and was forked from https://gitlab.com/nbatfai/bhax.git
+If you want to know more about the source, feel free to check out:
+- (Live Twitch Streams)[https://www.twitch.tv/nbatfai]
+- (YT Archives)[https://www.youtube.com/c/nbatfai]
+
+## Goal
+
+Goal of this project to created a custom derivation of bhax.
