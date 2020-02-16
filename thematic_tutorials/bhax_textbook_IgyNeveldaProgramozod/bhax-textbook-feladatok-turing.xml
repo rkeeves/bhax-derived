@@ -8,50 +8,46 @@
     <section>
         <title>Végtelen ciklus</title>
         <para>
-            Írj olyan C végtelen ciklusokat, amelyek 0 illetve 100 százalékban dolgoztatnak egy magot és egy olyat, amely  
+            Írj olyan C <link xlink:href="https://youtu.be/hQCG2AwzTxA">végtelen ciklusokat</link>, amelyek 0 illetve 100 százalékban dolgoztatnak egy magot és egy olyat, amely  
             100 százalékban minden magot!
         </para>
         <para>
-            Megoldás videó: <link xlink:href="https://youtu.be/lvmi6tyz-nI">https://youtu.be/lvmi6tyz-nI</link>
+            Megoldás videó: <link xlink:href="">No link</link>
         </para>
         <para>
-            Megoldás forrása: <link xlink:href="Turing/infty-f.c">
-                <filename>bhax/thematic_tutorials/bhax_textbook_IgyNeveldaProgramozod/Turing/infty-f.c</filename>
-            </link>, 
-            <link xlink:href="Turing/infty-w.c">
-                <filename>bhax/thematic_tutorials/bhax_textbook_IgyNeveldaProgramozod/Turing/infty-w.c</filename>
-            </link>.
+            Megoldás forrása:
+            <itemizedlist>
+              <listitem>
+                <para><link xlink:href="">Basic For infinite</link></para>                     
+              </listitem>
+              <listitem>
+                <para><link xlink:href="">For sleep with Torvalds</link></para>
+              </listitem>
+              <listitem>
+                <para><link xlink:href="">While infinite</link></para>
+              </listitem>
+              <listitem>
+                <para><link xlink:href="">For sleep with both Torvalds and a greedy company</link></para>
+              </listitem>
+            </itemizedlist>
         </para>
         <para>
             Számos módon hozhatunk és hozunk létre végtelen ciklusokat. 
             Vannak esetek, amikor ez a célunk, például egy szerverfolyamat fusson folyamatosan és van amikor egy
-            bug, mert ott lesz végtelen ciklus, ahol nem akartunk. Saját péláinkban ilyen amikor a PageRank algoritmus
+            bug, mert ott lesz végtelen ciklus, ahol nem akartunk. Saját péláinkban ilyen amikor a <link xlink:href="https://youtu.be/WfbTbPEEJxI?t=9971">PageRank algoritmus</link> 
             rázza az 1 liter vizet az internetben, de az iteráció csak nem akar konvergálni...
         </para>                    
         <para>
             Egy mag 100 százalékban:               
         </para>
-        <programlisting language="c"><![CDATA[int
-main ()
-{
-  for (;;);
-
-  return 0;
-}
-]]>
-        </programlisting>        
+        <programlisting language="c" linenumbering="numbered">
+          <textobject><textdata fileref="Turing/thefor.c"/></textobject>
+        </programlisting>   
         <para>        
         vagy az olvashatóbb, de a programozók és fordítók (szabványok) között kevésbé hordozható
         </para>
-        <programlisting language="c"><![CDATA[int
-#include <stdbool.h>
-main ()
-{
-  while(true);
-
-  return 0;
-}
-]]>
+        <programlisting language="c" linenumbering="numbered">
+          <textobject><textdata fileref="Turing/infty-f_torvalds.c"/></textobject>
         </programlisting>        
         <para>
             Azért érdemes a <literal>for(;;)</literal> hagyományos formát használni, 
@@ -60,256 +56,293 @@ main ()
             Mert ugye, ha a <literal>while</literal>-al trükközünk egy nem triviális 
             <literal>1</literal> vagy <literal>true</literal> feltétellel, akkor ott egy másik, a forrást
             olvasó programozó nem látja azonnal a szándékunkat.
-        </para>            
+        </para>                        
         <para>
-            Egyébként a fordító a <literal>for</literal>-os és 
-            <literal>while</literal>-os ciklusból ugyanazt az assembly kódot fordítja:
-        </para>            
-        <screen><![CDATA[$ gcc -S -o infty-f.S infty-f.c 
-$ gcc -S -o infty-w.S infty-w.c 
-$ diff infty-w.S infty-f.S 
-1c1
-< 	.file	"infty-w.c"
----
-> 	.file	"infty-f.c"
-]]></screen>  
-        <para>
-            Egy mag 0 százalékban:               
+            OS independens             
         </para>        
-        <programlisting language="c"><![CDATA[#include <unistd.h>
-int
-main ()
-{
-  for (;;)
-    sleep(1);
-    
-  return 0;
-}
-]]>
+        <programlisting language="c" linenumbering="numbered">
+          <textobject><textdata fileref="Turing/infty-w.c"/></textobject>
+        </programlisting>         
+        <para>
+            OS dependens-re példa, hisz a sleep rendszerhívás.    
+        </para>
+        <programlisting language="c" linenumbering="numbered">
+          <textobject><textdata fileref="Turing/infty-f.c"/></textobject>
         </programlisting>        
         <para>
-            Minden mag 100 százalékban:               
-        </para>
-
-        <programlisting language="c"><![CDATA[#include <omp.h>
-int
-main ()
-{
-#pragma omp parallel
-{
-  for (;;);
-}
-  return 0;
-}
-]]>
-        </programlisting>        
-        <para>
-            A <command>gcc infty-f.c -o infty-f -fopenmp</command> parancssorral készítve a futtathatót, majd futtatva,               
-            közben egy másik terminálban a <command>top</command> parancsot kiadva tanulmányozzuk, mennyi CPU-t használunk:            
-        </para>
-        <screen><![CDATA[top - 20:09:06 up  3:35,  1 user,  load average: 5,68, 2,91, 1,38
-Tasks: 329 total,   2 running, 256 sleeping,   0 stopped,   1 zombie
-%Cpu0 :100,0 us, 0,0 sy, 0,0 ni, 0,0 id, 0,0 wa, 0,0 hi, 0,0 si, 0,0 st
-%Cpu1 : 99,7 us, 0,3 sy, 0,0 ni, 0,0 id, 0,0 wa, 0,0 hi, 0,0 si, 0,0 st
-%Cpu2 :100,0 us, 0,0 sy, 0,0 ni, 0,0 id, 0,0 wa, 0,0 hi, 0,0 si, 0,0 st
-%Cpu3 : 99,7 us, 0,3 sy, 0,0 ni, 0,0 id, 0,0 wa, 0,0 hi, 0,0 si, 0,0 st
-%Cpu4 :100,0 us, 0,0 sy, 0,0 ni, 0,0 id, 0,0 wa, 0,0 hi, 0,0 si, 0,0 st
-%Cpu5 :100,0 us, 0,0 sy, 0,0 ni, 0,0 id, 0,0 wa, 0,0 hi, 0,0 si, 0,0 st
-%Cpu6 :100,0 us, 0,0 sy, 0,0 ni, 0,0 id, 0,0 wa, 0,0 hi, 0,0 si, 0,0 st
-%Cpu7 :100,0 us, 0,0 sy, 0,0 ni, 0,0 id, 0,0 wa, 0,0 hi, 0,0 si, 0,0 st
-KiB Mem :16373532 total,11701240 free, 2254256 used, 2418036 buff/cache
-KiB Swap:16724988 total,16724988 free,       0 used. 13751608 avail Mem 
-
-  PID USER      PR  NI    VIRT    RES    SHR S  %CPU %MEM     TIME+ COMMAND     
- 5850 batfai    20   0   68360    932    836 R 798,3  0,0   8:14.23 infty-f     
-]]></screen>  
-                                
-        <tip>
-            <title>Werkfilm</title>
-            <itemizedlist>
-                <listitem>
-                    <para>
-                        <link xlink:href="https://youtu.be/lvmi6tyz-nI">https://youtu.be/lvmi6tyz-nI</link>
-                    </para>    
-                </listitem>                
-            </itemizedlist>                
-        </tip>
-    </section>        
-        
-    <section>
-        <title>Lefagyott, nem fagyott, akkor most mi van?</title>
-        <para>
-            Mutasd meg, hogy nem lehet olyan programot írni, amely bármely más programról eldönti, hogy le fog-e fagyni vagy sem!
+          Egyébként a <literal>gcc</literal> mellé betudunk passzolni flageket. Például <literal>-DALMA</literal>-val gyakorlatilag azt mondjuk a preprocesszornak, hogy vegye úgy mintha <literal>#define ALMA</literal>.
+          Ez pontosan annyira szép mint amennyire elegáns, de ez van.
         </para>
         <para>
-            Megoldás videó:
+            Ha belenézel az STL-be, akkor az is tele lesz ilyenekkel, hisz különböző OS-ekkel kell tudni használni, és a rendszerhívások átlalában eltérőek.
+            Egyébként ha valami IDE-vel dolgozol, ott gyakran még szépen be is szürkíti azokat a részeket a kódban amelyeket ki fog hagyni.
+            Itt semmi mágia nem történik, hanem simán nem a forráskódod megy a compiler-nek, hanem előtte van egy preprocesszor, ami feldolgozza ezeket az utasításokat.
+            Makrók ugyanilyenek. Tehát nem runtime kiértékelhető az <literal>#ifdef</literal> hanem egy utasítás a preprocesszornak.
+            Leggyakrabban <literal>#ifdef</literal>-el header guard-ként fogsz találkozni (vele kb. ekvivalens a nem mindenhol támogatott <literal>#pragma once</literal>).
         </para>
-        <para>
-            Megoldás forrása:  tegyük fel, hogy akkora haxorok vagyunk, hogy meg tudjuk írni a <function>Lefagy</function>
-            függvényt, amely tetszőleges programról el tudja dönteni, hogy van-e benne vlgtelen ciklus:              
-        </para>
-        <programlisting language="c"><![CDATA[Program T100
-{
-
-	boolean Lefagy(Program P)
-	{
-		 if(P-ben van végtelen ciklus)
-			return true;
-		 else
-			return false; 
-	}
-
-	main(Input Q)
-	{
-		Lefagy(Q)
-	}
-}]]></programlisting>            
-        <para>
-            A program futtatása, például akár az előző <filename>v.c</filename> ilyen pszeudókódjára:
-            <screen><![CDATA[T100(t.c.pseudo)
+    </section>
+      <section>
+      <title>Lefagyott, nem fagyott, akkor most mi van?</title>
+      <para>
+          Mutasd meg, hogy nem lehet olyan programot írni, amely bármely más programról eldönti, hogy le fog-e fagyni vagy sem!
+      </para>
+      <para>
+          Megoldás videó: <link xlink:href="">No link</link>
+      </para>
+      <para>
+          Megoldás forrása:
+          <itemizedlist>
+              <listitem>
+                <para><link xlink:href="">Turing 100 (pseudocode)</link></para>
+              </listitem>
+              <listitem>
+                <para><link xlink:href="">Turing 1000 (pseudocode)</link></para>
+              </listitem>
+          </itemizedlist>
+      </para>
+      <para>
+          Tegyük fel, hogy akkora haxorok vagyunk, hogy meg tudjuk írni a <function>Lefagy</function>
+          függvényt, amely tetszőleges programról el tudja dönteni, hogy van-e benne végtelen ciklus:              
+      </para>
+      <programlisting language="c" linenumbering="numbered">
+        <textobject><textdata fileref="Turing/t100.c"/></textobject>
+      </programlisting>           
+      <para>
+          A program futtatása, például akár az előző <filename>v.c</filename> ilyen pszeudókódjára:
+          <screen><![CDATA[T100(t.c.pseudo)
 true]]></screen>            
-            akár önmagára
-            <screen><![CDATA[T100(T100)
+          akár önmagára
+          <screen><![CDATA[T100(T100)
 false]]></screen>  
-            ezt a kimenetet adja.          
-        </para>
-        <para>
-            A T100-as programot felhasználva készítsük most el az alábbi T1000-set, amelyben a
-            Lefagy-ra épőlő Lefagy2 már nem tartalmaz feltételezett, csak csak konkrét kódot:
-        </para>
-        <programlisting language="c"><![CDATA[Program T1000
-{
-
-	boolean Lefagy(Program P)
-	{
-		 if(P-ben van végtelen ciklus)
-			return true;
-		 else
-			return false; 
-	}
-
-	boolean Lefagy2(Program P)
-	{
-		 if(Lefagy(P))
-			return true;
-		 else
-			for(;;); 
-	}
-
-	main(Input Q)
-	{
-		Lefagy2(Q)
-	}
-
-}]]></programlisting>            
-        <programlisting><![CDATA[]]></programlisting>            
-        <para>
-            Mit for kiírni erre a <computeroutput>T1000(T1000)</computeroutput> futtatásra?
-                                
-            <itemizedlist>
-                <listitem>
-                    <para>Ha T1000 lefagyó, akkor nem fog lefagyni, kiírja, hogy true</para>                        
-                </listitem>
-                <listitem>
-                    <para>Ha T1000 nem fagyó, akkor pedig le fog fagyni...</para>                        
-                </listitem>
-            </itemizedlist>
-            akkor most hogy fog működni? Sehogy, mert ilyen <function>Lefagy</function>
-            függvényt, azaz a T100 program nem is létezik.                
-        </para>
-        <para>
-            Tanulságok, tapasztalatok, magyarázat...
-        </para>
-    </section>        
-                
-    <section>
-        <title>Változók értékének felcserélése</title>
-        <para>
-            Írj olyan C programot, amely felcseréli két változó értékét, bármiféle logikai utasítás vagy kifejezés
-            nasználata nélkül!
-        </para>
-        <para>
-            Megoldás videó: <link xlink:href="https://bhaxor.blog.hu/2018/08/28/10_begin_goto_20_avagy_elindulunk">https://bhaxor.blog.hu/2018/08/28/10_begin_goto_20_avagy_elindulunk</link>
-        </para>
-        <para>
-            Megoldás forrása:  
-        </para>
-        <para>
-            Tanulságok, tapasztalatok, magyarázat...
-        </para>
-    </section>                     
-
-    <section>
-        <title>Labdapattogás</title>
-        <para>
-            Először if-ekkel, majd bármiféle logikai utasítás vagy kifejezés
-            nasználata nélkül írj egy olyan programot, ami egy labdát pattogtat a karakteres konzolon! (Hogy mit értek
-            pattogtatás alatt, alább láthatod a videókon.)
-        </para>
-        <para>
-            Megoldás videó: <link xlink:href="https://bhaxor.blog.hu/2018/08/28/labdapattogas">https://bhaxor.blog.hu/2018/08/28/labdapattogas</link>
-        </para>
-        <para>
-            Megoldás forrása:  
-        </para>
-        <para>
-            Tanulságok, tapasztalatok, magyarázat...
-        </para>
-    </section>                     
-
-    <section>
-        <title>Szóhossz és a Linus Torvalds féle BogoMIPS</title>
-        <para>
-            Írj egy programot, ami megnézi, hogy hány bites a szó a gépeden, azaz mekkora az <type>int</type> mérete.
-            Használd ugyanazt a while ciklus fejet, amit Linus Torvalds a BogoMIPS rutinjában! 
-        </para>
-        <para>
-            Megoldás videó: <link xlink:href="https://youtu.be/9KnMqrkj_kU">https://youtu.be/9KnMqrkj_kU</link>, 
-            <link xlink:href="https://youtu.be/KRZlt1ZJ3qk">https://youtu.be/KRZlt1ZJ3qk</link>, 
-            <link xlink:href=""></link>.
-        </para>
-        <para>
-            Megoldás forrása: <link xlink:href="Turing/bogomips.c">
-                <filename>bhax/thematic_tutorials/bhax_textbook_IgyNeveldaProgramozod/Turing/bogomips.c</filename>
-            </link>
-        </para>
-        <para>
-            Tanulságok, tapasztalatok, magyarázat... 
-        </para>
-    </section>                     
-
-    <section>
-        <title>Helló, Google!</title>
-        <para>
-            Írj olyan C programot, amely egy 4 honlapból álló hálózatra kiszámolja a négy lap Page-Rank 
-            értékét!
-        </para>
-        <para>
-            Megoldás videó: <link xlink:href=""></link>
-        </para>
-        <para>
-            Megoldás forrása: <link xlink:href=""></link>
-        </para>
-        <para>
-            Tanulságok, tapasztalatok, magyarázat...
-        </para>
-    </section>
-                                                                                                                                                                                                                                                                                                                                                        
-    <section xml:id="bhax-textbook-feladatok-turing.MontyHall">
-        <title>A Monty Hall probléma</title>
-        <para>
-            Írj R szimulációt a Monty Hall problémára!
-        </para>
-        <para>
-            Megoldás videó: <link xlink:href="https://bhaxor.blog.hu/2019/01/03/erdos_pal_mit_keresett_a_nagykonyvben_a_monty_hall-paradoxon_kapcsan">https://bhaxor.blog.hu/2019/01/03/erdos_pal_mit_keresett_a_nagykonyvben_a_monty_hall-paradoxon_kapcsan</link>
-        </para>
-        <para>
-            Megoldás forrása: <link xlink:href="https://gitlab.com/nbatfai/bhax/tree/master/attention_raising/MontyHall_R">https://gitlab.com/nbatfai/bhax/tree/master/attention_raising/MontyHall_R</link>
-        </para>
-        <para>
-            Tanulságok, tapasztalatok, magyarázat...
-        </para>
-    </section>
+          ezt a kimenetet adja.          
+      </para>
+      <para>
+          A T100-as programot felhasználva készítsük most el az alábbi T1000-set, amelyben a
+          Lefagy-ra épőlő Lefagy2 már nem tartalmaz feltételezett, csak csak konkrét kódot:
+      </para>
+      <programlisting language="c" linenumbering="numbered">
+        <textobject><textdata fileref="Turing/t1000.c"/></textobject>
+      </programlisting>                     
+      <para>
+        Mit for kiírni erre a <computeroutput>T1000(T1000)</computeroutput> futtatásra?
+                            
+        <itemizedlist>
+            <listitem>
+                <para>Ha T1000 lefagyó, akkor nem fog lefagyni, kiírja, hogy true</para>                        
+            </listitem>
+            <listitem>
+                <para>Ha T1000 nem fagyó, akkor pedig le fog fagyni...</para>                        
+            </listitem>
+        </itemizedlist>
+        akkor most hogy fog működni? Sehogy, mert ilyen <function>Lefagy</function>
+        függvényt, azaz a T100 program nem is létezik.                
+      </para>
+      <para>
+        Szerintem Tanár Úr leírása tök jó volt. Nincs szívem hozzányúlni.
+        Mivel technikailag nem lehet többet hozzárakni, ezért inkább egy kis kulturális plusz:
+        A borbély az aki azok haját vágja, akik nem teszik meg ezt saját maguknak.
+        De a borbély vágja-e a saját haját?
+        Nos, tegyük fel levágja:
+        Ebben az esetben ő levágta a haját egy olyan embernek aki egyébként ezt megteszi saját magának.
+        Ok, tegyük fel nem vágja:
+        Viszont ebben az esetben nem vágja a saját haját, aka lehetne a saját ügyfele, viszont ha most levágja akkor kezdődik az egész elölről <link xlink:href="https://en.wikipedia.org/wiki/Russell%27s_paradox">Russel's paradox</link>.
+      </para>
+  </section>            
+  <section>
+    <title>Változók értékének felcserélése</title>
+    <para>
+      Írj olyan C programot, amely felcseréli két változó értékét, bármiféle logikai utasítás vagy kifejezés
+      használata nélkül!
+    </para>
+    <para>
+      Megoldás videó: <link xlink:href="">No Link</link>
+    </para>
+    <para>
+      Megoldás forrása:
+      <itemizedlist>
+      <listitem>
+        <para><link xlink:href="">Swap XOR</link></para>
+      </listitem>
+      <listitem>
+        <para><link xlink:href="">Swap Subtract</link></para>
+      </listitem>
+      <listitem>
+        <para><link xlink:href="">Swap Multiplication</link></para>
+      </listitem>
+      <listitem>
+        <para><link xlink:href="">Swap Ptr</link></para>                   
+      </listitem>
+    </itemizedlist>
+    </para>
+    <para>
+        Több megoldási lehetőség is van, ezeket fogjuk a következő bekezdésekben bemutatni.
+    </para>
+    <para>
+        Swap by bitwise xor
+    </para>
+    <programlisting language="c" linenumbering="numbered">
+      <textobject><textdata fileref="Turing/swap_xor.cpp"/></textobject>
+    </programlisting>  
+    <para>
+        Swap by subtraction
+    </para>
+    <programlisting language="c" linenumbering="numbered">
+      <textobject><textdata fileref="Turing/swap_subtract.cpp"/></textobject>
+    </programlisting>  
+    <para>
+        Swap by multiplication
+    </para>
+    <programlisting language="c" linenumbering="numbered">
+      <textobject><textdata fileref="Turing/swap_mult.cpp"/></textobject>
+    </programlisting>  
+    <para>
+        Ez az utolsó csak egy picit behozza a pointer-eket a képbe.
+        Ezekkel ha még nem értjük mi van, ne aggódjunk.
+        Minden pointert érdemes egy címként felfogni.
+        Azaz ha létezik egy int változónk foo néven akkor foo-nak van ugye egy értéke, illetve egy címe.
+        A cím az amit a ptr megtestesít (na jó nem, de most így elég...).
+        Természetesen funckiókra is mutathatunk.
+        Sőt, ha már valaha láttunk C kódot, akkor valószínűleg belefutottunk már callback-ekbe stb.
+        Aka akár funkciókat és bepasszolhatunk funkciókba.
+        <link xlink:href="https://youtu.be/MFUgDYwyC2s?t=60">Ez egy totál handy dolog, biztos nem lesz rossz vége!</link>
+    </para>
+    <programlisting language="c" linenumbering="numbered">
+      <textobject><textdata fileref="Turing/swap_ptr.cpp"/></textobject>
+    </programlisting>  
+  </section>                     
+  <section>
+    <title>Labdapattogás</title>
+    <para>
+        Először if-ekkel, majd bármiféle logikai utasítás vagy kifejezés
+        nasználata nélkül írj egy olyan programot, ami egy labdát pattogtat a karakteres konzolon! Nem írhatsz hozzá DLC-t, és ne legyen benne lootbox, mert nem ez EA vagyunk.
+    </para>
+    <para>
+        Megoldás videó: <link xlink:href=""></link>
+    </para>
+    <para>
+        Megoldás forrása:
+        <itemizedlist>
+          <listitem>
+              <para><link xlink:href="">Necessary header for terminal manip</link></para>
+          </listitem>
+          <listitem>
+              <para><link xlink:href="">Ball C</link></para>
+          </listitem>
+        </itemizedlist>
+    </para>
+    <para>
+        Ennek a feladatnak az volt a lényege, hogy megismertessen low level trükkökkel.
+        Természetesen ez minket totál hidegen hagy. Úgyhogy inkább nézzük meg, hogy például egy játék-ot hogyan lehet passzív adatsruktúrákkal felépíteni.
+        Alább található egy link egy manapság erősen hype-olt programtervezési módra (Pl.: Unity is hasonló)
+        <link xlink:href="https://github.com/alecthomas/entityx">Entity Component System C++</link>. Egyébként ha belenézel és valami nagyon nincs rendben <link xlink:href="https://en.wikipedia.org/wiki/Curiously_recurring_template_pattern">a template super definíciójával</link>, nos hát igen.
+    </para>
+    <para>
+      Az egész feladat self-explanatory, úgyhogy inkább nézz rá <link xlink:href="https://github.com/ikalnytskyi/termcolor">erre</link>. Ez egy pici header only project OS independens terminál szín kezelésre. Huzzah!
+    </para>
+    <programlisting language="c" linenumbering="numbered">
+      <textobject><textdata fileref="Turing/ball.c"/></textobject>
+    </programlisting>  
+  </section>                     
+  <section>
+    <title>Szóhossz és a Linus Torvalds féle BogoMIPS</title>
+    <para>
+        Írj egy programot, ami megnézi, hogy hány bites a szó a gépeden, azaz mekkora az <type>int</type> mérete.
+        Használd ugyanazt a while ciklus fejet, amit Linus Torvalds a BogoMIPS rutinjában! 
+    </para>
+    <para>
+        Megoldás videó: <link xlink:href="https://youtu.be/9KnMqrkj_kU">https://youtu.be/9KnMqrkj_kU</link>, 
+        <link xlink:href="https://youtu.be/KRZlt1ZJ3qk">https://youtu.be/KRZlt1ZJ3qk</link>, 
+        <link xlink:href=""></link>.
+    </para>
+    <para>
+        Megoldás forrása: <link xlink:href="Turing/bogomips.c">
+            <filename>bhax/thematic_tutorials/bhax_textbook_IgyNeveldaProgramozod/Turing/bogomips.c</filename>
+        </link>
+    </para>
+    <para>
+      TLDR: Örülj, hogy nagyon elhivatott csajok/srácok/semlegestöbbesszám tervezik a hardware-t, és ha egyszer össze futsz ilyennel hívd meg egy kávéra(én legalábbis biztos megfogom)!
+      Ha valakinek van gyereke, vagy gyerek ismerőse és ezt az egészet játékosan akarja neki elmagyarázni akkor van egy szuper aranyos kis könyv ami mellé adnak ingyen progikat és a nullából építhet otthon egy pici számítógépet kapuktól tetris játékig bezárólag. <link xlink:href="https://www.nand2tetris.org/">Ez az</link>
+   </para>
+    <para>
+        Szóhossz alatt a gépi szavak hosszát értjük.
+        Mi ez az egész gépi szó dolog?
+        Túlzott részletezés nélkül a következő. A gépünk logikai kapukból épül fel (meg még sok másból). Röviden ezek egy "bit" műveletre képesek. Ha pl. 8 "bit"-et akarunk egyszerre kezelni, akkor egy bites kapukból összelehet legózni.
+        Ezek a "kábelhágcsók" a valóságban nem kábelek, és "belevannak égetve" a "vasba". A kapuk is "belevannak égetve" a "vasba".
+        Azaz az, hogy egy menetben max mennyi kábelnyit tudunk kezelni a gyártott gép specialitása.
+        Egy mittudomén 5 bit-es gépet azért (sem) lehet upgrade-elni 2020 bit-essé, mert a "beégetett kábelhágcsó"-k száma 5, és pont, vége a mondatnak.
+        A szó egy picit más. A lényeg hogy a proci-ba ha küldünk mondjuk 01101-t, akkor ez valójában mi?
+        Nos intel stb. gyártótól eltérő, de pl. a mi gagyi esetünkben legyen a következő szabály:
+        Az első bit ha 0 akkor robbanjon fel a gép. Ha az első bit 1, akkor a többi bit által reprezentált idő múlva robbanjon fel.
+        Azaz 01101-re felrobban egyből, 10001-re pedig egy másodperc múlva robban fel.
+    </para>
+    <para>
+        Változtassunk a specifikáción, lesz a procinak egy regisztere:
+        Ha az első bit 0 akkor olvassunk a többi négy bit által megadott ram címről és tegyük be a regiszterbe.
+        Ha az első bit 1 akkor írjunk a többi négy bit által megadott ram címre azt ami jelenleg a regiszterben van.
+        Hát...ez így nem frankó, hiszen annak ellenére, hogy a gépünk technikailag képes lenne 5bites címek kezelésére, az instrukciók miatt nem lehet.
+        Szóval, blablabla emiatt van double word stb. de most abba ne menjünk bele hogy az Intel miért okozta a Spectre-t, Meltdown-t stb. (tippecske: évről évre egyre többet várt tőlük a piac, ők meg - mint jó kapitalista - csaltak és cache-be raktak olyat is ami nem biztos hogy kellett a kódnak, pl.: conditionaltől függetlenül két ágát kicsit előre számítani. Végeredményt lehetett látni a híradóban.).
+    </para>
+  </section>                     
+  <section>
+    <title>Helló, Google!</title>
+    <para>
+        Írj olyan C programot, amely egy több milliárd(haha ne ne...elég lesz kevesebb srsly) honlapból álló hálózatra kiszámolja az N lap Page-Rank 
+        értékét, és <link xlink:href="https://youtu.be/WfbTbPEEJxI?t=9971">nem lesz belőle baj egy szenátusi kihallgatáson</link>!
+    </para>
+    <para>
+        Megoldás videó: <link xlink:href=""></link>
+    </para>
+    <para>
+        Megoldás forrása:
+        <itemizedlist>
+          <listitem>
+              <para><link xlink:href="">C' le magnifique</link></para>
+          </listitem>
+          <listitem>
+              <para><link xlink:href="">STL Iterator</link></para>
+          </listitem>
+          <listitem>
+              <para><link xlink:href="">Purely STL Vector</link></para>
+          </listitem>
+        </itemizedlist>
+    </para>
+    <para>
+      <link xlink:href="https://youtu.be/mW7-kGwPNQI">C hisz ma magába mindenki szerelemes</link>
+    </para>
+    <programlisting language="c" linenumbering="numbered">
+      <textobject><textdata fileref="Turing/pagerank_c.cpp"/></textobject>
+    </programlisting> 
+    <para>
+      Pagerank STL Iterators
+    </para>
+    <programlisting language="c" linenumbering="numbered">
+      <textobject><textdata fileref="Turing/pagerank_iter.cpp"/></textobject>
+    </programlisting> 
+    <para>
+      Pagerank Purely STL Vector
+    </para>
+    <programlisting language="c" linenumbering="numbered">
+      <textobject><textdata fileref="Turing/pagerank_vec.cpp"/></textobject>
+    </programlisting> 
+  </section>
+  <section xml:id="bhax-textbook-feladatok-turing.MontyHall">
+    <title>A Monty Hall probléma</title>
+    <para>
+        Írj szimulációt a Monty Hall problémára!
+    </para>
+    <para>
+        Megoldás videó: <link xlink:href="">No link</link>
+    </para>
+    <para>
+        Megoldás forrása: <link xlink:href="">No link</link>
+    </para>
+    <para>
+        Cpp with a slight twist. Remélem yo!
+    </para>
+    <programlisting language="c" linenumbering="numbered">
+      <textobject><textdata fileref="Turing/monty_hall.cpp"/></textobject>
+    </programlisting> 
+  </section>
 
     <section xml:id="Brun">
         <title>100 éves a Brun tétel</title>
@@ -563,5 +596,4 @@ plot(x,y,type="b")]]>
             </itemizedlist>                
         </tip>
     </section>
-
 </chapter>                
