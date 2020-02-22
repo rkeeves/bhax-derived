@@ -34,4 +34,12 @@
             A Brun tételes feladat kidolgozása.
         </revremark>
     </revision>
+    <revision>
+        <revnumber>0.0.5</revnumber>
+        <date>2020-02-15</date>
+        <authorinitials>rkeeves</authorinitials>
+        <revremark>
+            Forked and inited bhax derived <link xlink:href="https://github.com/rkeeves/bhax-derived">bhax-derived</link>
+        </revremark>
+    </revision>
 </revhistory>

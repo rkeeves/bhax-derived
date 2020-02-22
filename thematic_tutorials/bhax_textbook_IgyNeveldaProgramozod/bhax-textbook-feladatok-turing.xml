@@ -81,7 +81,7 @@
             Leggyakrabban <literal>#ifdef</literal>-el header guard-ként fogsz találkozni (vele kb. ekvivalens a nem mindenhol támogatott <literal>#pragma once</literal>).
         </para>
     </section>
-      <section>
+    <section>
       <title>Lefagyott, nem fagyott, akkor most mi van?</title>
       <para>
           Mutasd meg, hogy nem lehet olyan programot írni, amely bármely más programról eldönti, hogy le fog-e fagyni vagy sem!
@@ -105,7 +105,7 @@
           függvényt, amely tetszőleges programról el tudja dönteni, hogy van-e benne végtelen ciklus:              
       </para>
       <programlisting language="c" linenumbering="numbered">
-        <textobject><textdata fileref="Turing/t100.c"/></textobject>
+        <textobject><textdata encoding="UTF-8" fileref="Turing/t100.c"/></textobject>
       </programlisting>           
       <para>
           A program futtatása, például akár az előző <filename>v.c</filename> ilyen pszeudókódjára:
@@ -260,7 +260,6 @@ false]]></screen>
         </link>
     </para>
     <para>
-      TLDR: Örülj, hogy nagyon elhivatott csajok/srácok/semlegestöbbesszám tervezik a hardware-t, és ha egyszer össze futsz ilyennel hívd meg egy kávéra(én legalábbis biztos megfogom)!
       Ha valakinek van gyereke, vagy gyerek ismerőse és ezt az egészet játékosan akarja neki elmagyarázni akkor van egy szuper aranyos kis könyv ami mellé adnak ingyen progikat és a nullából építhet otthon egy pici számítógépet kapuktól tetris játékig bezárólag. <link xlink:href="https://www.nand2tetris.org/">Ez az</link>
    </para>
     <para>
@@ -307,7 +306,7 @@ false]]></screen>
         </itemizedlist>
     </para>
     <para>
-      <link xlink:href="https://youtu.be/mW7-kGwPNQI">C hisz ma magába mindenki szerelemes</link>
+      Pagerank C jelleggel
     </para>
     <programlisting language="c" linenumbering="numbered">
       <textobject><textdata fileref="Turing/pagerank_c.cpp"/></textobject>
@@ -319,7 +318,7 @@ false]]></screen>
       <textobject><textdata fileref="Turing/pagerank_iter.cpp"/></textobject>
     </programlisting> 
     <para>
-      Pagerank Purely STL Vector
+      Pagerank STL Vector
     </para>
     <programlisting language="c" linenumbering="numbered">
       <textobject><textdata fileref="Turing/pagerank_vec.cpp"/></textobject>
@@ -337,7 +336,11 @@ false]]></screen>
         Megoldás forrása: <link xlink:href="">No link</link>
     </para>
     <para>
-        Cpp with a slight twist. Remélem yo!
+        Gondolkodjunk úgy hogy két stratégia van: "nem választunk újra" és "újra választunk".
+        Alábbi kódban "nem választunk újra" esetben N lehetőség közül 1/N valószínűségünk van nyerni.
+        Viszont ha tudjuk hogy "nem választunk újra" veszített, és a fazon már kinyitott egy ajtót, akkor N-2-ből kell csak választanunk.
+        Utolsó sorban kiírja az nbatfai és ezen kód is sanity check jelleggel a két startégia nyertes kimeneteleinek összegét, ami N=3 esetben egyenlő N-nel.
+        Magasabb N-nél ez nem így van, hisz ha "nem választunk újra" veszített és a fazon kinyitottegy ajtót és N>3 akkor nekünk kisebb mint 100% esélyünk van "újra választunk"-kal nyerni.
     </para>
     <programlisting language="c" linenumbering="numbered">
       <textobject><textdata fileref="Turing/monty_hall.cpp"/></textobject>
@@ -579,7 +582,24 @@ plot(x,y,type="b")]]>
                     <phrase>A B<subscript>2</subscript> konstans közelítése</phrase>
                 </textobject>
             </mediaobject>
-        </figure>                             
+        </figure> 
+        <para>
+          Az nbatfai program C++-ban bitset-tel. (Bitset miatt compile time tudnunk kell N-et.)
+        </para>
+        <programlisting language="c" linenumbering="numbered">
+          <textobject><textdata fileref="Turing/primes.cpp"/></textobject>
+        </programlisting>
+        <figure>
+            <title>Az c++ B<subscript>2</subscript> konstans közelítés eredményei</title>
+            <mediaobject>
+                <imageobject>
+                    <imagedata fileref="img/brun.png" scale="100" />
+                </imageobject>
+                <textobject>
+                    <phrase>A B<subscript>2</subscript> konstans közelítése</phrase>
+                </textobject>
+            </mediaobject>
+        </figure> 
         <tip>
             <title>Werkfilm</title>
             <itemizedlist>
@@ -596,4 +616,54 @@ plot(x,y,type="b")]]>
             </itemizedlist>                
         </tip>
     </section>
+    <section>
+      <title>Minecraft csiga</title>
+      <para>
+        Csinálj csigaként körbe-körbe menő mozgást Malmo-ben! (És éld túl, hogy lehal a géped, mert túlmelegszik.)
+      </para>
+      <para>
+          Megoldás videó: <link xlink:href="">No link</link>
+      </para>
+      <para>
+          Megoldás forrása:
+          <itemizedlist>
+              <listitem>
+                <para><link xlink:href="">Folyamatos mozgásos csiga xml</link></para>
+              </listitem>
+              <listitem>
+                <para><link xlink:href="">Folyamatos mozgásos kód</link></para>
+              </listitem>
+              <listitem>
+                <para><link xlink:href="">Diszkrét mozgásos csiga xml</link></para>
+              </listitem>
+              <listitem>
+                <para><link xlink:href="">Diszkrét mozgásos csiga kód</link></para>
+              </listitem>
+          </itemizedlist>
+      </para>
+      <para>
+          Az első részfeladat folyamatos mozgás esetéről szól. Itt semmi feedback nincs (pl.: PID kontroll), simán váltogatjuk hogy az ágens forduljon-e vagy sem. 
+      </para>
+      <programlisting language="python" linenumbering="numbered">
+        <textobject><textdata encoding="UTF-8" fileref="Turing/turning.py"/></textobject>
+      </programlisting>           
+      <para>
+          A második részfeladat diszkrét mozgás esetéről szól. Itt például megemlíthetjük, hogy a 3x3x3-as "látótér adatokat" egy vektorban kapjuk meg.
+      </para>
+      <programlisting language="python" linenumbering="numbered">
+        <textobject><textdata encoding="UTF-8" fileref="Turing/gridaccessor.py"/></textobject>
+      </programlisting> 
+      <para>
+        Egy másik érdekes dolog, hogy az összes observation adat-ot egy string-ben kapjuk, amit json formában kell parseolni, majd ennek különböző fieldjeit nézegethetjük.
+      </para>
+      <programlisting language="python" linenumbering="numbered">
+        <textobject><textdata encoding="UTF-8" fileref="Turing/observationadapter.py"/></textobject>
+      </programlisting> 
+      <para>
+        Utolsó sorban, pedig waypointokat generálunk kifele növekevő spirál alakban. Az ágens a waypoint iter által számított legújabb waypointot közelíti, majd egy bizonyos hibahatáron belül, úgy tekinti elérte és kér újat.
+      </para>
+      <programlisting language="python" linenumbering="numbered">
+        <textobject><textdata encoding="UTF-8" fileref="Turing/wpiter.py"/></textobject>
+      </programlisting> 
+  </section> 
 </chapter>                

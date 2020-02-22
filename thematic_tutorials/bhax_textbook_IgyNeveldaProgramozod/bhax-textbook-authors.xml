@@ -72,5 +72,20 @@
                 <email>batfai.greta@gmail.com</email>               
             </address>
         </affiliation>               
+    </author>
+    <author>
+        <personname>       
+            <surname>Human</surname>
+            <firstname>Person</firstname>        
+        </personname>    
+        <affiliation>
+            <shortaffil>guy</shortaffil>
+            <jobtitle>guy</jobtitle>
+            <orgname>Earth</orgname>
+            <orgdiv>Mammals</orgdiv>
+            <address>
+                <email>aprettydecentaddress@gmail.com</email>               
+            </address>
+        </affiliation>               
     </author>  
 </authorgroup>
