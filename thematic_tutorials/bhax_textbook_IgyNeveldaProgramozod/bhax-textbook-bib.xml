@@ -91,5 +91,100 @@
             </publisher>
             <pubdate>2004</pubdate>
         </biblioentry> 
-    </bibliodiv>    
+        <biblioentry>
+            <abbrev>SICP</abbrev>
+            <authorgroup>
+                <author>
+                    <personname>
+                        <firstname>Harold</firstname>
+                        <surname>Abelson</surname>
+                    </personname>
+                </author>
+            </authorgroup>
+            <title>Structure and Interpretation of Computer Programs</title>
+            <publisher>
+                <publishername>
+                    <link xlink:href="https://web.mit.edu/alexmv/6.037/sicp.pdf">MIT</link>
+                </publishername>
+            </publisher>
+            <pubdate>1996</pubdate>
+        </biblioentry> 
+    </bibliodiv>   
+    <bibliodiv>
+        <title>My Little Ponys</title>
+        <biblioentry>
+            <abbrev>DENOTATIONALSEMANTICS</abbrev>
+            <authorgroup>
+                <author>
+                    <personname>
+                        <firstname>Lloyd</firstname>
+                        <surname>Allison</surname>
+                    </personname>
+                </author>
+            </authorgroup>
+            <title>A practical introduction to denotational semantics</title>
+            <publisher>
+                <publishername>
+                    <link xlink:href="https://www.cambridge.org/core/books/practical-introduction-to-denotational-semantics/80122D52B49F175D38E0478EA45D4EDD">Cambridge University Press</link>
+                </publishername>
+            </publisher>
+            <pubdate>1986</pubdate>
+        </biblioentry>
+        <biblioentry>
+            <abbrev>PROGLANGS</abbrev>
+            <authorgroup>
+                <author>
+                    <personname>
+                        <firstname>Robert</firstname>
+                        <surname>Harper</surname>
+                    </personname>
+                </author>
+            </authorgroup>
+            <title>Practical Foundations for Programming Language</title>
+            <publisher>
+                <publishername>
+                    <link xlink:href="https://www.cambridge.org/core/books/practical-introduction-to-denotational-semantics/80122D52B49F175D38E0478EA45D4EDD">Carnegie Mellon University</link>
+                </publishername>
+            </publisher>
+            <pubdate>2016</pubdate>
+        </biblioentry>
+        <biblioentry>
+            <abbrev>NANDTOTETRIS</abbrev>
+            <authorgroup>
+                <author>
+                    <personname>
+                        <firstname>Noam</firstname>
+                        <surname>Nisan</surname>
+                    </personname>
+                </author>
+            </authorgroup>
+            <title>The Elements of Computing Systems</title>
+            <publisher>
+                <publishername>
+                    <link xlink:href="https://www.nand2tetris.org/">Homepage of the book</link>
+                </publishername>
+            </publisher>
+            <pubdate>2005</pubdate>
+        </biblioentry>
+        <biblioentry>
+            <abbrev>CHISOMORPH</abbrev>
+            <authorgroup>
+                <author>
+                    <personname>
+                        <firstname>Morten Heine B</firstname>
+                        <surname>Sorensen</surname>
+                    </personname>
+                </author>
+            </authorgroup>
+            <title>Lectures on the Curry-Howard Isomorphism</title>
+            <publisher>
+                <publishername>
+                    <link xlink:href="https://disi.unitn.it/~bernardi/RSISE11/Papers/curry-howard.pdf">Pdf</link>
+                </publishername>
+            </publisher>
+            <pubdate>1998</pubdate>
+        </biblioentry>
+    </bibliodiv>   
+
+    
 </bibliography>     

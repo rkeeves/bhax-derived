@@ -10,8 +10,7 @@ void SleepProxy(int sleepMs)
 {
 #ifdef __linux__
     usleep(sleepMs * 1000);
-#endif
-#ifdef _WIN32
+#elif _WIN32
     Sleep(sleepMs);
 #endif
 }

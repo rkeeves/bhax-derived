@@ -5,10 +5,10 @@
             <keyword/>
         </keywordset>
     </info>
-    <section>
+   <section>
         <title>Végtelen ciklus</title>
         <para>
-            Írj olyan C <link xlink:href="https://youtu.be/hQCG2AwzTxA">végtelen ciklusokat</link>, amelyek 0 illetve 100 százalékban dolgoztatnak egy magot és egy olyat, amely  
+            Írj olyan végtelen ciklusokat, amelyek 0 illetve 100 százalékban dolgoztatnak egy magot és egy olyat, amely  
             100 százalékban minden magot!
         </para>
         <para>
@@ -18,61 +18,107 @@
             Megoldás forrása:
             <itemizedlist>
               <listitem>
-                <para><link xlink:href="">Basic For infinite</link></para>                     
+                <para><link xlink:href="https://github.com/rkeeves/bhax-derived/blob/master/thematic_tutorials/bhax_textbook_IgyNeveldaProgramozod/Turing/thefor.c">Basic infinite for loop</link></para>                     
               </listitem>
               <listitem>
-                <para><link xlink:href="">For sleep with Torvalds</link></para>
+                <para><link xlink:href="https://github.com/rkeeves/bhax-derived/blob/master/thematic_tutorials/bhax_textbook_IgyNeveldaProgramozod/Turing/infty-f_torvalds.c">For with linux sleep</link></para>
               </listitem>
               <listitem>
-                <para><link xlink:href="">While infinite</link></para>
+                <para><link xlink:href="https://github.com/rkeeves/bhax-derived/blob/master/thematic_tutorials/bhax_textbook_IgyNeveldaProgramozod/Turing/infty-w.c">While infinite</link></para>
               </listitem>
               <listitem>
-                <para><link xlink:href="">For sleep with both Torvalds and a greedy company</link></para>
+                <para><link xlink:href="https://github.com/rkeeves/bhax-derived/blob/master/thematic_tutorials/bhax_textbook_IgyNeveldaProgramozod/Turing/infty-f.c">Macros for OS call handling</link></para>
               </listitem>
             </itemizedlist>
         </para>
         <para>
-            Számos módon hozhatunk és hozunk létre végtelen ciklusokat. 
-            Vannak esetek, amikor ez a célunk, például egy szerverfolyamat fusson folyamatosan és van amikor egy
-            bug, mert ott lesz végtelen ciklus, ahol nem akartunk. Saját péláinkban ilyen amikor a <link xlink:href="https://youtu.be/WfbTbPEEJxI?t=9971">PageRank algoritmus</link> 
-            rázza az 1 liter vizet az internetben, de az iteráció csak nem akar konvergálni...
-        </para>                    
+            Végtelen ciklusokra gyakorlatban sok példa akad: szerverek, game loop-ok, interaktív interpreter terminálhoz.
+            A végtelen ciklus azonban olykor nem várt. Például lehet bug, de akár lehet a természetes működés része.
+            Erre jó példa a Tanár Úr által említett PageRank algoritmus.
+            Én azonban, a hozzáadott munka miatt másik példát hoznék: mérnöki CAE végeselemes számítások (pl. <application>Ansys</application>) esetén egyes esetekben a megoldás nem konvergál n lépés után sem, és ez előre nem látható be. Erre a célra a felhasználó megadhat vészhelyzeti kilépési konvergencia kritériumokat.
+            Ez nem matematikai kényszert jelent, hanem szimplán, ha n iteráció, vagy t idő elteltével a megoldáshoz nem jutunk közelebb, akkor a program ki break-el  ciklusból.
+        </para>  
         <para>
-            Egy mag 100 százalékban:               
+            Alább egy minimális végtelen ciklus látható for-ral. Amit vegyünk észre, az az hogy az egész "üres". Ezt a <link xlink:href="https://en.cppreference.com/w/cpp/language/for">for loop szintaktikai definíciója teszi lehetővé</link>, hisz nyíltan kifejezi az optional, hogy nem kötelező megadni.
+            Ez persze egyéb hatásokkal is jár, például, hogy a <literal>for(;;)</literal>-ban használhatjuk az ehhez képest külső scope-ban deklarált változókat.
         </para>
+        <figure>
+            <title>For syntax</title>
+            <mediaobject>
+                <imageobject>
+                    <imagedata fileref="img/for.png" scale="100" />
+                </imageobject>
+                <textobject>
+                    <phrase>for syntax (ugye hogy optional!)</phrase>
+                </textobject>
+            </mediaobject>
+        </figure>
         <programlisting language="c" linenumbering="numbered">
           <textobject><textdata fileref="Turing/thefor.c"/></textobject>
         </programlisting>   
         <para>        
-        vagy az olvashatóbb, de a programozók és fordítók (szabványok) között kevésbé hordozható
+          Alább a fenti példa látható egy <literal>while</literal> loop-pal. Értelemszerűen a conditional-ban mivel egy <literal>true</literal> bool literal-t írtuk, így ez mindig igazra fog kiértékelődni.
+        </para>
+        <programlisting language="c" linenumbering="numbered">
+          <textobject><textdata fileref="Turing/infty-w.c"/></textobject>
+        </programlisting>     
+        <para>
+            Alább egy <literal>while</literal>-t használtunk, de mostmár alszunk is.
+            A <literal>sleep</literal> viszont sajnos OS dependens call (mi sem mondja el jobban mint az unistd include-olása).
+            Mivel az OS feladata az ütemezés, plusz a megszakítások kezelése (hisz ugye az egész lelke az időzítés ezáltal a timer).
+            <literal>sleep</literal> esetén jelezzük az OS-felé, hogy nem kérünk CPU időt (azaz váltsa a process status-t), viszont emellett viszont a megfelelő idő elmúltával (megszakításos alapon) újból kerüljünk számításra várakozóba.
+            A probléma természetesen annyi, hogy scheduling-tól függően, lehet soha nem kerülünk vissza még az idő letelte után sem CPU-ra.
         </para>
         <programlisting language="c" linenumbering="numbered">
           <textobject><textdata fileref="Turing/infty-f_torvalds.c"/></textobject>
-        </programlisting>        
+        </programlisting> 
         <para>
-            Azért érdemes a <literal>for(;;)</literal> hagyományos formát használni, 
-            mert ez minden C szabvánnyal lefordul, másrészt
-            a többi programozó azonnal látja, hogy az a végtelen ciklus szándékunk szerint végtelen és nem szoftverhiba. 
-            Mert ugye, ha a <literal>while</literal>-al trükközünk egy nem triviális 
-            <literal>1</literal> vagy <literal>true</literal> feltétellel, akkor ott egy másik, a forrást
-            olvasó programozó nem látja azonnal a szándékunkat.
-        </para>                        
-        <para>
-            OS independens             
-        </para>        
-        <programlisting language="c" linenumbering="numbered">
-          <textobject><textdata fileref="Turing/infty-w.c"/></textobject>
-        </programlisting>         
-        <para>
-            OS dependens-re példa, hisz a sleep rendszerhívás.    
+          Mindenesetre az alvás egy OS specifikus dolog, pl.: <link xlink:href="http://man7.org/linux/man-pages/man2/nanosleep.2.html">nanosleep</link>.
+          Ha több fajta OS-n kell futni, ahhoz sajnos trükközni kell. Egy barbár megoldás a preprocesszor használata.
+          Alábbi példában az látható, hogy preprocesszor által értelmezett szöveget is elhelyeztem a fájlban.
+          Technikailag ez annyit tesz, hogy compile előtt a preprocesszor elődolgozza a forrásfájlt, és ez példánkban azzal jár 
         </para>
         <programlisting language="c" linenumbering="numbered">
           <textobject><textdata fileref="Turing/infty-f.c"/></textobject>
-        </programlisting>        
+        </programlisting>      
         <para>
           Egyébként a <literal>gcc</literal> mellé betudunk passzolni flageket. Például <literal>-DALMA</literal>-val gyakorlatilag azt mondjuk a preprocesszornak, hogy vegye úgy mintha <literal>#define ALMA</literal>.
-          Ez pontosan annyira szép mint amennyire elegáns, de ez van.
+          Ez pontosan annyira szép mint amennyire elegáns, de ez van. Nézzük csak meg ezt az almát!
         </para>
+        <programlisting language="c" linenumbering="numbered">
+          <textobject><textdata fileref="Turing/alma.cpp"/></textobject>
+        </programlisting>
+        <para>
+          Láthatóan ez nem fog lefordulni ha nincs definiálva az ALMA, de azért tegyünk próbát!
+        </para>
+        <figure>
+            <title>Alma no flag fail</title>
+            <mediaobject>
+                <imageobject>
+                    <imagedata fileref="img/almanoflag.png" scale="100" />
+                </imageobject>
+                <textobject>
+                    <phrase>A flag nem használva</phrase>
+                </textobject>
+            </mediaobject>
+        </figure>
+        <para>
+          Miért azt írja hogy <literal>hello was not declared in scope</literal>?
+          Nos a preprocesszor végigment a forrásfájlon, és, mivel nem volt ALMA definiálva, ezért a compilation stage-ben az a kód részlet ami <literal>#ifdef</literal>-be volt zárva nem létezett.
+          Próbáljuk ki azt hogy <literal>g++ alma.cpp -o alma -DALMA</literal>!
+          Az alábbi screenshot-ról látszik, hogy mivel lusta vagyok, ezért a git bash-ből csináltam.
+        </para>
+        <figure>
+            <title>Alma With flag</title>
+            <mediaobject>
+                <imageobject>
+                    <imagedata fileref="img/almaflag.png" scale="100" />
+                </imageobject>
+                <textobject>
+                    <phrase>A flag-et használva</phrase>
+                </textobject>
+            </mediaobject>
+        </figure> 
         <para>
             Ha belenézel az STL-be, akkor az is tele lesz ilyenekkel, hisz különböző OS-ekkel kell tudni használni, és a rendszerhívások átlalában eltérőek.
             Egyébként ha valami IDE-vel dolgozol, ott gyakran még szépen be is szürkíti azokat a részeket a kódban amelyeket ki fog hagyni.
@@ -80,33 +126,78 @@
             Makrók ugyanilyenek. Tehát nem runtime kiértékelhető az <literal>#ifdef</literal> hanem egy utasítás a preprocesszornak.
             Leggyakrabban <literal>#ifdef</literal>-el header guard-ként fogsz találkozni (vele kb. ekvivalens a nem mindenhol támogatott <literal>#pragma once</literal>).
         </para>
+        <para>
+            Na jó, de ez nem válaszolja meg a kérdést, hogy miért nem bírja a gépem OBS-el együtt a notepad++-t.
+        </para>
+        <para>
+            Mármint, akarom mondani, milyen ügyes kis dolog ez a preprocesszor! De csak ennyit tud? A válasz nem. Alábbi példában filename, linenumber-t íratunk ki.
+        </para>
+        <programlisting language="c" linenumbering="numbered">
+          <textobject><textdata fileref="Turing/builtins.cpp"/></textobject>
+        </programlisting>
+        <figure>
+            <title>builtins</title>
+            <mediaobject>
+                <imageobject>
+                    <imagedata fileref="img/builtins.png" scale="100" />
+                </imageobject>
+                <textobject>
+                    <phrase>Macro supplied fname és linenumber</phrase>
+                </textobject>
+            </mediaobject>
+        </figure>
+        <para>
+            Most pedig következzen egy összevagdosott code snippet egy régi projektemből. A lényeg annyi, hogy unit test-eléshez, egy makró alapú library-ről volt szó. (Csak poénból, tudom hogy van gtest).
+        </para>
+        <programlisting language="c" linenumbering="numbered">
+          <textobject><textdata fileref="Turing/example_macros.h"/></textobject>
+        </programlisting>
+        <para>
+            A fenti snippetben látszik, hogy a <literal>#define</literal>-al meghatározott dolgok többek mint "változók". Ezeket preprocesszor makróknak hívjuk, és az előfeldolgozáskor expandáljuk őket.
+            Azaz először az <literal>EXPECT_EQ</literal> expandálódik <literal>EXPECT(case,arg0,arg1,pred_eq,"Expect failed ==")</literal>. Az Expect-ben meg egy pici scope-ot létrehozunk.
+          A lényeg ebből annyi, hogy nem kell megijedni tőle, jóra is lehet használni. Annyi hogy az expanzióval óvatosan, mert elég nehéz debuggolni. (ugyanolyan szívás mint az STL-es template alapú hibákat, azaz nem egy one liner lesz.)
+        </para>
     </section>
-    <section>
+   <section>
       <title>Lefagyott, nem fagyott, akkor most mi van?</title>
       <para>
-          Mutasd meg, hogy nem lehet olyan programot írni, amely bármely más programról eldönti, hogy le fog-e fagyni vagy sem!
+        Lehet-e írni olyan programot amely minden programról megmondja, hogy lefut-e?
       </para>
-      <para>
+     <para>
           Megoldás videó: <link xlink:href="">No link</link>
       </para>
       <para>
           Megoldás forrása:
           <itemizedlist>
               <listitem>
-                <para><link xlink:href="">Turing 100 (pseudocode)</link></para>
+                <para><link xlink:href="https://github.com/rkeeves/bhax-derived/blob/master/thematic_tutorials/bhax_textbook_IgyNeveldaProgramozod/Turing/t100.c">Turing 100 (pseudocode)</link></para>
               </listitem>
               <listitem>
-                <para><link xlink:href="">Turing 1000 (pseudocode)</link></para>
+                <para><link xlink:href="https://github.com/rkeeves/bhax-derived/blob/master/thematic_tutorials/bhax_textbook_IgyNeveldaProgramozod/Turing/t1000.c">Turing 1000 (pseudocode)</link></para>
               </listitem>
           </itemizedlist>
       </para>
       <para>
+          A probléma elég fontos. Miért is? Nos, a probléma az, hogyha ez nem lehetséges, akkor soha nem fogjuk tudni bizonyítani az összes program helyességét.
+         
           Tegyük fel, hogy akkora haxorok vagyunk, hogy meg tudjuk írni a <function>Lefagy</function>
           függvényt, amely tetszőleges programról el tudja dönteni, hogy van-e benne végtelen ciklus:              
       </para>
+      
+      <para>
+      A borbély az aki azok haját vágja, akik nem teszik meg ezt saját maguknak.
+        De a borbély vágja-e a saját haját?
+        Nos, tegyük fel levágja:
+        Ebben az esetben ő levágta a haját egy olyan embernek aki egyébként ezt megteszi saját magának.
+        Ok, tegyük fel nem vágja:
+        Viszont ebben az esetben nem vágja a saját haját, aka lehetne a saját ügyfele, viszont ha most levágja akkor kezdődik az egész elölről <link xlink:href="https://en.wikipedia.org/wiki/Russell%27s_paradox">Russel's paradox</link>.
+      </para>
+      <para>
+        Ezzel a problémával sok helyen találkozhatunk. Például <citation>DENOTATIONALSEMANTICS</citation> 4.1.1. fejezet, vagy akár <citation>SICP</citation> Excercise 4.15.
+      </para>
       <programlisting language="c" linenumbering="numbered">
         <textobject><textdata encoding="UTF-8" fileref="Turing/t100.c"/></textobject>
-      </programlisting>           
+      </programlisting>   
       <para>
           A program futtatása, például akár az előző <filename>v.c</filename> ilyen pszeudókódjára:
           <screen><![CDATA[T100(t.c.pseudo)
@@ -114,8 +205,8 @@ true]]></screen>
           akár önmagára
           <screen><![CDATA[T100(T100)
 false]]></screen>  
-          ezt a kimenetet adja.          
-      </para>
+          ezt a kimenetet adja.    
+    </para>    
       <para>
           A T100-as programot felhasználva készítsük most el az alábbi T1000-set, amelyben a
           Lefagy-ra épőlő Lefagy2 már nem tartalmaz feltételezett, csak csak konkrét kódot:
@@ -123,7 +214,7 @@ false]]></screen>
       <programlisting language="c" linenumbering="numbered">
         <textobject><textdata fileref="Turing/t1000.c"/></textobject>
       </programlisting>                     
-      <para>
+       <para>
         Mit for kiírni erre a <computeroutput>T1000(T1000)</computeroutput> futtatásra?
                             
         <itemizedlist>
@@ -137,22 +228,78 @@ false]]></screen>
         akkor most hogy fog működni? Sehogy, mert ilyen <function>Lefagy</function>
         függvényt, azaz a T100 program nem is létezik.                
       </para>
-      <para>
-        Szerintem Tanár Úr leírása tök jó volt. Nincs szívem hozzányúlni.
-        Mivel technikailag nem lehet többet hozzárakni, ezért inkább egy kis kulturális plusz:
-        A borbély az aki azok haját vágja, akik nem teszik meg ezt saját maguknak.
-        De a borbély vágja-e a saját haját?
-        Nos, tegyük fel levágja:
-        Ebben az esetben ő levágta a haját egy olyan embernek aki egyébként ezt megteszi saját magának.
-        Ok, tegyük fel nem vágja:
-        Viszont ebben az esetben nem vágja a saját haját, aka lehetne a saját ügyfele, viszont ha most levágja akkor kezdődik az egész elölről <link xlink:href="https://en.wikipedia.org/wiki/Russell%27s_paradox">Russel's paradox</link>.
+       <para>
+        Persze ha már lefagyott, nem fagyott témánál vagyunk, akkor érdemes kicsit beszélni a kiértékelésről. Alább látható egy egyszerű kifejezés. Mi lesz vajon a vége?
+        <equation>
+          <mathphrase>(λx.y) ( (λz.z z) (λz.z z) )</mathphrase>
+        </equation>
+        Redukáljuk!
+        <equation>
+          <mathphrase>(λx.y) ( (λz.z z) (λz.z z) )</mathphrase>
+        </equation>
+        Hrumph, ugyanoda jutottunk, kezdjük elölről!
+        <equation>
+          <mathphrase>(λx.y)  ( (λz.z z) (λz.z z) )</mathphrase>
+        </equation>
+        Redukáljuk az x-t kötő baloldali lambdát a jobb oldallal a jobb oldal redukciója nélkül.
+        <equation>
+          <mathphrase>y</mathphrase>
+        </equation>
+        Azaz addig késleltettük a kiértékelést, amíg lehetett, és a végén kiderült, hogy abszolút nem is volt szükséges!
+        Ez a módszer zseniális! Innentől mindent késleltetni fogunk!
       </para>
-  </section>            
+      <para>
+        Nézzünk egy példát a <citation>SICP</citation>-ből! Alábbi definíciók alapján ki fogjuk értékelni a <function>(f 5)</function>-t!
+      </para>
+<literallayout>
+(define (square x) (* x x))
+(define (sum-of-squares x y)
+  (+ (square x) (square y)))
+(define (f a)
+  (sum-of-squares (+ a 1) (* a 2)))
+</literallayout>
+      <para>
+        Annyira jó ez a késleltetés, hogy alkalmazzuk a <function>(f 5)</function> kiértékelésénél!
+      </para>
+<literallayout>
+(f 5)
+(sum-of-squares (+ 5 1) (* 5 2))
+(+ (square (+ 5 1)) (square (* 5 2)) )
+(+ (* (+ 5 1) (+ 5 1)) (square (* 5 2)))
+(+ (* (+ 5 1) (+ 5 1)) (* (* 5 2) (* 5 2)))
+(+ (* 6 (+ 5 1)) (* (* 5 2) (* 5 2)))
+(+ (* 6 6) (* (* 5 2) (* 5 2)))
+(+ (* 6 6) (* 10 (* 5 2)))
+(+ (* 6 6) (* 10 10))
+(+ 36 (* 10 10))
+(+ 36 100)
+136
+</literallayout>
+      <para>
+        Mint ahogy azt látjuk <function>(+ 5 1)</function> és <function>(* 5 2)</function> kétszer kerül redukcióra. Hát így már nem is olyan jó...
+      </para>
+      <para>
+        Hogy fut le vajon egy másik út?
+      </para>
+<literallayout>
+(f 5)
+(sum-of-squares (+ 5 1) (* 5 2))
+(sum-of-squares 6 (* 5 2))
+(sum-of-squares 6 10)
+(+ (square 6) (square 10))
+(+ (* 6 6) (* 10 10))
+(+ 36 (* 10 10))
+(+ 36 100)
+136
+</literallayout>
+      <para>
+        Kevesebb számítást végzünk mint a késleltetős előző esetben. Azaz látjuk, hogy a redukciós stratégiának a teljesítményre is van hatása.
+      </para>
+  </section>
   <section>
     <title>Változók értékének felcserélése</title>
     <para>
-      Írj olyan C programot, amely felcseréli két változó értékét, bármiféle logikai utasítás vagy kifejezés
-      használata nélkül!
+      Írjunk egy olyan programot, amely felcseréli két változó értékét, bármiféle logikai utasítás vagy kifejezés használata nélkül, és ez ne bug hanem feature legyen!
     </para>
     <para>
       Megoldás videó: <link xlink:href="">No Link</link>
@@ -161,16 +308,16 @@ false]]></screen>
       Megoldás forrása:
       <itemizedlist>
       <listitem>
-        <para><link xlink:href="">Swap XOR</link></para>
+        <para><link xlink:href="https://github.com/rkeeves/bhax-derived/blob/master/thematic_tutorials/bhax_textbook_IgyNeveldaProgramozod/Turing/swap_xor.cpp">Swap XOR</link></para>
       </listitem>
       <listitem>
-        <para><link xlink:href="">Swap Subtract</link></para>
+        <para><link xlink:href="https://github.com/rkeeves/bhax-derived/blob/master/thematic_tutorials/bhax_textbook_IgyNeveldaProgramozod/Turing/swap_subtract.cpp">Swap Subtract</link></para>
       </listitem>
       <listitem>
-        <para><link xlink:href="">Swap Multiplication</link></para>
+        <para><link xlink:href="https://github.com/rkeeves/bhax-derived/blob/master/thematic_tutorials/bhax_textbook_IgyNeveldaProgramozod/Turing/swap_mult.cpp">Swap Multiplication</link></para>
       </listitem>
       <listitem>
-        <para><link xlink:href="">Swap Ptr</link></para>                   
+        <para><link xlink:href="https://github.com/rkeeves/bhax-derived/blob/master/thematic_tutorials/bhax_textbook_IgyNeveldaProgramozod/Turing/swap_ptr.cpp">Swap Ptr</link></para>                   
       </listitem>
     </itemizedlist>
     </para>
@@ -178,43 +325,73 @@ false]]></screen>
         Több megoldási lehetőség is van, ezeket fogjuk a következő bekezdésekben bemutatni.
     </para>
     <para>
-        Swap by bitwise xor
+        Nézzünk valami szorzásos osztásosat!
+    </para>
+    <programlisting language="c" linenumbering="numbered">
+      <textobject><textdata fileref="Turing/swap_mult.cpp"/></textobject>
+    </programlisting>
+    <para>
+      Kövessük nyomon mi történik!
+<literallayout>
+(a,6) (b,7)
+a = a * b => (a,42) (b,7)
+b = a &#92; b => (a,42) (b,7)
+a = a &#92; b => (a,6) (b,7)
+</literallayout>
+      Hát ez működik, de 0-val nem osztunk, plusz a szorzás osztás nehéz. Nézzünk mást!
+    </para>
+    <para>
+        Nézzünk valami összeadás kivonásosat!
+    </para>
+    <programlisting language="c" linenumbering="numbered">
+      <textobject><textdata fileref="Turing/swap_subtract.cpp"/></textobject>
+    </programlisting>
+    <para>
+      Kövessük nyomon mi történik!
+<literallayout>
+(a,6) (b,7)
+a = a + b => (a,13) (b,7)
+b = a - b => (a,13) (b,6)
+a = a - b => (a,7) (b,6)
+</literallayout>
+      Ez is jó, és ráadásul csak összeadással és kivonással terheljük a CPU-t!
+    </para>
+    <para>
+      De esetleg van valami más is? Nos nézzük a bitwise xor-t!
     </para>
     <programlisting language="c" linenumbering="numbered">
       <textobject><textdata fileref="Turing/swap_xor.cpp"/></textobject>
     </programlisting>  
     <para>
-        Swap by subtraction
+    Kövessük végig!
+<literallayout>
+(a,110) (b,111)
+a = a XOR b => (a,001) (b,111)
+b = a XOR b => (a,001) (b,110)
+a = a XOR b => (a,111) (b,110)
+</literallayout>
+        Egy nagyon furcsa dolgot láthatunk. Az összes előző esetnél több operátort kellett használni (*) és (/) illetve (+) és (-).
+      Most azonban egy olyan esetet látunk, amikor egyetlen operátorral megtudtuk oldani (kommutatív, asszociatív, identitás elem létezik, f(a,a)=Identitás elem).
     </para>
-    <programlisting language="c" linenumbering="numbered">
-      <textobject><textdata fileref="Turing/swap_subtract.cpp"/></textobject>
-    </programlisting>  
     <para>
-        Swap by multiplication
-    </para>
-    <programlisting language="c" linenumbering="numbered">
-      <textobject><textdata fileref="Turing/swap_mult.cpp"/></textobject>
-    </programlisting>  
-    <para>
-        Ez az utolsó csak egy picit behozza a pointer-eket a képbe.
+        Alábbi utolsó példa csak egy picit behozza a pointer-eket a képbe.
         Ezekkel ha még nem értjük mi van, ne aggódjunk.
         Minden pointert érdemes egy címként felfogni.
         Azaz ha létezik egy int változónk foo néven akkor foo-nak van ugye egy értéke, illetve egy címe.
         A cím az amit a ptr megtestesít (na jó nem, de most így elég...).
         Természetesen funckiókra is mutathatunk.
         Sőt, ha már valaha láttunk C kódot, akkor valószínűleg belefutottunk már callback-ekbe stb.
-        Aka akár funkciókat és bepasszolhatunk funkciókba.
-        <link xlink:href="https://youtu.be/MFUgDYwyC2s?t=60">Ez egy totál handy dolog, biztos nem lesz rossz vége!</link>
+        Aka akár funkciókat és bepasszolhatunk funkciókba, stb.
     </para>
-    <programlisting language="c" linenumbering="numbered">
+   <programlisting language="c" linenumbering="numbered">
       <textobject><textdata fileref="Turing/swap_ptr.cpp"/></textobject>
-    </programlisting>  
+    </programlisting>
   </section>                     
   <section>
     <title>Labdapattogás</title>
     <para>
         Először if-ekkel, majd bármiféle logikai utasítás vagy kifejezés
-        nasználata nélkül írj egy olyan programot, ami egy labdát pattogtat a karakteres konzolon! Nem írhatsz hozzá DLC-t, és ne legyen benne lootbox, mert nem ez EA vagyunk.
+        használata nélkül írj egy olyan programot, ami egy labdát pattogtat a karakteres konzolon! Nem írhatsz hozzá DLC-t, és ne legyen benne lootbox, mert nem ez EA vagyunk.
     </para>
     <para>
         Megoldás videó: <link xlink:href=""></link>
@@ -223,25 +400,111 @@ false]]></screen>
         Megoldás forrása:
         <itemizedlist>
           <listitem>
-              <para><link xlink:href="">Necessary header for terminal manip</link></para>
+              <para><link xlink:href="https://github.com/rkeeves/bhax-derived/blob/master/thematic_tutorials/bhax_textbook_IgyNeveldaProgramozod/Turing/pubghypetrain.h">Helper header</link></para>
           </listitem>
           <listitem>
-              <para><link xlink:href="">Ball C</link></para>
+              <para><link xlink:href="https://github.com/rkeeves/bhax-derived/blob/master/thematic_tutorials/bhax_textbook_IgyNeveldaProgramozod/Turing/ball.cpp">Ball</link></para>
+          </listitem>
+          <listitem>
+              <para><link xlink:href="https://github.com/rkeeves/bhax-derived/blob/master/thematic_tutorials/bhax_textbook_IgyNeveldaProgramozod/Turing/ballnoif.cpp">Ball no if</link></para>
           </listitem>
         </itemizedlist>
     </para>
     <para>
-        Ennek a feladatnak az volt a lényege, hogy megismertessen low level trükkökkel.
-        Természetesen ez minket totál hidegen hagy. Úgyhogy inkább nézzük meg, hogy például egy játék-ot hogyan lehet passzív adatsruktúrákkal felépíteni.
-        Alább található egy link egy manapság erősen hype-olt programtervezési módra (Pl.: Unity is hasonló)
-        <link xlink:href="https://github.com/alecthomas/entityx">Entity Component System C++</link>. Egyébként ha belenézel és valami nagyon nincs rendben <link xlink:href="https://en.wikipedia.org/wiki/Curiously_recurring_template_pattern">a template super definíciójával</link>, nos hát igen.
-    </para>
-    <para>
-      Az egész feladat self-explanatory, úgyhogy inkább nézz rá <link xlink:href="https://github.com/ikalnytskyi/termcolor">erre</link>. Ez egy pici header only project OS independens terminál szín kezelésre. Huzzah!
+        Ennek a feladatnak az volt a lényege, hogy elágazás nélkül kicsikarjunk a gépből valami féle döntés alapú útválasztást.
+        Először nézzük az alapot.
     </para>
     <programlisting language="c" linenumbering="numbered">
-      <textobject><textdata fileref="Turing/ball.c"/></textobject>
-    </programlisting>  
+      <textobject><textdata fileref="Turing/ball.cpp"/></textobject>
+    </programlisting>
+    <para>
+      Nyilvánvalóan valahogyan trükközni kell, hisz az <literal>if</literal>-et ha kihagynánk, akkor nem tudnánk például dönteni, hogy mely karaktert küldjük std out-ra. Nézzük egy lehetséges megoldást.
+    </para>
+    <programlisting language="c" linenumbering="numbered">
+      <textobject><textdata fileref="Turing/ballnoif.cpp"/></textobject>
+    </programlisting>
+    <para>
+      Simán csak implicit konverzió történik, mind <literal>collide</literal>, mind <literal>draw</literal> esetén.
+    </para>
+    
+    <para>
+      Ha már itt tartunk, akkor nézzünk más jellegű if encode-olást is! (használhatjuk például a <citation>CHISOMORPH</citation>-t) 
+<literallayout>
+true = λx.λy.x
+false = λx.λy.y
+if(B,P,Q)= B P Q
+</literallayout>
+    </para>
+   <para> Az if true then P else Q redukciója
+<literallayout>
+if true then P else Q
+= true P Q
+= λx.λy.x P Q
+= λy.P Q
+= P
+</literallayout>
+  Az if false then P else Q redukciója
+<literallayout>
+if false then P else Q
+= false P Q
+= λx.λy.y P Q
+= λy.y Q
+= Q
+</literallayout>
+</para>
+<para>
+Vezessünk be számokat!
+<literallayout>
+if false then P else Q
+0 = λf.λx.x
+1 = λf.λx.f x
+2 = λf.λx.f (f x)
+...
+</literallayout>
+Illetve egy isZero predikátumot!
+<literallayout>
+IsZero = λn.n (λx.false) true
+</literallayout>
+Nézzük meg pár esetre a predikátumunk működését!
+<literallayout>
+IsZero 0
+= (λn.n (λx.false) true) (λf.λx.x)
+= ( (λf.λx.x) (λx.false) true)
+= ( λx.x true)
+= true
+</literallayout>
+<literallayout>
+IsZero 1
+= (λn.n (λx.false) true) (λf.λx.f x)
+= ( (λf.λx.f x) (λx.false) true) 
+= ( (λx.(λx.false) x)  true) 
+= (λx.false) true
+= false
+</literallayout>
+</para>
+    <para>
+     Mostmár mondhatunk olyat, hogy osztásnál ne legyen nulla a nevezőben, azaz if IsZero b then 0 else (div a b).
+     A lényeg az, hogy dobjon vissza egy (div valami valami)-t ha el lehet végezni, különben pedig egy 0-t. Például 4-el és 0-val hívjuk. 
+<literallayout>
+( (λx.λy.(IsZero y) 0 (div x y)) 4 0
+= ( (λy.(IsZero y) 0 (div 4 y)) 0 
+= ((IsZero 0) 0 (div 4 0))
+= (true 0 (div 4 0))
+= ((λx.λy.x) 0 (div 4 0))
+= ((λy.0) (div 4 0))
+= 0
+</literallayout>
+Most nézzük meg 4 és 2-vel.
+<literallayout>
+( (λx.λy.(IsZero y)) 0 (div x y)) 4 2
+( (λy.IsZero y) 0 (div 4 y)) 2
+((IsZero 2) 0 (div 4 2))
+(false 2 (div 4 2))
+((λx.λy.y) 0 (div 4 2))
+((λy.y) (div 4 2))
+(div 4 2)
+</literallayout>
+    </para>
   </section>                     
   <section>
     <title>Szóhossz és a Linus Torvalds féle BogoMIPS</title>
@@ -255,34 +518,147 @@ false]]></screen>
         <link xlink:href=""></link>.
     </para>
     <para>
-        Megoldás forrása: <link xlink:href="Turing/bogomips.c">
-            <filename>bhax/thematic_tutorials/bhax_textbook_IgyNeveldaProgramozod/Turing/bogomips.c</filename>
-        </link>
+        Megoldás forrása:
+        <itemizedlist>
+          <listitem>
+              <para><link xlink:href="https://github.com/rkeeves/bhax-derived/blob/master/thematic_tutorials/bhax_textbook_IgyNeveldaProgramozod/Turing/wordsize.cpp">Wordsize</link></para>
+          </listitem>
+          <listitem>
+              <para><link xlink:href="https://github.com/rkeeves/bhax-derived/blob/master/thematic_tutorials/bhax_textbook_IgyNeveldaProgramozod/Turing/bogomips.c">Bogomips</link></para>
+          </listitem>
+        </itemizedlist>
     </para>
+   <para>
+      Először is nézzük a biteket! A számokat kettes számrendszerben tároljuk. A shift az értékek "tologatása". De pontosan mi az a shift? 
+    </para> 
     <para>
-      Ha valakinek van gyereke, vagy gyerek ismerőse és ezt az egészet játékosan akarja neki elmagyarázni akkor van egy szuper aranyos kis könyv ami mellé adnak ingyen progikat és a nullából építhet otthon egy pici számítógépet kapuktól tetris játékig bezárólag. <link xlink:href="https://www.nand2tetris.org/">Ez az</link>
-   </para>
-    <para>
-        Szóhossz alatt a gépi szavak hosszát értjük.
-        Mi ez az egész gépi szó dolog?
-        Túlzott részletezés nélkül a következő. A gépünk logikai kapukból épül fel (meg még sok másból). Röviden ezek egy "bit" műveletre képesek. Ha pl. 8 "bit"-et akarunk egyszerre kezelni, akkor egy bites kapukból összelehet legózni.
-        Ezek a "kábelhágcsók" a valóságban nem kábelek, és "belevannak égetve" a "vasba". A kapuk is "belevannak égetve" a "vasba".
-        Azaz az, hogy egy menetben max mennyi kábelnyit tudunk kezelni a gyártott gép specialitása.
-        Egy mittudomén 5 bit-es gépet azért (sem) lehet upgrade-elni 2020 bit-essé, mert a "beégetett kábelhágcsó"-k száma 5, és pont, vége a mondatnak.
-        A szó egy picit más. A lényeg hogy a proci-ba ha küldünk mondjuk 01101-t, akkor ez valójában mi?
-        Nos intel stb. gyártótól eltérő, de pl. a mi gagyi esetünkben legyen a következő szabály:
-        Az első bit ha 0 akkor robbanjon fel a gép. Ha az első bit 1, akkor a többi bit által reprezentált idő múlva robbanjon fel.
-        Azaz 01101-re felrobban egyből, 10001-re pedig egy másodperc múlva robban fel.
+      Amikor left shiftelünk, akkor mi is történik? Nézzük unsigned char-ra!
+      <quote>For unsigned lhs, the value of LHS &lt;&lt; RHS is the value of LHS * 2^RHS, reduced modulo maximum value of the return type plus 1 (that is, bitwise left shift is performed and the bits that get shifted out of the destination type are discarded). </quote>
+      Alább látható hogy miről van szó.
     </para>
-    <para>
-        Változtassunk a specifikáción, lesz a procinak egy regisztere:
-        Ha az első bit 0 akkor olvassunk a többi négy bit által megadott ram címről és tegyük be a regiszterbe.
-        Ha az első bit 1 akkor írjunk a többi négy bit által megadott ram címre azt ami jelenleg a regiszterben van.
-        Hát...ez így nem frankó, hiszen annak ellenére, hogy a gépünk technikailag képes lenne 5bites címek kezelésére, az instrukciók miatt nem lehet.
-        Szóval, blablabla emiatt van double word stb. de most abba ne menjünk bele hogy az Intel miért okozta a Spectre-t, Meltdown-t stb. (tippecske: évről évre egyre többet várt tőlük a piac, ők meg - mint jó kapitalista - csaltak és cache-be raktak olyat is ami nem biztos hogy kellett a kódnak, pl.: conditionaltől függetlenül két ágát kicsit előre számítani. Végeredményt lehetett látni a híradóban.).
+<literallayout>
+1   &lt;&lt; 1 =&gt;    (1*2^1)%(255+1) = 2   (00000010)
+2   &lt;&lt; 1 =&gt;    (2*2^1)%(255+1) = 4   (00000100)
+4   &lt;&lt; 1 =&gt;    (4*2^1)%(255+1) = 8   (00001000)
+8   &lt;&lt; 1 =&gt;    (8*2^1)%(255+1) = 16  (00010000)
+16  &lt;&lt; 1 =&gt;   (16*2^1)%(255+1) = 32  (00100000)
+32  &lt;&lt; 1 =&gt;   (32*2^1)%(255+1) = 64  (01000000)
+64  &lt;&lt; 1 =&gt;   (64*2^1)%(255+1) = 128 (10000000)
+128 &lt;&lt; 1 =&gt;  (128*2^1)%(255+1) = 0   (00000000)
+</literallayout>
+  <para>
+      Alábbi kóddal nézzük meg:
     </para>
-  </section>                     
-  <section>
+  <programlisting language="c" linenumbering="numbered">
+      <textobject><textdata fileref="Turing/shiftl_uchar.cpp"/></textobject>
+    </programlisting>
+  <figure>
+            <title>shiftl_uchar</title>
+            <mediaobject>
+                <imageobject>
+                    <imagedata fileref="img/shiftl_uchar.png" scale="100" />
+                </imageobject>
+                <textobject>
+                    <phrase>shiftl_uchar std kimeneten</phrase>
+                </textobject>
+            </mediaobject>
+        </figure> 
+    <para>
+      Mi történik a right shift esetben?
+      <quote>For unsigned lhs and for signed lhs with nonnegative values, the value of LHS >> RHS is the integer part of LHS / 2^RHS.</quote>
+    </para>  
+<literallayout>
+255 &gt;&gt; 1 =&gt; intp(255 div 2^1) = 127 (01111111)
+127 &gt;&gt; 1 =&gt; intp(127 div 2^1) = 63  (00111111)
+63  &gt;&gt; 1 =&gt; intp(63 div 2^1)  = 31  (00011111)
+31  &gt;&gt; 1 =&gt; intp(31 div 2^1)  = 15  (00001111)
+15  &gt;&gt; 1 =&gt; intp(15 div 2^1)  = 7   (00000111)
+7   &gt;&gt; 1 =&gt; intp(7 div 2^1)   = 3   (00000011)
+3   &gt;&gt; 1 =&gt; intp(3 div 2^1)   = 1   (00000001)
+1   &gt;&gt; 1 =&gt; intp(1 div 2^1)   = 0   (00000000)
+</literallayout>
+<para>
+      Alábbi kóddal nézzük meg:
+    </para>
+  <programlisting language="c" linenumbering="numbered">
+      <textobject><textdata fileref="Turing/shiftr_uchar.cpp"/></textobject>
+    </programlisting>
+  <figure>
+            <title>shiftr_uchar</title>
+            <mediaobject>
+                <imageobject>
+                    <imagedata fileref="img/shiftr_uchar.png" scale="100" />
+                </imageobject>
+                <textobject>
+                    <phrase>shiftr_uchar std kimeneten</phrase>
+                </textobject>
+            </mediaobject>
+        </figure>
+  <para>
+      Alábbi kód az előzőeket hajtja végre csak int-et használunk.
+    </para>
+  <programlisting language="c" linenumbering="numbered">
+      <textobject><textdata fileref="Turing/wordsize.cpp"/></textobject>
+  </programlisting>
+<para>
+      Előjeles esetben figyelembe kell venni, hogy például a felső bit előjelet is jelenthet akár. Alábbi ábra szép illusztrációt ad arra, mire is kell gondolni (2s complement).
+    </para>
+  <figure>
+    <title>2s complement</title>
+    <mediaobject>
+        <imageobject>
+            <imagedata fileref="img/twoscomplement.png" scale="100" />
+        </imageobject>
+        <textobject>
+            <phrase>2s complement</phrase>
+        </textobject>
+    </mediaobject>
+</figure>
+    <para>
+      Most áttérünk a bogomips-re. Itt egy új dologgal talákozunk &lt;&lt;= de ez igazából csak annyit tesz, hogy a shift rhs-t egyből az lhs oldalon lévő változóba vissza is tároljuk.
+      A delay egy for loop ami elszámol <literal>loops</literal>-ig, azaz addig növeli (++) unáris operátorral i értékét amíg a <literal>i &lt; loops</literal> conditional igaz.
+      A while ciklus fejben pedig már a jól ismert left shift zajlik (loops_per_sec 1-ről indul).
+      De hogy biztosak legyünk nézzük az alábbi programot (bár nagyon ismerős lesz...)
+    </para>
+<programlisting language="c" linenumbering="numbered">
+      <textobject><textdata fileref="Turing/bogomips_shifting.cpp"/></textobject>
+  </programlisting>
+   <figure>
+    <title>ullshift</title>
+    <mediaobject>
+        <imageobject>
+            <imagedata fileref="img/ullshift.png" scale="100" />
+        </imageobject>
+        <textobject>
+            <phrase>bogomips_shifting kimeneten</phrase>
+        </textobject>
+    </mediaobject>
+</figure>
+<para>
+A bogomips while body egyébként annyiról szól, hogy lekérjük hány tick telt el idáig, majd nyomunk n mennyiség lépést a for ciklusban, visszajövünk és megint lekérdezzük az eltelt tick-ek számát. Ha a tickek száma nem kevesebb mint amennyit a CLOCKS_PER_SEC konstanssal állít magáról a gép, akkor elkezdjük a kiszállást.
+A loops_per_sec pedig a következő módon jön ki:
+</para>
+<literallayout>
+loop_per_masodperc = ( loopok_szama / tick_szam ) * CLOCKS_PER_SEC;
+[1/s] = ( [1] / [1] ) * [1/s]
+</literallayout>
+    <para>
+    Ezután következik zsonglőrködés a számokkal. Ez a rész a <literal>bogus</literal> a bogomips-ben.
+    Ha sok időnk van akkor meg is mérhetjük a saját gépünkét. Alább egy random példa.
+    </para>
+   <figure>
+    <title>bogomips kimeneten</title>
+    <mediaobject>
+        <imageobject>
+            <imagedata fileref="img/bogoihatemondays.png" scale="100" />
+        </imageobject>
+        <textobject>
+            <phrase>bogomips kimeneten</phrase>
+        </textobject>
+    </mediaobject>
+</figure>
+  </section> 
+<section>
     <title>Helló, Google!</title>
     <para>
         Írj olyan C programot, amely egy több milliárd(haha ne ne...elég lesz kevesebb srsly) honlapból álló hálózatra kiszámolja az N lap Page-Rank 
@@ -295,33 +671,220 @@ false]]></screen>
         Megoldás forrása:
         <itemizedlist>
           <listitem>
-              <para><link xlink:href="">C' le magnifique</link></para>
+              <para><link xlink:href="https://github.com/rkeeves/bhax-derived/blob/master/thematic_tutorials/bhax_textbook_IgyNeveldaProgramozod/Turing/pagerank_example.cpp">Pagerank Példa</link></para>
           </listitem>
           <listitem>
-              <para><link xlink:href="">STL Iterator</link></para>
+              <para><link xlink:href="https://github.com/rkeeves/bhax-derived/blob/master/thematic_tutorials/bhax_textbook_IgyNeveldaProgramozod/Turing/pagerank_c.cpp">Pagerank C</link></para>
           </listitem>
           <listitem>
-              <para><link xlink:href="">Purely STL Vector</link></para>
+              <para><link xlink:href="https://github.com/rkeeves/bhax-derived/blob/master/thematic_tutorials/bhax_textbook_IgyNeveldaProgramozod/Turing/pagerank_iter.cpp">STL Iterator</link></para>
+          </listitem>
+          <listitem>
+              <para><link xlink:href="https://github.com/rkeeves/bhax-derived/blob/master/thematic_tutorials/bhax_textbook_IgyNeveldaProgramozod/Turing/pagerank_vec.cpp">Purely STL Vector</link></para>
           </listitem>
         </itemizedlist>
     </para>
-    <para>
-      Pagerank C jelleggel
+<para>
+      Pagerank a Google által használt adóelk...keresési algoritmus magja. A feladat arról szólt, hogy egy négy honlapból álló kapcsolati hálón kellene vele elemezni. A pageranktől azt várjuk, hogy az összes honlapnak mondjuk adjon egy 0-1-ig terjedő értéket (normalizált, azaz az összes lap rankjének összege 1 for sanity check).
+       Van több implementáció is, de mi egy konkrétan kitenyésztett példa progival fogunk dolgozni. Ez a pagerank vektor értékeit fő iterációs lépésenként kiírja egy fájlba.
+      A pagerankkel a példában egy irányított multigráfon fogunk számolni. (irányított mert számít hogy honnan-hova megy az él, multigráf pedig a több él egy pontból plusz hurkok is lehetnek)
     </para>
-    <programlisting language="c" linenumbering="numbered">
-      <textobject><textdata fileref="Turing/pagerank_c.cpp"/></textobject>
-    </programlisting> 
+    <figure>
+    <title>pagerank kapcsolati irányított multigráf</title>
+    <mediaobject>
+        <imageobject>
+            <imagedata fileref="img/pagerank_graph.png" scale="100" />
+        </imageobject>
+        <textobject>
+            <phrase>pagerank kapcsolati irányított multigráf</phrase>
+        </textobject>
+    </mediaobject>
+    </figure>
     <para>
-      Pagerank STL Iterators
+      Ez ugyan emberként érthető, de próbáljuk valahogy szervezettebb formába hozni. Csináljunk egy kvadratikus mátrixot, és töltsük ki a következő szabály szerint: <literal>Először mindenhova írjunk be nullát</literal> majd <literal>Ha A-ból B-be megy él, akkor A oszlop B sorába írjunk 1-et</literal>
+      Először nézzük csak meg J-re(J-ből egy él megy ki JP felé...)
     </para>
-    <programlisting language="c" linenumbering="numbered">
-      <textobject><textdata fileref="Turing/pagerank_iter.cpp"/></textobject>
-    </programlisting> 
+<literallayout>
+    J  JP JPL   M
+J   0   0   0   0
+JP  1   0   0   0
+JPL 0   0   0   0
+M   0   0   0   0
+</literallayout>
     <para>
-      Pagerank STL Vector
+      Most pedig csináljuk meg JP-re(magába és JPLbe)
     </para>
+<literallayout>
+    J  JP JPL   M
+J   0   0   0   0
+JP  1   1   0   0
+JPL 0   1   0   0
+M   0   0   0   0
+</literallayout>
+    <para>
+      Jöhet JPL (mindenkibe csak magába nem)
+    </para>
+<literallayout>
+    J  JP JPL   M
+J   0   0   1   0
+JP  1   1   0   0
+JPL 0   1   1   0
+M   0   0   1   0
+</literallayout>
+    <para>
+      Jöhet M (csak JP-be)
+    </para>
+<literallayout>
+    J  JP JPL   M
+J   0   0   1   0
+JP  1   1   0   1
+JPL 0   1   1   0
+M   0   0   1   0
+</literallayout>
+    <para>
+      Most normalizáljuk, azaz adjuk össze az egy oszlopban lévő számokat, nevezzük ezt <literal>szum</literal>mának.
+       Ha meg van, akkor utána ugyanezen az oszlopon menjünk végig és mindenkit osszunk el <literal>szum</literal>-mal, ha szum nem nulla.
+    </para>
+<literallayout>
+    J  JP JPL   M
+J   0   0 1/3   0
+JP  1 1/2 1/3   1
+JPL 0 1/2   0   0
+M   0   0 1/3   0
+</literallayout>
+ <para>
+      Vessük össze az előadás diával.
+    </para>
+<figure>
+    <title>pagerank link mátrix sanity check</title>
+    <mediaobject>
+        <imageobject>
+            <imagedata fileref="img/pagerank_lmx.png" scale="100" />
+        </imageobject>
+        <textobject>
+            <phrase>pagerank link mátrix sanity check</phrase>
+        </textobject>
+    </mediaobject>
+</figure>
+    <para>
+      Most hogy végre van link mátrixunk elkezdhetünk számolni. De mi is a lényeg, mit fogunk számolni?
+      Gondoljunk vissza a <link xlink:href="https://www.youtube.com/watch?v=PFDu9oVAE-g">sajátérték sajátvektorra</link>!
+      Magyarul amikor Tanár Úr azt mondja <literal>Tehát ha h jelöli a PR vektort, akkor h=Lh. Linalg kedvelőknek: a PageRank vektor az L linkmátrix 1 sajátértékhez tartozó sajátvektora.</literal>
+      akkor gondoljunk a következőre
+    </para>
+<literallayout>
+                      | PR[1] |
+                      | PR[2] |
+                      | PR[3] |
+                      | PR[4] |
+                     
+   | 0   0 1/3   0 |  |   ?   |   = | PR[1] |
+   | 1 1/2 1/3   1 |  |   ?   |     | PR[2] |
+   | 0 1/2   0   0 |  |   ?   |     | PR[3] |
+   | 0   0 1/3   0 |  |   ?   |     | PR[4] |
+</literallayout>
+    <para>
+      Mátrixok vektorok stb. szorzást pedig már tanultunk szóval
+    </para>
+<literallayout>
+                   | PR[1] |
+                   | PR[2] |
+                   | PR[3] |
+                   | PR[4] |
+                     
+| 0   0 1/3   0 |  | PR[3]/3                     | = | PR[1] |
+| 1 1/2 1/3   1 |  | PR[1]+PR[2]/2+PR[3]/3+PR[4] |   | PR[2] |
+| 0 1/2   0   0 |  | PR[2]/2                     |   | PR[3] |
+| 0   0 1/3   0 |  | PR[3]/3                     |   | PR[4] |
+</literallayout>
+    <para>
+      Szét is robbanthatjuk akár egyenletekre...
+    </para>
+<literallayout>
+PR[3]/3             = PR[1]
+PR[1]+PR[2]/2+PR[4] = PR[2]
+PR[2]/2+PR[3]/3     = PR[3]
+PR[3]/3             = PR[4]
+</literallayout>
+    <para>
+      Most pedig jön a kérdés, hogy hogyan oldjuk meg? PR[2] önmagából számolja önmagát!
+    </para>
+    <para>
+      A válasz nem túlzottan bonyolult...tároljuk el az előző lépés értékeit minden ciklusban és használjuk azokat. (Ez lesz a megoldásban PRv)
+    </para>
+<literallayout>
+PRv[3]/3             = PR[1]
+PRv[1]+PR[2]/2+PR[4] = PR[2]
+PRv[2]/2+PR[3]/3     = PR[3]
+PRv[3]/3             = PR[4]
+</literallayout>
+  <para>
+    Egy kérdés még maradt: Mennyi legyen PRv iniciális értéke?
+    A válasz annyi, hogy mindegyik érték 1 aztán benormáljuk, hogy összegük 1 legyen (Mat viz).
+  </para>
+  <para>
+    Ha midezt megértettük, akkor már könnyű lesz megérteni az alábbi kódomat! A refekkel, constokkal, initializer listekkel meg a többi szeméttel ne törődjünk még nem kell őket érteni, csak a pagerank-re fókuszáljunk.
+    Ha esetleg nem lenne érthető a kód, akkor beraktam a repóba egy openoffice calc (olyan mint az excel csak kevesebb benne a fluff) doksit, ami ugyanezt a pagerank számítást csinálja...
+    A fejezet végén beillesztettem a C++ kódot, viszont most következzen két diagram. Az első a C++ algoritmus PR vektorának értékeit mutatja iterációnként, a másik pedig az <link xlink:href="https://github.com/rkeeves/bhax-derived/blob/master/thematic_tutorials/bhax_textbook_IgyNeveldaProgramozod/Turing/pagerank.ods">open office</link>-ost, ha valaki valami miatt szereti az irodai munkát.
+  </para>
+  <figure>
+    <title>pagerank cpp konvergál</title>
+    <mediaobject>
+        <imageobject>
+            <imagedata fileref="img/pagerank_results_cpp.png" scale="100" />
+        </imageobject>
+        <textobject>
+            <phrase>pagerank cpp konvergál</phrase>
+        </textobject>
+    </mediaobject>
+  </figure>
+<figure>
+    <title>pagerank openoffice konvergál</title>
+    <mediaobject>
+        <imageobject>
+            <imagedata fileref="img/pagerank_results_openoffice.png" scale="100" />
+        </imageobject>
+        <textobject>
+            <phrase>pagerank openoffice konvergál</phrase>
+        </textobject>
+    </mediaobject>
+</figure>
+
+    <para>
+    Kicsit azért vigyázzunk...ugyanis van két kis probléma.
+    Tanár Úr azért mondta hogy rázzuk a vizet az internetben, mert arra gondolt, hogy ez az iteratív megoldás olyan mintha vödrök között öntögetnénk vizet, vagy mondjuk egy fémlemez hőmérsékletét akarnánk úgy kiszámolni, hogy az egyik szélén tudjuk a hőmérsékletet a többit pedig úgy számoljuk, hogy a négy (felső-alsó-bal-jobb egy kockás lapon mondjuk) szomszédját átlagoljuk.
+    Nos első esetben az a probléma, hogy az egyik vödörbe folyik víz be, vissza is folyik magába, de kifele nem.
+    A példa fájlban egy <literal>get_dangling</literal> funkció csinál olyan mátrix-ot amiben van egy nyelő jellegű node.
+    </para>
+<literallayout>
+    { 1,0,1,0,1,0},
+    { 1,1,0,1,0,0},
+    { 0,1,1,0,1,0},
+    { 1,0,1,1,0,0},
+    { 0,1,0,1,1,0},
+    { 1,0,1,0,1,0}
+</literallayout>
+    <para>
+    Most pedig következzen az igazi vizes locspocs.
+    Vegyük a következő kapcsolati gráfot:
+    </para>
+<literallayout>
+    A   A
+A   0   0
+B   1   1
+</literallayout>
+<para>
+ A locspocs-t indítsuk a következő PRv-vel:
+</para>
+<literallayout>
+PRv  0 
+PRv  1
+</literallayout>
+<para>
+    Érezhető hogy ennek mi lesz a vége, ha valaki elképesztően kíváncsi az open office <link xlink:href="https://github.com/rkeeves/bhax-derived/blob/master/thematic_tutorials/bhax_textbook_IgyNeveldaProgramozod/Turing/pagerank.ods">fájlban</link>-ban látható egy <literal>Infinite</literal> nevű munkalap.
+</para>
     <programlisting language="c" linenumbering="numbered">
-      <textobject><textdata fileref="Turing/pagerank_vec.cpp"/></textobject>
+      <textobject><textdata fileref="Turing/pagerank_example.cpp"/></textobject>
     </programlisting> 
   </section>
   <section xml:id="bhax-textbook-feladatok-turing.MontyHall">
@@ -616,54 +1179,4 @@ plot(x,y,type="b")]]>
             </itemizedlist>                
         </tip>
     </section>
-    <section>
-      <title>Minecraft csiga</title>
-      <para>
-        Csinálj csigaként körbe-körbe menő mozgást Malmo-ben! (És éld túl, hogy lehal a géped, mert túlmelegszik.)
-      </para>
-      <para>
-          Megoldás videó: <link xlink:href="">No link</link>
-      </para>
-      <para>
-          Megoldás forrása:
-          <itemizedlist>
-              <listitem>
-                <para><link xlink:href="">Folyamatos mozgásos csiga xml</link></para>
-              </listitem>
-              <listitem>
-                <para><link xlink:href="">Folyamatos mozgásos kód</link></para>
-              </listitem>
-              <listitem>
-                <para><link xlink:href="">Diszkrét mozgásos csiga xml</link></para>
-              </listitem>
-              <listitem>
-                <para><link xlink:href="">Diszkrét mozgásos csiga kód</link></para>
-              </listitem>
-          </itemizedlist>
-      </para>
-      <para>
-          Az első részfeladat folyamatos mozgás esetéről szól. Itt semmi feedback nincs (pl.: PID kontroll), simán váltogatjuk hogy az ágens forduljon-e vagy sem. 
-      </para>
-      <programlisting language="python" linenumbering="numbered">
-        <textobject><textdata encoding="UTF-8" fileref="Turing/turning.py"/></textobject>
-      </programlisting>           
-      <para>
-          A második részfeladat diszkrét mozgás esetéről szól. Itt például megemlíthetjük, hogy a 3x3x3-as "látótér adatokat" egy vektorban kapjuk meg.
-      </para>
-      <programlisting language="python" linenumbering="numbered">
-        <textobject><textdata encoding="UTF-8" fileref="Turing/gridaccessor.py"/></textobject>
-      </programlisting> 
-      <para>
-        Egy másik érdekes dolog, hogy az összes observation adat-ot egy string-ben kapjuk, amit json formában kell parseolni, majd ennek különböző fieldjeit nézegethetjük.
-      </para>
-      <programlisting language="python" linenumbering="numbered">
-        <textobject><textdata encoding="UTF-8" fileref="Turing/observationadapter.py"/></textobject>
-      </programlisting> 
-      <para>
-        Utolsó sorban, pedig waypointokat generálunk kifele növekevő spirál alakban. Az ágens a waypoint iter által számított legújabb waypointot közelíti, majd egy bizonyos hibahatáron belül, úgy tekinti elérte és kér újat.
-      </para>
-      <programlisting language="python" linenumbering="numbered">
-        <textobject><textdata encoding="UTF-8" fileref="Turing/wpiter.py"/></textobject>
-      </programlisting> 
-  </section> 
 </chapter>                

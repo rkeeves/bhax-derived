@@ -1,9 +1,4 @@
 #include "pubghypetrain.h"
-#include <iostream>
-#include <chrono>
-#include <thread>
-
-using namespace std;
 
 void collide(int posX, int posY, int &velX, int &velY, int xmax, int ymax){
   bool outX = (posX <= 0 || posX >= xmax-1);
@@ -21,9 +16,9 @@ void draw(int posX, int posY, int xmax, int ymax){
   ClearScreen();
   for(int y = 0; y < ymax; y++){
     for(int x = 0; x < xmax; x++){
-      if( (posX == x) && (posY == y) ){cout << 'O';}else{cout << '.';};
+      if( (posX == x) && (posY == y) ){ std::cout << 'O';}else{ std::cout << '.';};
     };
-    cout << endl;
+    std::cout << std::endl;
   };
 };
 
