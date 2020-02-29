@@ -357,7 +357,7 @@ a = a - b => (a,7) (b,6)
       Ez is jó, és ráadásul csak összeadással és kivonással terheljük a CPU-t!
     </para>
     <para>
-      De esetleg van valami más is? Nos nézzük a bitwise xor-t!
+      De esetleg van valami más is? Nos nézzük a xor műveletet!
     </para>
     <programlisting language="c" linenumbering="numbered">
       <textobject><textdata fileref="Turing/swap_xor.cpp"/></textobject>
