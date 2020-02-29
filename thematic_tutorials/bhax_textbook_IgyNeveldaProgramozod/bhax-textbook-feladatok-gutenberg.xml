@@ -15,6 +15,181 @@
         <para>         
             <citation>PICI</citation>       
         </para>
+        <section>
+          <title>Adattípusok</title>
+          <para>         
+              (28) tartomány, műveletek, reprezentáció, egyszerű, összetett, mutató  
+          </para>
+          <para>         
+            Mielőtt beszélünk a típusokról nézzünk egy nem típusos nyelvet! A <citation>NANDTOTETRIS</citation>-hez írtunk egy c++ interpreter jellegű programot, mely úgy viselkedik mintha egy vlós CPU lenne(csak jóval egyszerűbbek az opcode-ok).
+            A lényeg, hogy 2 regiszter van. A és D. A "Adress" ugyanis a jump-ok mindig az A-ban lévő értékű címre ugranak. D "Data" register pedig egy "sima" regiszter. "A" regiszterrel a trükközés azért kell, mert így borzasztóan egyszerűve válnak az opcode-ok.
+            0-kat és 1-eseket nem akarunk írni, ezért írtunk rá egy assemblert.
+            Alább látható egy szuper egyszerű assembly kód erre a teljesen minimalista kis gépre. 
+          </para>
+<literallayout>
+@2
+D=A
+@3
+D=D+A
+@0
+M=D
+</literallayout>
+        <para>         
+          A lényeg, hogy az assembler (label és egyéb dolgok mellett) elsősorban azt a célt szolgálja, hogy a fenti szöveg átforduljon bytecode-ra.
+          Alább látható a fordított gépikód.
+        </para>
+<literallayout>
+0000000000000010
+1110110000010000
+0000000000000011
+1110000010010000
+0000000000000000
+1110001100001000
+</literallayout>
+        <para>         
+          Nincsenek típusok, minden "szó" N menyiségű bitből álló rendezett 16-os. Műveleteket nem definiálhatunk magunk, hisz azt a CPU csinálja.
+        </para>
+        <para>         
+          Innentől kezdve bármit tanulunk emlékezzünk arra, hogy hasonló lesz a vége. (Persze a valóságban jóval összetettebb, de 1-esek és 0-k lesznek a legadvancedebb cpp kódból a nap végén.)
+        </para>
+        <para>         
+          A típus megadja a gépnek hogy mikor írtunk egy programot és ráengedjük a lexert, parsert, compilert vagy interpretert akkor mit fogadjon el egyáltalán.
+          Azaz hogy milyen elemei lehetnek. Azaz a típus egy halmazként is felfogható, melynek elemei a lehetséges értékek.
+          Halmazoknál ugye felsorolhatjuk, de akár ha pro-k vagyunk szabályokkal is megadhatjuk (emlékezzünk a természetes számok halmazán successor-ra, vagy akár a modulo kongruencia osztályokra egészeknél)
+        </para>
+        <para>         
+          A típus megadja a gépnek hogy milyen műveleteket és hogyan kell végezni.
+          Például egy bool-t ha negálunk más történik, mintha egy int-et. Sőt, sokszor nem is lehet bizonyos dolgokat értelmezni, például Várterész Tanárnő nem nagyon szorozgatott igaz-t hamis-sal (majd később belemegyünk a szorzásba, most simán csak gondoljunk gyerekkorunkban tanultakra).
+        </para>
+        <para>         
+          A típus megadja a gépnek hogy hogyan kell interpretálni az adatot. Például gondoljunk egy egyszerű C struct-ra, van két char fieldje "foo" és "bar". Elrakjuk valahova a memóriába (és tároljuk a címét), majd kis idő múlva kellene az "b" field. Honnan fogjuk tudni, hogy a sok bit közül hol kezdődnek a "b" field bitjei illetve, hogy hány bitből is áll?
+          Például erre (is) ad válazt a primitív char típus.
+        </para>
+        <para>         
+          Magyarul minden nyelv ad pár egyszerű típus-t. Például C esetében int, char, float stb...
+          <itemizedlist>
+            <listitem>
+                <para>numerikus - pl.: (C)int, (C)float</para>
+            </listitem>
+            <listitem>
+                <para>karakteres - pl.: (C)char</para>
+            </listitem>
+            <listitem>
+                <para>karakterlánc - pl.: ezt általában nem igazi primitív, hanem a nyelv mellé adott alap library része, például Erlang-ban egyébként egy lista</para>
+            </listitem>
+            <listitem>
+                <para>logikai - pl.: (C) bool</para>
+            </listitem>
+            <listitem>
+                <para>felsorolásos - pl.: (C) enum</para>
+            </listitem>
+            <listitem>
+                <para>sorszámozott - pl.: (Pascal) byte, word, int, ...</para>
+            </listitem>
+          </itemizedlist>
+        </para>
+        <para>         
+          A nyelv által definiált egyszerű típusokból van lehetőség új strukturált típusok összerakására ezek az összetett típusok.
+        </para>
+        <para>         
+          A típusnak pedig végül kell hogy legyen valami azonosítója, hogy tudjunk rá a későbbiekben hivatkozni.
+        </para>
+        <para>       
+          A mutató típusról kicsit külön érdemes beszélni. A mutató egy tárbeli címre mutat vagy <link xlink:href="https://www.youtube.com/watch?v=YYkOWzrO3xg">NULL</link>-ra.
+          Érdemes tudni, hogy a mutatott cím egyáltal milyen típus. Azaz a <literal>char* foo</literal> ptr típusú, viszont amire mutat azt char-ként fogja "interpretálni". Persze egy int-et tároló mem területre rámehetünk egy char ptr-rel gond nélkül.
+        </para>
+        </section>
+        
+        <section>
+          <title>A nevesített konstans</title>
+          <para>         
+              (34) név, típus, érték
+          </para>
+          <para>         
+              Szerintem a könyvbeli preprocesszor-os példa technikailag nem igaz. Az hogy a preproceszor mit csinál már a Turing-os fejezetben bemutattam, plusz mutattam olyat is amikor makró alkalmaz makrót ami kódot injektál. Na egy ilyen esetben látszik hogy a preprocesszor csak egy "szövegszerkesztő" eszköz, nem a nyelv része, plusz úgy ütöm felül a a define-okat ahogy akarom.
+          </para>
+          <para>         
+              Ellenben a <literal>const int = 6;</literal> egy konstans. típus, const qualifier, és értékadás, just like God intended.
+              Ha már itt tartunk akkor itt a világ legmegbízhatóbb Java kódja, ami viszont olykor mégis hibát okozhat (assuming that it wont get optimized away): <literal>private static void foo(){};</literal>. He. He.
+          </para>
+        </section>
+        
+        <section>
+          <title>A változó</title>
+          <para>         
+              (35) név, attribútumok, cím, érték
+          </para>
+          <para>         
+              A változóknak négy komponense van:
+              <itemizedlist>
+            <listitem>
+                <para>név - pl.: user defined, scope-on belül egyedi</para>
+            </listitem>
+            <listitem>
+                <para>attribútumok - pl.: típus, vagy qualifiers</para>
+            </listitem>
+            <listitem>
+                <para>cím - stack, heap vagy manual</para>
+            </listitem>
+            <listitem>
+                <para>érték - értékadás, itt annyit érdemes megjegyezni, hogy attól hogy létrehozom és kap címet, azt nem lehet várni hogy a tár tiszta legyen, úgyhogy érdemes lehet initelni.</para>
+            </listitem>
+            <listitem>
+                <para>felsorolásos - pl.: (C) enum</para>
+            </listitem>
+            <listitem>
+                <para>sorszámozott - pl.: (Pascal) byte, word, int, ...</para>
+            </listitem>
+          </itemizedlist>
+          </para>
+        </section>
+        
+        <section>
+          <title>Alapelemek az egyes nyelvekben</title>
+          <para>         
+              (39) innen csak a C nyelves rész persze
+          </para>
+          <para>
+          Aritmetikai típusok
+          <itemizedlist>
+            <listitem>
+                <para>integrális - egész (int, short[int], long[int]) : signed unsigned-ról már turingban írtam példával együtt </para>
+            </listitem>
+            <listitem>
+                <para>integrális - karakter (char)</para>
+            </listitem>
+            <listitem>
+                <para>integrális - felsorolásos (enum)</para>
+            </listitem>
+            <listitem>
+                <para>valós - (float, double, long double) </para>
+            </listitem>
+          </itemizedlist>
+          
+          Származtatott típusok
+          <itemizedlist>
+            <listitem>
+                <para>tömb </para>
+            </listitem>
+            <listitem>
+                <para>függvény </para>
+            </listitem>
+            <listitem>
+                <para>mutató </para>
+            </listitem>
+            <listitem>
+                <para>struktúra </para>
+            </listitem>
+            <listitem>
+                <para>union </para>
+            </listitem>
+            <listitem>
+                <para>void </para>
+            </listitem>
+          </itemizedlist>
+          </para>
+        </section>
+        
     </section>        
     <section>
         <title>Programozás bevezetés</title>
