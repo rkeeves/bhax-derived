@@ -815,6 +815,21 @@ y = [1	0	0.5	0.25	0.375	0.3125	0.34375	]
       (Ha valakit érdekel akkor a 2d-s eset az oppenoffice <link xlink:href="https://github.com/rkeeves/bhax-derived/blob/master/thematic_tutorials/bhax_textbook_IgyNeveldaProgramozod/Turing/pagerank.ods">fájl</link>-ban a <literal>twod</literal> munkalapon van, de semmi különös.)
     </para>
     <para>
+      Ha valaki mégsem értené, nézzünk egy konkrét példát: Hogyan lett pl [0.5,0.5] irányú vektorból [0.75,0.25]?
+      Alábbi ábrán felveszünk egy [0.75,0.25] vektort(zöld folytonos vonal), és ezt változatlanul fogjuk hagyni. Ezután veszünk egy [1,1] vektort(kék folytonos vonal). Azért [1,1] mert csak az irány a fontos, és azt akartam hogy nyúljon túl a zöldön trafó után. Ezekután transzformáljuk a linkmátrix-szal a kéket. Azt várjuk hogy a transzformáció után a zöld folytonos és kék folytonos egyirányú legyen.
+    </para>
+     <figure>
+            <title>pagerank trf</title>
+            <mediaobject>
+                <imageobject>
+                    <imagedata fileref="img/pagerank_trf.png" scale="100" />
+                </imageobject>
+                <textobject>
+                    <phrase>pagerank trf</phrase>
+                </textobject>
+            </mediaobject>
+        </figure> 
+    <para>
       Vissza matekra! Mátrixok vektorok stb. szorzást már tanultunk szóval, oldjuk is meg!
     </para>
 <literallayout>
