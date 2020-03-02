@@ -12,14 +12,11 @@
     </info>
     <section>
         <title>Programozási alapfogalmak</title>
-        <para>         
-            <citation>PICI</citation>       
-        </para>
         <section>
           <title>Adattípusok</title>
           <para>         
               (28) tartomány, műveletek, reprezentáció, egyszerű, összetett, mutató  
-          </para>
+          </para>       
           <para>         
             Mielőtt beszélünk a típusokról nézzünk egy nem típusos nyelvet! A <citation>NANDTOTETRIS</citation>-hez írtunk egy c++ interpreter jellegű programot, mely úgy viselkedik mintha egy vlós CPU lenne(csak jóval egyszerűbbek az opcode-ok).
             A lényeg, hogy 2 regiszter van. A és D. A "Adress" ugyanis a jump-ok mindig az A-ban lévő értékű címre ugranak. D "Data" register pedig egy "sima" regiszter. "A" regiszterrel a trükközés azért kell, mert így borzasztóan egyszerűve válnak az opcode-ok.
@@ -34,6 +31,87 @@ D=D+A
 @0
 M=D
 </literallayout>
+          <para>         
+            Direkt a fenti egyszerűbbet mert látható a példán egy gcc -S -el készült sima main-ből ez lesz a körítés miatt.
+          </para>
+<literallayout>
+	.file	"one.c"
+	.def	__main;	.scl	2;	.type	32;	.endef
+	.text
+	.globl	main
+	.def	main;	.scl	2;	.type	32;	.endef
+	.seh_proc	main
+main:
+	pushq	%rbp
+	.seh_pushreg	%rbp
+	movq	%rsp, %rbp
+	.seh_setframe	%rbp, 0
+	subq	$32, %rsp
+	.seh_stackalloc	32
+	.seh_endprologue
+	call	__main
+	movl	$1, %eax
+	addq	$32, %rsp
+	popq	%rbp
+	ret
+	.seh_endproc
+	.ident	"GCC: (Rev1, Built by MSYS2 project) 7.2.0"
+</literallayout>
+
+          <para>         
+            Sajnos, el kellett engednem a teljes leírást, mert egyszerűen nincs rá idő, de komolyan ajánlom mindenkinek a <citation>NANDTOTETRIS</citation>-t.
+            Alább például látszik egy szuper bugyuta kis ALU. Akármennyire bugyuta és tele van csalással a lényeg, hogy közelebb visz a szoftver és hardware találkozásához, ahol az igazi varázslat történik. (Hisz papíron ugyan Gödel megcsinálta, de sok idő kellett mire mindekinek lett macskáskép nézegetője.)
+            Másrészről nincs jobb érzés, mint amikor megcsinálja az ember a kapukat, majd ráküldi a kódot és megtudja vele csinálni a "for"-t!
+            Tényleg fáj a szívem hogy nincs módom berakni a doksiba. De őszintén ajánlom a könyvet, mert valójában az NEM EGY KÖNYV. Minden fejezet egy minimális elméleti alapozó és utána szuper egyértelmű task-ok vannak, TESZTEKKEL és platformmal együtt. Annyi, hogy én nem szeretem a Java-t mert az Oracle gonosz, ezért csak az assembler-es részt rossz minőségű c++-ban reprodukáltam a <link xlink:href="https://github.com/rkeeves/bhax-derived/blob/master/thematic_tutorials/bhax_textbook_IgyNeveldaProgramozod/Gutenberg/hack">ide</link>.
+          </para>
+          <para>         
+            Ha valakit abszolút nem érdekel a dolog, akkor is egyszer javaslom, csak amiatt, hogy átérezzük, hogy mennyire komoly segítséget adnak a mérnökinfósok és villamos mérnökök nekem illetve nekünk.
+          </para>
+          <para>         
+            Ha pedig valakit a mérnökinfósok sem érdekelnek és nem szeret olvasni, legalább vessen egy pillantást <link xlink:href="https://youtu.be/cgVVZMfLjEI?t=1925">erre</link>.
+          </para>
+<literallayout>
+CHIP ALU {
+    IN  
+        x[16], y[16],  // 16-bit inputs        
+        zx, // zero the x input?
+        nx, // negate the x input?
+        zy, // zero the y input?
+        ny, // negate the y input?
+        f,  // compute out = x + y (if 1) or (x and y) (if 0)
+        no; // negate the out output?
+
+    OUT 
+        out[16], // 16-bit output
+        zr, // 1 if (out == 0), 0 otherwise
+        ng; // 1 if (out less than 0),  0 otherwise
+
+    PARTS:
+
+    // X INP
+      Mux16(a=x,b[0..15]=false,sel=zx,out=xt);
+      Not16(in=xt,out=xtn);
+      Mux16(a=xt,b=xtn,sel=nx,out=xarg);
+    // Y INP
+      Mux16(a=y,b[0..15]=false,sel=zy,out=yt);
+      Not16(in=yt,out=ytn);
+      Mux16(a=yt,b=ytn,sel=ny,out=yarg);
+    // F
+      And16(a=xarg,b=yarg,out=oand);
+      Add16(a=xarg,b=yarg,out=oadd);
+      Mux16(a=oand,b=oadd,sel=f,out=o);
+    // OUT POST
+      Not16(in=o,out=onot);
+      Mux16(a=o,b=onot,sel=no,out=oo);
+    // ZR
+      Or16Way(in=oo,out=tzr);
+      Not(in=tzr,out=zr);
+    // NG
+      And16(a[0..15]=true,b=oo,out[15]=ng,out[1..14]=drop);
+    // OUT
+      Or16(a=oo,b[0..15]=false,out=out);
+}
+</literallayout>
         <para>         
           A lényeg, hogy az assembler (label és egyéb dolgok mellett) elsősorban azt a célt szolgálja, hogy a fenti szöveg átforduljon bytecode-ra.
           Alább látható a fordított gépikód.
@@ -46,6 +124,7 @@ M=D
 0000000000000000
 1110001100001000
 </literallayout>
+
         <para>         
           Nincsenek típusok, minden "szó" N menyiségű bitből álló rendezett 16-os. Műveleteket nem definiálhatunk magunk, hisz azt a CPU csinálja.
         </para>
@@ -66,7 +145,164 @@ M=D
           Például erre (is) ad válazt a primitív char típus.
         </para>
         <para>         
-          Magyarul minden nyelv ad pár egyszerű típus-t. Például C esetében int, char, float stb...
+          Amit még nagyon fontos lefektetni, az az hogy inheritance, primitív típus, template mind csak fluff és eyecandy a CPU szempontjából. Előbb utóbb mindenből 0101 0011 1111 0000 lesz. Igen igen 32 64, plusz valójában nem egy szó kerül be stb. de a lényeg hogy mindent számokra képezünk le. Az összes többi dolog csak és kizárólag azért kell, mert az ember biológiailag nem 0 és 1 olvasásra és nagy sebességű aritmetikai műveletek elvégzésére fajlődött hanem az ágakon tekergő kígyók elől való elugrálásra.
+        </para>
+        <para>         
+          A tankönyv említi hogy forrásszöveget írunk, amelyből aztán két mágiával lehet gépi kód. Compiler-es és interpreter-es. Ez a valóságban sajnos nem ilyen egyértelmű. Nézzünk például egy Java-s példát. Igen compiled, de...mégis a VM stack machine-en fut. A stack machine csak egy absztrakció, nem a tiszta vas. Ez is a középpontja az Java azon ígéretének mi szerint "write once, run before Oracle sues you for using VM without paying your subscription for server side usage".
+        </para>
+        <para>         
+          Másik Java példa: Project Lombok. Fel annotáljuk meta nyelven a forrás szöveget, és a class file-ba belegeneráljuk a boilerplate code-ot, anélkül, hogy telenyomnánk vele a source-t.
+        </para>
+        <para>         
+          Másik Java példa: Spring, xml vagy reflection (annotation) based meta adatok. Igen a forrás fájl része, de egy framework használja az adatokat...
+        </para>
+        <para>         
+          És a akkor a kedvencem: Írok egy progit C-ben. Mondjuk egy macskáskép játék. A business logic-ot direkt C helyett Lua-ban írom, magyarul a C programom tartja számon a Lua state-t. A programom compiled, viszont ha a lua szkriptet változtatom alatta akkor gond nélkül hot swappelhetem mondjuk szerver oldalon. Most akkor része a business logic a programomnak? Vagy a programom egy hyper program ami önmaga nem a macskás játék? De hát a grafikus funkciók C-ben vannak írva? A lényeg, hogy nem ilyen egyértelmű a dolog.
+        </para>
+        <para>
+          Arról pedig már ne is beszéljünk, amit egy JIT compiler egy átlagos hétfő délután csinál.
+        </para>
+      
+        <para>         
+          A tankönyv ezután belemegy a fordító programok világába. Ez ahogy láttuk nem egy merev dolog, de ennél még rosszabb is történhet. Egyes "compiler"-ek azért vannak hogy C-kódot generáljanak valami deklaratív jellegű nyelvből. De ennél még rosszabb, hogy van aminek az a célja hogy C kódot fordítson Javascriptre.
+          A fordítás általános feladatai a tankönyv szerint a következőek:
+          <itemizedlist>
+            <listitem>
+                <para>lexikális elemzés</para>
+            </listitem>
+            <listitem>
+                <para>szintaktikai elemzés</para>
+            </listitem>
+            <listitem>
+                <para>szemantikai elemzés</para>
+            </listitem>
+            <listitem>
+                <para>kódgenerálás</para>
+            </listitem>
+          </itemizedlist>
+        </para>
+        <para>
+         A könyv kiemeli, hogy lehet szó előfordítókról. 
+          Most egy tanulságos történet: Java spring-based web server. 
+          Hibernate előtti időszak, szóval perzisztenciát from scratch. 
+          Amerikaiak úgy döntöttek, hogy egy perzisztens class-t annotációkkal fognak "dekorálni" (ez akkor még nagy szó volt, mert ez még az xml config-os spring era), 
+          és technikai okokból, ha ez megtörtént, az annotációkban megjelölt információk alapján a SUPER class auto generálni fogjuk. 
+          Igen <literal>Derived extends Base</literal> és Base még nem volt kész, hanem Derived alapján jött létre "automatán" a Derived annotált source kód alapján.
+          Például olyan célt szolgált, hogy a null check-ek validálások, propertyeventchanged küldések stb. ne kézzel íródjanak.
+         <link xlink:href="https://www.ptc.com/en/products/plm/plm-products/windchill">Ő az</link>. Az már egy másik cseresznye a tortán, hogy nem a hétköznapi módon csináltak Product táblát, Employee táblát stb., 
+         hanem például TypeIdentifier, AttributeTypeIdentifier és hasonló táblák voltak, azaz runtime lehetett új "típusokat" létrehozni, úgy hogy ezek nem csak a field-eket örökölték, hanem viselkedést is (igen a munka nagyrésze az application layerben ment).
+          </para>
+ <para>A könyv kitér rá, és tényleg nagyon fontos a linker. Egyébként így elsőre prog 1-ből az lesz az előnye, hogy nem kell mindig az egészet újra fordítani. Persze ha nem kell mindig újra fordítani. Persze a compile-olgatásnak és linkelgetésnek is meg van a maga ára. Például ha ritkán változó dologról van szó, akkor lehet precompiled header-ekkel dolgozni.</para>
+          <para>Na jó...de mi ez az egész linkelés? Pl. C++ esetén a compilation unit Foo, illetve van egy FooMain-ünk ahol használjuk. Külön külön fordítjuk, és ha minden rendben akkor végül együtt kell működniük majd, tehát linkelésnél valamilyen módon a FooMain beli használathoz társítani kell a Foo beli implementációt. A szerződés az együttműködésre Foo.hpp.</para>
+          <programlisting language="c" linenumbering="numbered">
+  <textobject><textdata fileref="cbook/Foo.hpp"/></textobject>
+</programlisting>
+<programlisting language="c" linenumbering="numbered">
+  <textobject><textdata fileref="cbook/Foo.cpp"/></textobject>
+</programlisting>
+<programlisting language="c" linenumbering="numbered">
+  <textobject><textdata fileref="cbook/FooMain.cpp"/></textobject>
+</programlisting>
+      
+<figure>
+    <title>Foo és Foo Main</title>
+    <mediaobject>
+        <imageobject>
+            <imagedata fileref="img/foocompile.png" scale="100" />
+        </imageobject>
+        <textobject>
+            <phrase>Foo és Foo Main</phrase>
+        </textobject>
+    </mediaobject>
+</figure>
+<para>
+Na jó... de mi történik, ha megváltozik az a field? Mi van ha kifele int-et mutatok, de valójában másképp akarom tárolni?
+</para>
+<para>
+Amíg a hpp változatlan addig azt csinálok implementációban amit akarok!
+</para>
+<para>
+De...szóval mi van ha esetleg az a implementációjához akarok hozzányúlni. Bad luck! Hpp-t módosítani kell és akkor már nem tudnak ellened linke...VÁRJUNK CSAK!
+</para>
+<para>
+Egy kis trükközéssel encapsulating kivitelezhető ezen kívánságra is, csak kompozíciót kell alkalmazni és egy struct-ba wrappelni amit rejteni kívánunk.
+</para>
+<programlisting language="c" linenumbering="numbered">
+  <textobject><textdata fileref="cbook/FooABI.hpp"/></textobject>
+</programlisting>
+<programlisting language="c" linenumbering="numbered">
+  <textobject><textdata fileref="cbook/FooABI.cpp"/></textobject>
+</programlisting>
+<programlisting language="c" linenumbering="numbered">
+  <textobject><textdata fileref="cbook/FooABIMain.cpp"/></textobject>
+</programlisting>
+<figure>
+    <title>FooABI és FooABI Main</title>
+    <mediaobject>
+        <imageobject>
+            <imagedata fileref="img/fooabicompile.png" scale="100" />
+        </imageobject>
+        <textobject>
+            <phrase>FooABI és FooABI Main</phrase>
+        </textobject>
+    </mediaobject>
+</figure> 
+
+<para>A tankönyvet régen írták, de igen, továbbra is nagyon fontos hogy ki hogyan és mihez kapcsolódik, viszont mivel telt múlt azóta az idő, vannak új trükkök!</para>
+<para>A betöltés egy nagyon fontos dolog. Miért is? A gépekben az adat, az eljárás és a macskás képek nem különülnek el. Minden adat. Vicces túlzással élve a számítógép valójában egy ipari lyukasztó gép amit, nos lényegében lyukasztott kártyákkal programozunk, innentől kezdve ő kilyukasztja az utasítás kártyát ha kell, és ha kell lefuttatja a kilyukasztott végterméket egyaránt ha beadjuk neki. Számára lyuk-lyuk egyre megy.</para>
+<para>Betöltés</para>
+<para>C++, C, Java oldalról nehéz megérteni a betöltést. Nézzük assemblyvel egy egyszerű példán:</para>
+<literallayout>
+   @0
+   D=M
+   @INFINITE_LOOP
+   D;JLE 
+   @counter
+   M=D
+   @SCREEN
+   D=A
+   @address
+   M=D
+(LOOP)
+   @address
+   A=M
+   M=-1
+   @address
+   D=M
+   @32
+   D=D+A
+   @address
+   M=D
+   @counter
+   MD=M-1
+   @LOOP
+   D;JGT
+(INFINITE_LOOP)
+   @INFINITE_LOOP
+   0;JMP
+</literallayout>
+
+<para>A lényeg, hogy van egy LOOP label-em. Ez egy hely a kódban ahova ugorhatok. Hogy ugrom oda? Long story short <literal>@LOOP</literal>-al betárolom LOOP helyét majd   <literal>JGT</literal>-vel ugrom.</para>
+<para>Ok. Pszeudokódban megy, de...Mennyi is a LOOP label címe? Mármint konkrétan nekem kellene, hogy az most akkor 0111 0111 0111 1111? Honnan tudom?</para>
+<para>Naív válasz: Oké, 0 memória címre lesz betöltve a programom, szóval simán kiszámolom hogy az @address(hisz oda fogok ugrani, mert a LOOP az csak egy sajtos papír "tag", tag alatt az angol tag-et értem)</para>
+<para>Ez egy tökéletes megoldás lehet Nintendo-n, vagy nem tudom... valami ROM-on!</para>
+<para>De akkor mi van, ha én nem oda kerülök, hanem mondjuk már előttem vannak dolgok, mondjuk egy macskáskép sokszorosító?</para>
+<para>Egyszerű megoldás: Akkor derüljön ki LOOP értéke, mikor én elhelyezésre kerülök! Zseniális!</para>
+<para>Viszont...nos, innentől kezdve én elmozdíthatatlan vagyok! Pontosabban elmozdíthatnak, de mivel a LOOP egy konkrét érték, ezért ha arébb raknak, akkor rossz területre fog hivatkozni.</para>
+<para>És akkor például itt jöhetnek trükkös megoldások a cím újra számításra, vagy esetleg arra, hogy én ne direktbe hivatkozzak egyenesen a fizikai címre, hanem magamhoz képest relatív.</para>
+<para>Java esetben ez másképp van hiszen egy stack machine-be pakolunk dolgokat, ami az Oracle szerint write once run...</para>
+<para>Persze a VM egyébként egy <link xlink:href="https://youtu.be/JvBT4XBdoUE?t=1126">nagyon jó dolog</link>. Vagy például az eve online <link xlink:href="https://www.eveonline.com/">Stackless Python</link>-t használ ami egyébként ugyanúgy a unmutabilityt választotta, hasonlóan az Erlang-hoz</para>         
+<para>Interpreternél ugye nincs szükség ekkora hercehurcára, kivéve ha van szükség. Mármint például egyes interpretált nyelveknél direkt egy előfordított formába rkhatjuk a szkriptet és akkor kicsit gyorsítani tudunk a dolgokon.</para>
+<para>Interpreteres esetekben persze mindig ott a lehetőség, hogy a CPU intenzív dolgokat natívba rakjuk. Pl. a <link xlink:href="https://www.klei.com/games/dont-starve">dont starve</link> esetén Lua intézi az üzleti logikát, ami az állatok párzási időszakban erősödő agressziójáért felelős, de a grafika, fizika, collision C/C++ oldalon van tartva. Azért nem mondok tiszta Cpp-t, mert Lua raw c ptr-eket fogad, illetve C-s callbackek szolgálnak hook-ként a lifecycle eventekre (magyarul ha a Lua gc elakar takarítani valamit, és az egy küldő kódból származó raw ptr, akkor egy user defined c callback-et hív ezen ptr-el. Mi például itt tudjuk az átküldött címre hívni a destruktort explicit, utána visszakerül lua-nak az irányítás. Azért nincs free vagy delete, mert az is customizeable, azaz lehet például, hogy mi írunk alá memory managementet, mert folyamatosan az OS-től kérni apró chunkokat elég lassú.).</para>
+<para>Ezzel az egész résszel az volt a célom, hogy kifejezzem, hogy a könyv nagyon jó, de már régóta eltűntek azok az éles határok, illetve mivel nem láttam pontos definíciót ezért nehéz egyáltalán megtámadni is.</para>
+<para>Természetesen a lexikális elemzés során megtörténik a forrás szöveg lexikális egységekre történő bontása. Ez ma is így van.</para>
+<para>Egyébként viszont az is egy érdekes kérdés, hogy a Cpp type system az imperatív nyelvbe hogy kerül bele. Mármint arra a vicces dologra akarom felhívni a figyelmet, hogy mondjuk én egy extends-el egy abszolút nem imperatív dolgot csinálok, a type inference pedig...nos ennél kevésbé imperatív dolog nincs. Persze, igen, C-style cast.</para>
+<para>Most bele lehetne menni szárazon a BNF-be, de ennél aranyosabb a Q={"l","3","t",a++b | a,b eleme Q} Szóval <link xlink:href="https://youtu.be/dFexYse8UF0?t=234">l33t</link>, de Várterész Tanárnő egyébként szó szerint ilyen "elemzést végzett", amikor felírta az ábécét és a szabályokat.</para>
+<para>A szintaktikai szabályok kicsit hajlékonyak, például ha Tanárnő hiányzik, akkor emlékezzünk arra, hogy a <literal>-Wpedantic</literal>(pl: field initialization sorrend csak a deklarációs sorrendben megengedett) </para>
+<para>Imperatív nyelveknél a programozó mondja meg hogy hogyan, ezért tele van bugokkal. Mellette szól viszont, hogy <link xlink:href="http://judy.sourceforge.net/">gyorsabb kódot lehet így írni az elméletileg lehetségesnél</link> </para>
+<para>Deklaratív nyelveknék a programozó nem mondja meg hogyan. Emiatt nincs hiba. Technikailag. De természetesen abszolút nem az fog történi amire az ember gondol és sok szerencsét a Prolog debuggolással.</para>
+<para>Imperatív nyelvekhez még talán annyit, hogy...nos az OOP nagyon jó dolog. Bizonyos feladatokra. Folyamatos vessző paripám az <link xlink:href="https://github.com/alecthomas/entityx">ECS</link>. Nem ez nem egy nyelv, hanem egy megközelítési forma. Az egész arról szól hogy passzív adatstruktúráim vannak és a viselkedést megvalósító részeket megpróbálom (bár általában nehéz) állapot mentesíteni. Szerintem az OOP az emberi intuíciót és a problémákról történő gondolkodást elősegíti, de semmilyen bizonyíték nincs arra, hogy karbantartható codebase-hez vezet. (Például a <link xlink:href="http://cowboyprogramming.com/2007/01/05/evolve-your-heirachy/">Tony Hawk</link>) Vannak olyan nyelvek melyek az interface-t (vagy teljesen absztrakt class-t) preferálják, és kigyomlálták a hétköznapi java-ban burjánzó inheritance fákat, erdőket.</para>      
+<para>         
           <itemizedlist>
             <listitem>
                 <para>numerikus - pl.: (C)int, (C)float</para>
@@ -194,7 +430,7 @@ M=D
     <section>
         <title>Programozás bevezetés</title>
         <para>                
-            <citation>KERNIGHANRITCHIE</citation>
+            <citation>KERNIGHANRITCHIE</citation> (2nd edition)
         </para>
         <para>
             Megoldás videó: <link xlink:href="https://youtu.be/zmfT9miB-jY">https://youtu.be/zmfT9miB-jY</link>
