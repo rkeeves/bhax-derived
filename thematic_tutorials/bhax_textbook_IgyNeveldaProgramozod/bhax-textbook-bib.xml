@@ -19,7 +19,25 @@
                 </publishername>
             </publisher>
             <pubdate>2005</pubdate>
-        </biblioentry>  
+        </biblioentry>
+        <biblioentry xml:lang="hu">
+            <abbrev>JUHASZ</abbrev>
+            <authorgroup>
+                <author>
+                    <personname>
+                        <firstname>István</firstname>
+                        <surname>Juhász</surname>
+                    </personname>
+                </author>
+            </authorgroup>
+            <title>Magas sznitű programozási nyelvek</title>
+            <publisher>
+                <publishername>
+                    mobiDiák
+                </publishername>
+            </publisher>
+            <pubdate>2008</pubdate>
+        </biblioentry>        
     </bibliodiv> 
     <bibliodiv>
         <title>C</title>
