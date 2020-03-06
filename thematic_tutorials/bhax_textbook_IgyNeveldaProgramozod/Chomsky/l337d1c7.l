@@ -1,11 +1,4 @@
 /*
-Forditas:
-$ lex -o l337d1c7.c l337d1c7.l 
-
-Futtatas:
-$ gcc l337d1c7.c -o l337d1c7 -lfl
-(kilépés az input vége, azaz Ctrl+D)
-
 Copyright (C) 2019
 Norbert Bátfai, batfai.norbert@inf.unideb.hu
 
@@ -22,6 +15,7 @@ Norbert Bátfai, batfai.norbert@inf.unideb.hu
   You should have received a copy of the GNU General Public License
   along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
+%option noyywrap
 %{
   #include <stdio.h>
   #include <stdlib.h>
@@ -89,9 +83,9 @@ Norbert Bátfai, batfai.norbert@inf.unideb.hu
 	    
 	      int r = 1+(int) (100.0*rand()/(RAND_MAX+1.0));
 	    
-          if(r<91)
+        if(r<91)
 	        printf("%s", l337d1c7[i].leet[0]);
-          else if(r<95)
+        else if(r<95)
 	        printf("%s", l337d1c7[i].leet[1]);
 	      else if(r<98)
 	        printf("%s", l337d1c7[i].leet[2]);
@@ -112,7 +106,7 @@ Norbert Bátfai, batfai.norbert@inf.unideb.hu
 int 
 main()
 {
-  srand(time(NULL)+getpid());
+  srand(time(NULL));
   yylex();
   return 0;
 }

@@ -44,15 +44,53 @@
             BNF-ben a C utasítás fogalmát!
             Majd mutass be olyan kódcsipeteket, amelyek adott szabvánnyal nem fordulnak (például C89), mással (például C99) igen.
         </para>
-        <para>
-            Megoldás videó: 
-        </para>
-        <para>
-            Megoldás forrása:  
-        </para>
-        <para>
-            Tanulságok, tapasztalatok, magyarázat...
-        </para>
+         
+      <section>
+        <title>BNF</title>
+        <para>statement-ek BNF formában</para>
+        <programlisting language="c" linenumbering="numbered">
+          <textobject><textdata fileref="Chomsky/bnf_c.txt"/></textobject>
+        </programlisting> 
+      </section>
+      <section>
+        <title>inline functions</title>
+        <para>Inline régebben nem volt.</para>
+        <programlisting language="c" linenumbering="numbered">
+          <textobject><textdata fileref="Chomsky/inline.c"/></textobject>
+        </programlisting>
+      </section>
+      <section>
+        <title>új típusok</title>
+        <para>Például long long int. Érdemes <literal>-Wall -Wpedantic</literal>-al compile-olni, hogy dobja a hibát.</para>
+        <programlisting language="c" linenumbering="numbered">
+          <textobject><textdata fileref="Chomsky/longlongint.c"/></textobject>
+        </programlisting>
+        <para>Complex például nem volt része a szabványnak</para>
+        <programlisting language="c" linenumbering="numbered">
+          <textobject><textdata fileref="Chomsky/try_complex.c"/></textobject>
+        </programlisting>
+      </section>
+      <section>
+        <title>struct initialization</title>
+        <para>Például designated initialization</para>
+        <programlisting language="c" linenumbering="numbered">
+          <textobject><textdata fileref="Chomsky/designatedinit.c"/></textobject>
+        </programlisting>
+      </section>
+      <section>
+        <title>mixing decl and code</title>
+        <para>Deklaráció lehet akár kód után is</para>
+        <programlisting language="c" linenumbering="numbered">
+          <textobject><textdata fileref="Chomsky/decl.c"/></textobject>
+        </programlisting>
+      </section>
+      <section>
+        <title>implicit fn</title>
+        <para>Régebben, ha például include math lemaradt, attól még compile működött, mert implicit egy int sin() deklaráció generált. Mivel ez többnyire nem egyezik a valódásgossal, ezért ez általában hibához vezet.</para>
+        <programlisting language="c" linenumbering="numbered">
+          <textobject><textdata fileref="Chomsky/implicitf.c"/></textobject>
+        </programlisting>
+      </section>
     </section>                     
 
     <section>
@@ -63,33 +101,34 @@
             a feladat lényege, hogy lexert használjunk, azaz óriások vállán álljunk és ne kispályázzunk!
         </para>
         <para>
-            Megoldás videó: <link xlink:href="https://youtu.be/9KnMqrkj_kU">https://youtu.be/9KnMqrkj_kU</link> (15:01-től).
+          Első és legfontosabb, hogy <literal>math.h</literal> atoi atof miatt explicit beraktam. (Persze jogos kérdés, hogy miért kell egyszerre öv és hózentróger a nadrághoz...)
         </para>
         <para>
-            Megoldás forrása: <link xlink:href="Chomsky/realnumber.l">
-                <filename>bhax/thematic_tutorials/bhax_textbook_IgyNeveldaProgramozod/Chomsky/realnumber.l</filename>
-            </link> 
+          Első és legfontosabb, hogy <literal>math.h</literal> atoi atof miatt explicit beraktam. (Persze jogos kérdés, hogy miért kell egyszerre öv és hózentróger a nadrághoz...)
+           A Tanár Úr verziója csak valós számokat parse-ol. Az enyémben int és float parse megy külön counterrel.
+           Ahhoz hogy ezt elérjük definiáltuk a <literal>DIGIT</literal>-et, és ha 1 vagy több digit van egymás mellett és a végén terminál a karaterlánc, vagy whitespace van, akkor int, ha pedig pont van (és utána 0 vagy több DIGIT) akkor pedig float.
         </para>
-        <programlisting language="c"><![CDATA[%{
-#include <stdio.h>
-int realnumbers = 0;
-%}
-digit	[0-9]
-%%
-{digit}*(\.{digit}+)?	{++realnumbers; 
-    printf("[realnum=%s %f]", yytext, atof(yytext));}
-%%
-int
-main ()
-{
- yylex ();
- printf("The number of real numbers is %d\n", realnumbers);
- return 0;
-}
-]]></programlisting>
         <para>
-            Tanulságok, tapasztalatok, magyarázat...
+           A másik dolog, hogy Tanár Úr verziója nem lép ki. Nos, a mi esetünkben a <literal>brexit</literal> karakterlánc hatására a program leáll.
         </para>
+        <para>
+          Lehetne hosszabban taglalni a feladatot (pl. 1.1e3 parse?), de direkt rövidre vettük.
+        </para>
+        <programlisting language="c" linenumbering="numbered">
+          <textobject><textdata fileref="Chomsky/numberparser.lex"/></textobject>
+        </programlisting>
+        <para>
+            A lényeg annyi a flex az alap lex fájl alapján generál egy C forrásfájlt amit aztán le kell fordítani gcc-vel. Annyi hogy gcc compile esetén mellé kell linkelni valamely library-t dependencia miatt. (A bepasszolt -ll vagy -lml stb. flag).
+            Ahhoz hogy ez menjen olykor a -lml stb. flag ELŐTT -L"Mypath"-al meg kell adni a lib-et tartalmazó dir abszolút elérését.
+        </para>
+        <para>
+            A kigenerált forrásba nézzünk bele mert érdekes. Láthatóan <literal>label</literal>-eket használ és <literal>goto</literal>-t.
+            De mit is ugrál ez a kis szörnyeteg? Nos, a Tanár Úr által említett Turing-os dologról van szó!
+            Emlékezzünk a bevprog-os Bjarne Stroustrup-os példára. Ott például emlékezhetünk, hogy nem lehetett simán azt mondani, hogy 1 vagy több digit az int lesz, hiszen ha a következő char . akkor float-ot parse-olunk.
+            Nos ez startégia van lekódolva label-ekkel. Ha state machine-ként képzeljük el, akkor gyakorlatilag ezek a label-ek a állapotok.
+        </para>
+        
+        
     </section>                     
 
     <section>
@@ -98,108 +137,36 @@ main ()
             Lexelj össze egy l33t ciphert!
         </para>
         <para>
-            Megoldás videó: <link xlink:href="https://youtu.be/06C_PqDpD_k">https://youtu.be/06C_PqDpD_k</link>
+            Annyi történik, hogy a lexernél nem bonyolítottuk túl a szabályokat. Egy szabály van ami bármely char esetén érvényes. 
         </para>
-        <para>
-            Megoldás forrása: <link xlink:href="Chomsky/l337d1c7.l">
-                <filename>bhax/thematic_tutorials/bhax_textbook_IgyNeveldaProgramozod/Chomsky/l337d1c7.l</filename>
-            </link>  
-        </para>
-        <programlisting language="c"><![CDATA[%{
-  #include <stdio.h>
-  #include <stdlib.h>
-  #include <time.h>
-  #include <ctype.h>
-
-  #define L337SIZE (sizeof l337d1c7 / sizeof (struct cipher))
-    
-  struct cipher {
-    char c;
-    char *leet[4];
-  } l337d1c7 [] = {
-
-  {'a', {"4", "4", "@", "/-\\"}},
-  {'b', {"b", "8", "|3", "|}"}},
-  {'c', {"c", "(", "<", "{"}},
-  {'d', {"d", "|)", "|]", "|}"}},
-  {'e', {"3", "3", "3", "3"}},
-  {'f', {"f", "|=", "ph", "|#"}},
-  {'g', {"g", "6", "[", "[+"}},
-  {'h', {"h", "4", "|-|", "[-]"}},
-  {'i', {"1", "1", "|", "!"}},
-  {'j', {"j", "7", "_|", "_/"}},
-  {'k', {"k", "|<", "1<", "|{"}},
-  {'l', {"l", "1", "|", "|_"}},
-  {'m', {"m", "44", "(V)", "|\\/|"}},
-  {'n', {"n", "|\\|", "/\\/", "/V"}},
-  {'o', {"0", "0", "()", "[]"}},
-  {'p', {"p", "/o", "|D", "|o"}},
-  {'q', {"q", "9", "O_", "(,)"}},
-  {'r', {"r", "12", "12", "|2"}},
-  {'s', {"s", "5", "$", "$"}},
-  {'t', {"t", "7", "7", "'|'"}},
-  {'u', {"u", "|_|", "(_)", "[_]"}},
-  {'v', {"v", "\\/", "\\/", "\\/"}},
-  {'w', {"w", "VV", "\\/\\/", "(/\\)"}},
-  {'x', {"x", "%", ")(", ")("}},
-  {'y', {"y", "", "", ""}},
-  {'z', {"z", "2", "7_", ">_"}},
-  
-  {'0', {"D", "0", "D", "0"}},
-  {'1', {"I", "I", "L", "L"}},
-  {'2', {"Z", "Z", "Z", "e"}},
-  {'3', {"E", "E", "E", "E"}},
-  {'4', {"h", "h", "A", "A"}},
-  {'5', {"S", "S", "S", "S"}},
-  {'6', {"b", "b", "G", "G"}},
-  {'7', {"T", "T", "j", "j"}},
-  {'8', {"X", "X", "X", "X"}},
-  {'9', {"g", "g", "j", "j"}}
-  
-// https://simple.wikipedia.org/wiki/Leet
-  };
-  
-%}
-%%
-.	{
-	  
-	  int found = 0;
-	  for(int i=0; i<L337SIZE; ++i)
-	  {
-	  
-	    if(l337d1c7[i].c == tolower(*yytext))
-	    {
-	    
-	      int r = 1+(int) (100.0*rand()/(RAND_MAX+1.0));
-	    
-          if(r<91)
-	        printf("%s", l337d1c7[i].leet[0]);
-          else if(r<95)
-	        printf("%s", l337d1c7[i].leet[1]);
-	      else if(r<98)
-	        printf("%s", l337d1c7[i].leet[2]);
-	      else 
-	        printf("%s", l337d1c7[i].leet[3]);
-
-	      found = 1;
-	      break;
-	    }
-	    
-	  }
-	  
-	  if(!found)
-	     printf("%c", *yytext);	  
-	  
-	}
-%%
-int 
-main()
-{
-  srand(time(NULL)+getpid());
-  yylex();
-  return 0;
-}
-]]></programlisting>
+        <para>Alábbi sor annyit jelent, hogy l337d1c7 egy array melynek elemei user defined cipher struct típusúak. Az hogy hány elemű l337d1c7 azt úgy tudjuk meg, hogy l337d1c7 méretét (memóriabeli foglalási méretét) elosztjuk cipher foglalási méretével. Eredményü azt kapjuk hány cipher van az arrayben. Magyarul ez csak egy handy dolog, hogy ne manuálisan kelljen megadni.(it would be prone to errors)</para>
+<literallayout>
+#define L337SIZE (sizeof l337d1c7 / sizeof (struct cipher))
+</literallayout>
+        <para>A lényege az egésznek, hogy stdin-re gyűlik az input. Mihelyst EOF van "aktivizálódunk", és minden karaktert egyenként beolvasunk (magyarul nincs sok értelme a lexernek, hisz nincs igazi szabály)</para>
+        <para>l337d1c7-t legegyszerűbb egy szótárként felfogni: Minden charhoz megadja a leet beli karakterlánc megfelelőit</para>
+        <para>Minden char-nál csinálunk egy lineáris keresést (nem a char-ral, hanem a lowercase verziójával), azaz addig megyünk l337d1c7 amíg meg nem találjuk azt a ciphert amelynek az adott charról szól. Mivel nem biztos hogy lesz ilyen a végén found-dal van egy guard ami annyit jelent, ha nem találtunk a szótárban, akkor írjuk vissza stdout-ra az eredeti chart.</para>
+        <para>Ha viszont benne volt a szótárban, akkor generálunk egy random számot(main-ben már megseedetuk sys time-al és linuxon a saját pid-nkkal)</para>
+        <para>Ha a random szám</para>
+        <para>kisebb mint 91 akkor a szótárból az első karakterláncot írjuk ki stdout-ra</para>
+        <para>kisebb mint 95 akkor a szótárból a második karakterláncot írjuk ki stdout-ra</para>
+        <para>kisebb mint 98 akkor a szótárból a harmadik karakterláncot írjuk ki stdout-ra</para>
+        <para>egyébként a szótárból a negyedik karakterláncot írjuk ki stdout-ra</para>
+         <figure>
+              <title>leetspeak</title>
+              <mediaobject>
+                  <imageobject>
+                      <imagedata fileref="img/lolspeak.png" scale="100" />
+                  </imageobject>
+                  <textobject>
+                      <phrase>leetspeak</phrase>
+                  </textobject>
+              </mediaobject>
+          </figure>
+          <para>Alább a source kód</para>
+          <programlisting language="c" linenumbering="numbered">
+            <textobject><textdata fileref="Chomsky/l337d1c7.l"/></textobject>
+          </programlisting>
         <para>
             Tanulságok, tapasztalatok, magyarázat...
         </para>
@@ -212,12 +179,26 @@ main()
             Hogyan olvasod, hogyan értelmezed természetes nyelven az alábbi kódcsipeteket? Például
             <programlisting><![CDATA[if(signal(SIGINT, jelkezelo)==SIG_IGN)
     signal(SIGINT, SIG_IGN);]]></programlisting>
-            Ha a SIGINT jel kezelése figyelmen kívül volt hagyva, akkor ezen túl is legyen
-            figyelmen kívül hagyva, ha nem volt figyelmen kívül hagyva, akkor a jelkezelo függvény
-            kezelje. (Miután a <command>man 7 signal</command> lapon megismertem a SIGINT jelet, a
-            <command>man 2 signal</command> lapon pedig a használt rendszerhívást.)
         </para>
-
+        
+        <para>
+          Nem kell túlbonyolítani... signal function-nek két argja van: <literal>signum</literal>, és <literal>handler</literal>.
+        </para>
+        <para>
+          Minden signal csak egy szám, hogy "hanyas csatornán jön az üzenet". Ha jön egy jel mondjuk a 15-ös csatornán, akkor az fogja kezelni, aki a 15-ösre be lett állítva.
+        </para>
+        <para>
+          Mikor signal-hoz új handlert rendelünk akkor return-ben visszakapjuk az eddigi handler fn ptr-ét.
+        </para>
+        <para>
+          Annyit még tisztázzunk hogy SIG_IGN egy makró ami egy default handler címévé expandál. Annyi a trükk hogy ennek a címe SOHA nem egyezik meg egy normális funkció címével se. Azaz ez az address unique.
+        </para>
+        <para>
+          Hogy tiszta legyen a kép, alább egy példa program a signal működéséről.
+        </para>
+        <programlisting language="c" linenumbering="numbered">
+          <textobject><textdata fileref="Chomsky/signalhandling.c"/></textobject>
+        </programlisting>
         <caution>
             <title>Bugok</title>
             <para>
@@ -230,54 +211,61 @@ main()
             <listitem>                                    
                 <programlisting><![CDATA[if(signal(SIGINT, SIG_IGN)!=SIG_IGN)
     signal(SIGINT, jelkezelo);]]></programlisting>
+            <para>
+              Átállítom ignoredra. Ha eddig is ignored volt minden ok, de ha eddig nem ignored volt, akkor átrakom jelkezelőre.
+            </para>
             </listitem>
             <listitem>                                    
-                <programlisting><![CDATA[for(i=0; i<5; ++i)]]></programlisting>            
+                <programlisting><![CDATA[for(i=0; i<5; ++i)]]></programlisting>
+                <para>Valid, prefix de mivel az expression return value semmire se kell, ezért lehetne postfix is</para>                
             </listitem>
             <listitem>                                    
-
-                <programlisting><![CDATA[for(i=0; i<5; i++)]]></programlisting>            
+                <programlisting><![CDATA[for(i=0; i<5; i++)]]></programlisting>
+                <para>Valid, postfix</para>                         
             </listitem>
             <listitem>                                    
-
-                <programlisting><![CDATA[for(i=0; i<5; tomb[i] = i++)]]></programlisting>            
+                <programlisting><![CDATA[for(i=0; i<5; tomb[i] = i++)]]></programlisting>   
+                <para>belép loop-ba, felveszi a nullát i, szóval tomb[0]=0</para>
+                <para>következő menetben a postfix miatt, először lemásolja a jelenlegi értéket, inkrementálja i-t, majd a másolt érték lesz a kiértékelés vége.</para>                
+                <para>Magyarul tomb[1]=0</para>
             </listitem>
             <listitem>                                    
-
-                <programlisting><![CDATA[for(i=0; i<n && (*d++ = *s++); ++i)]]></programlisting>            
+                <programlisting><![CDATA[for(i=0; i<n && (*d++ = *s++); ++i)]]></programlisting>
+                <para>Maybe unintended assignment versus equality comparison. (nagyon rossz debuggolni az ilyet, volt vele szerencsém)</para>                
             </listitem>
             <listitem>                                    
-
-                <programlisting><![CDATA[printf("%d %d", f(a, ++a), f(++a, a));]]></programlisting>            
+                <programlisting><![CDATA[printf("%d %d", f(a, ++a), f(++a, a));]]></programlisting>
+                <para>EZ IGAZI BUG!</para>
+                <para>A kiértékelési sorrend nem függ sztenderdtől, szóval bármit kaphatunk (implementáció dönt).</para>
             </listitem>
             <listitem>                                    
-
-                <programlisting><![CDATA[printf("%d %d", f(a), a);]]></programlisting>            
+                <programlisting><![CDATA[printf("%d %d", f(a), a);]]></programlisting> 
+                <para>Ha a egy ptr akkor okozhat meglepetéseket, de egyébként mivel az értékek alapvetően másolódva adódnak át, ezért ok lehet.</para>                
             </listitem>
             <listitem>                                    
-
-                <programlisting><![CDATA[printf("%d %d", f(&a), a);]]></programlisting>            
+                <programlisting><![CDATA[printf("%d %d", f(&a), a);]]></programlisting>
+                <para>Ez sem eldönthető ennyi alapján, annyi hozzáfűzve, hogy f láthatóan okozhat mellékhatást, hisz címet kap, de akár ok is lehet.</para>
             </listitem>
         </orderedlist>
-        <para>
-            Megoldás forrása:  
-        </para>
-
-        <para>
-            Megoldás videó: 
-        </para>
-
-        <para>
-            Tanulságok, tapasztalatok, magyarázat...
-        </para>
-
     </section>                     
-
+<!--
     <section>
         <title>Logikus</title>
         <para>
             Hogyan olvasod természetes nyelven az alábbi Ar nyelvű formulákat?
         </para>
+        <para>
+          Egyszerűsítésért bevezettem <literal>s</literal> succesor függvényt, illetve <literal>P</literal> predikátumot.
+        </para>
+<para>&#8704; x &#8707; y ( (x&lt;y) &#8743; (P(y)) )</para>
+<para>Bármely x-hez található legalább egy x-nél nagyobb y prím szám.</para>
+<para>&#8704; x &#8707; y ( (x&lt;y) &#8743; (P(s(s(y)))) )</para>
+<para></para>
+<para>Bármely x-hez található oly x-nél nagyobb y szám, mely rákövetkezőjének rákövetkezője prím.</para>
+<para>&#8707; y &#8704; x ( P(x) &#8835; (x&lt;y))</para>
+<para>Létezik oly y szám, hogy bármely x esetén ha x prímszám akkor x kisebb mint y.</para>
+<para>&#8707; y &#8704; x ( (y&lt;x) &#8835; &#172;(P(x)))</para>
+<para>Létezik oly y,  hogy bármely x esetén, ha y kisebb mint x, akkor x nem prím.</para>
         <programlisting language="tex"><![CDATA[$(\forall x \exists y ((x<y)\wedge(y \text{ prím})))$ 
 
 $(\forall x \exists y ((x<y)\wedge(y \text{ prím})\wedge(SSy \text{ prím})))$ 
@@ -286,26 +274,14 @@ $(\exists y \forall x (x \text{ prím}) \supset (x<y)) $
 
 $(\exists y \forall x (y<x) \supset \neg (x \text{ prím}))$
 ]]></programlisting>        
-        <para>
-            Megoldás forrása: <link xlink:href="https://gitlab.com/nbatfai/bhax/blob/master/attention_raising/MatLog_LaTeX">https://gitlab.com/nbatfai/bhax/blob/master/attention_raising/MatLog_LaTeX</link>
-        </para>
-
-        <para>
-            Megoldás videó: <link xlink:href="https://youtu.be/ZexiPy3ZxsA">https://youtu.be/ZexiPy3ZxsA</link>, <link xlink:href="https://youtu.be/AJSXOQFF_wk">https://youtu.be/AJSXOQFF_wk</link>
-        </para>
-
-        <para>
-            Tanulságok, tapasztalatok, magyarázat...
-        </para>
     </section>                                                                                                                                                                            
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    
+                  -->                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  
     <section>
         <title>Deklaráció</title>
             
         <para>
             Vezesd be egy programba (forduljon le) a következőket: 
         </para>
-
         <itemizedlist>
             <listitem>
                 <para>egész</para>                        
@@ -337,151 +313,76 @@ $(\exists y \forall x (y<x) \supset \neg (x \text{ prím}))$
             <listitem>
                 <para>függvénymutató egy egészet visszaadó és két egészet kapó függvényre mutató mutatót visszaadó, egészet kapó függvényre</para>                        
             </listitem>            
-        </itemizedlist>            
-
+        </itemizedlist>   
+          <para>Alább mellékeltem egy példát, próbáltam értelmessé tenni, szóval nem csak compile-ol, hanem eredményeket is ad...</para>
+       <programlisting language="c" linenumbering="numbered">
+          <textobject><textdata fileref="Chomsky/decls.cpp"/></textobject>
+        </programlisting> 
         <para>
             Mit vezetnek be a programba a következő nevek?
         </para>
 
         <itemizedlist>
             <listitem>
-                <programlisting><![CDATA[int a;]]></programlisting>            
+                <programlisting><![CDATA[int a;]]></programlisting>  
+                <para>int típusú a nevű változó adott scope-ban.</para>                
             </listitem>
             <listitem>
-                <programlisting><![CDATA[int *b = &a;]]></programlisting>            
+                <programlisting><![CDATA[int *b = &a;]]></programlisting>
+                <para>ptr típusú b nevű változó, mely int típusra mutat. értéke legyen az a változó címe.</para>  
             </listitem>
             <listitem>
-                <programlisting><![CDATA[int &r = a;]]></programlisting>            
+                <programlisting><![CDATA[int &r = a;]]></programlisting>
+                <para>referencia r néven int típusra. referencia mutasson a változóra.</para>
             </listitem>
             <listitem>
-                <programlisting><![CDATA[int c[5];]]></programlisting>            
+                <programlisting><![CDATA[int c[5];]]></programlisting>
+                <para>tömb típusú c nevű 5 elemű int típust taralmazó, inicializálatlan (azaz ram szeméttől függnek értékei)</para>
             </listitem>
             <listitem>
-                <programlisting><![CDATA[int (&tr)[5] = c;]]></programlisting>            
+                <programlisting><![CDATA[int (&tr)[5] = c;]]></programlisting>
+                <para>referencia tr néven tömbre int elemekkel 5-ös mérettel</para>                
             </listitem>
             <listitem>
-                <programlisting><![CDATA[int *d[5];]]></programlisting>            
+                <programlisting><![CDATA[int *d[5];]]></programlisting>  
+                <para>d néven tömb(bár igazából minden tömb ptr) 5 elemű elemei int ptr-ek.</para> 
             </listitem>
             <listitem>
-                <programlisting><![CDATA[int *h ();]]></programlisting>            
+                <programlisting><![CDATA[int *h ();]]></programlisting>
+                <para>h néven int ptr return type-ú  void arg-ú függvény.</para>                 
             </listitem>
             <listitem>
-                <programlisting><![CDATA[int *(*l) ();]]></programlisting>            
+                <programlisting><![CDATA[int *(*l) ();]]></programlisting>    
+                <para>l néven fn ptr. A mutatott függvény int ptr return type-ú és void arg-ú</para>                 
             </listitem>
             <listitem>
-                <programlisting><![CDATA[int (*v (int c)) (int a, int b)]]></programlisting>            
+                <programlisting><![CDATA[int (*v (int c)) (int a, int b)]]></programlisting>   
+                <para>v néven function. v egy intet fogad és egy fn ptr-et ad vissza. A visszaadott fn ptr int-et ad vissza és két argja van int, int.</para>
             </listitem>            
             <listitem>
-                <programlisting><![CDATA[int (*(*z) (int)) (int, int);]]></programlisting>            
+                <programlisting><![CDATA[int (*(*z) (int)) (int, int);]]></programlisting> 
+                <para>z néven egy fn ptr. Fn ptr egy int-et kaphat, és fn ptr-t ad vissza. A visszaadott fn ptr két intet fogad és int-et ad vissza.</para>
             </listitem>            
         </itemizedlist>       
-
-
+        <para> 
+          A typedef használata következik most. DIREKT TÉRTEM EL Tanár ÚR példájától.
+          Okom erre az volt, hogy az alábbi pattern-t nagyon gyakran használják  C API-k esetén.
+        </para> 
         <para>
-            Megoldás videó: 
+          A lényeg az, hogy van valami adatstruktúra, vagy adat, vagy akármi amit zárni akarnak api használó elől, viszont indirekt hozzáférés kell hozzá.
         </para>
         <para>
-            Megoldás forrása:  
+          Alábbi példában annyi történik, hogy (ismerős lehet Java, Cpp lambdákból) egy funkciót, és egy user defined void ptr-t adunk be, és a library ezt fogja hívogatni.
         </para>
         <para>
-            Az utolsó két deklarációs példa demonstrálására két olyan kódot
-            írtunk, amelyek összahasonlítása azt mutatja meg, hogy miért 
-            érdemes a <command>typedef</command> használata: <link xlink:href="Chomsky/fptr.c">
-                <filename>bhax/thematic_tutorials/bhax_textbook_IgyNeveldaProgramozod/Chomsky/fptr.c</filename>
-            </link>,
-            <link xlink:href="Chomsky/fptr2.c">
-                <filename>bhax/thematic_tutorials/bhax_textbook_IgyNeveldaProgramozod/Chomsky/fptr2.c</filename>.
-            </link>  
-            
+          Annyival megspékeltük a dolgot, hogyha a visit function nem 0-t ad vissza akkor a lib megáll és nem iterál tovább.
         </para>
-        <programlisting><![CDATA[#include <stdio.h>
-
-int
-sum (int a, int b)
-{
-    return a + b;
-}
-
-int
-mul (int a, int b)
-{
-    return a * b;
-}
-
-int (*sumormul (int c)) (int a, int b)
-{
-    if (c)
-        return mul;
-    else
-        return sum;
-
-}
-
-int
-main ()
-{
-
-    int (*f) (int, int);
-
-    f = sum;
-
-    printf ("%d\n", f (2, 3));
-
-    int (*(*g) (int)) (int, int);
-
-    g = sumormul;
-
-    f = *g (42);
-
-    printf ("%d\n", f (2, 3));
-
-    return 0;
-}]]></programlisting>            
-        <programlisting><![CDATA[#include <stdio.h>
-
-typedef int (*F) (int, int);
-typedef int (*(*G) (int)) (int, int);
-
-int
-sum (int a, int b)
-{
-    return a + b;
-}
-
-int
-mul (int a, int b)
-{
-    return a * b;
-}
-
-F sumormul (int c)
-{
-    if (c)
-        return mul;
-    else
-        return sum;
-}
-
-int
-main ()
-{
-
-    F f = sum;
-
-    printf ("%d\n", f (2, 3));
-
-    G g = sumormul;
-
-    f = *g (42);
-
-    printf ("%d\n", f (2, 3));
-
-    return 0;
-}
-]]></programlisting>            
         <para>
-            Tanulságok, tapasztalatok, magyarázat...
+          Long story short, ez a program az 5 indexű elemig eliterál, de azt már nem írja ki és befejezi a visit-et.
         </para>
+        <programlisting language="c" linenumbering="numbered">
+          <textobject><textdata fileref="Chomsky/typedefedtodeath.c"/></textobject>
+        </programlisting>
     </section>                     
 
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         
