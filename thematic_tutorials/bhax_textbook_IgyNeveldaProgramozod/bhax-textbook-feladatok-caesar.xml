@@ -12,68 +12,148 @@
             párost használó C programot, amely helyet foglal
             egy alsó háromszög mátrixnak a szabad tárban!
         </para>
-        <para>
-            Megoldás videó: <link xlink:href="https://youtu.be/1MRTuKwRsB0">https://youtu.be/1MRTuKwRsB0</link>,
-            <link xlink:href="https://youtu.be/RKbX5-EWpzA">https://youtu.be/RKbX5-EWpzA</link>.
+        <para>Mi az az alsó háromszög mx? Nos, vegyünk egy nxn-es mátrixot. A főátló és az alatti elemek az alsó háromszög mx.</para>
+<literallayout>
+X O O O O
+X X O O O
+X X X O O
+X X X X O
+X X X X X
+</literallayout>
+        <para>Gyakorlati haszna az, hogy ha pl. szimmetrikus a mátrixunk, akkor elég az alsó háromszög mx-ot tárolni.</para>
+        <para>Nézzük a kódot, de előtte tisztázzuk malloc-ot és free-t!</para>
+        <para>malloc egy értéket vár, hogy hány bájt memória területet(konzisztens, tehát egybefüggően szabad) adjon. Amit vissza ad, az egy ptr a mem a blokk kezdőcímére.</para>
+        <para>free egy ptr-t vár. Adott ptr-t kezdeti címnek veszi és ezen címtől kezdve annyit szabadít fel, amennyit a ptr által mutatott típus foglal.</para>
+        <para>Alább egy malloc call:</para>
+<literallayout>
+if ((tm = (double **) malloc (nr * sizeof (double *))) == NULL){
+  return -1;
+}
+</literallayout>
+      <para>Azaz kérünk memória nr darab double ptr-nek. Ha malloc nem tud adni, akkor null ptr jön vissza, ezáltal igaz lesz a kondíció és kilépünk -1-el.</para>
+      <para>Persze, ez csak a madártávlati nézet, hiszen technikailag, tm-be assignoljuk a malloc által adott értéket és utána checkeljük, hogy tm==NULL -e.</para>
+       <para>A lényeg hogyha ezen túl vagyunk, akkor van egy tömbünk a memóriában pointerekkel (melyek double-re mutatnak). Ezek a pointerek jelenleg mem szemetet tárolnak, úgyhogy kezdjük el őket valódi címekkel feltölteni.</para> 
+       <para>Mivel nr darab-szor kell elvégezni ugyanazt a műveletet majd, ezért logikusan jön egy for, de nekünk a for teste a lényeg.</para>
+<literallayout>
+if ((tm[i] = (double *) malloc ((i + 1) * sizeof (double))) == NULL)
+{
+    return -1;
+}
+</literallayout>
+       <para>Mivel előbb a malloc-ot tisztáztuk, most inkább a méretbe és az elméletbe akarok belemenni. Mármint miért ez a (i+1) szorzó?</para>
+        <figure>
+              <title>mem mx</title>
+              <mediaobject>
+                  <imageobject>
+                      <imagedata fileref="img/mxmem.png" scale="100" />
+                  </imageobject>
+                  <textobject>
+                      <phrase>mem mx</phrase>
+                  </textobject>
+              </mediaobject>
+          </figure>
+        <para>Fenti ábrán látható, hogy minden pointer "eggyel hosszab" blokkra mutat mint a másik, az egész pedig egyről indul (hisz az első a főatlóbeli elemet tartalmazza csak)</para>
+       <para>Most ne menjünk bele az alignment-be, meghogy valójában hogyan is tárolódik, inkább örüljünk az ábrának!</para>
+      <para>Azaz kérünk blokkokat, megkapjuk a címeket, és ezeket tm[i]-be assignoljuk... </para>
+      <para>Sajnos a double-ök még mindig memória szemetet tartalmaznak, ezért felülírjuk őket 0, 1, 2...stb. vel</para>
+<literallayout>
+for (int i = 0; i &lt; nr; ++i)
+    for (int j = 0; j &lt; i + 1; ++j)
+        tm[i][j] = i * (i + 1) / 2 + j;
+Szamoljuk t[i][j] értékét i=2 j=2 esetben
+tm[i][j] = i * (i + 1) / 2 + j;
+tm[2][2] = 2 * (2 + 1) / 2 + 2;
+tm[2][2] = 2 * 3 / 2 + 2;
+tm[2][2] = 3 + 2;
+tm[2][2] = 5;
+  j 0  1  2
+i
+0   0
+1   1  2  
+2   3  4  5
+</literallayout>
+      <para>Ezekután stdoutra kiprinteljük a mx elemeit soronként</para>
+      <para>Ezekután jön egy kis trükközés</para>
+<literallayout>
+tm[3][0] = 42.0;
+egyértelmű
+
+(*(tm + 3))[1] = 43.0;
+(tm + 3) = tm + 3*sizeof(double*)
+(tm+3) at derefeljük *-gal
+azaz megmondjuk, hogy amit ott talál azt egy double ptr-ként értelmezze (hisz ugye alapból double** volt tm...)
+utána pedig this[1]=*(this+1*sizeof(double))
+Azaz a mátrixba assignolunk tm[3][1]=43
+
+*(tm[3] + 2) = 44.0;
+tm[3] = *(tm+3*sizeof(double*))
+*(tm[3] + 2) pedig simán annyit hogy tm[3] + 2= tm[3] + 2*sizeof(double)
+deref miatt doubleként dolgozzuk fel a cym által mutatott helytől kezdve a memóriát (és ugye annyit amennyi a sizeof(double))
+Azaz a mátrixba assignolunk tm[3][2]=44
+
+*(*(tm + 3) + 3) = 45.0;
+(tm + 3) = tm + 3*sizeof(double*)
+derefeljük úgyhogy double* kapunk.
+hozzáadunk 3-at azaz *(tm + 3) + 3 = *(tm + 3) + 3*sizeof(double)
+Azaz a mátrixba assignolunk tm[3][3]=45
+</literallayout>
+  <para>
+  Tanár Úr még kérdésként feltette mi van ha 
+  </para>
+<literallayout>
+*(tm + 3)[1] = 43.0;
+</literallayout>
+  <para>
+  Szóval <link xlink:href="https://en.cppreference.com/w/c/language/operator_precedence"> baj </link>. Indirection ugye RL asszociatív és 2-es precedence, míg [] LR asszociatív és 1-es precedence.
+  Hogy jól eltudjam magyarázni csináltam egy labortenyésztett frankenstein példát:
+  </para>
+<literallayout>
+*(tm + 3)[1] = 43.0;
+*((tm + 3)[1])
+*(*((tm + 3)+(1)))
+*(*((tm + 4)))
+**(tm + 4)
+tm[4][0] Azaz a tm[4][0] értéket fogjuk átírni
+</literallayout>
+<para></para>
+<literallayout>
+0.000000, 
+1.000000, 2.000000, 
+3.000000, 4.000000, 5.000000, 
+42.000000, 7.000000, 44.000000, 45.000000, 
+43.000000, 11.000000, 12.000000, 13.000000, 14.000000,
+</literallayout>
+       <para>
+            Újra kinyomtatjuk a mátrixot.
         </para>
+        <para>
+            Most jön a lényeges rész: mi legyen a memóriával ha már nem kell?
+        </para>
+<literallayout>
+for (int i = 0; i &lt; nr; ++i)
+        free (tm[i]);
+    free (tm);
+</literallayout>
+          <figure>
+              <title>mem free</title>
+              <mediaobject>
+                  <imageobject>
+                      <imagedata fileref="img/mxfree.png" scale="100" />
+                  </imageobject>
+                  <textobject>
+                      <phrase>mem free</phrase>
+                  </textobject>
+              </mediaobject>
+          </figure>
         <para>
             Megoldás forrása: <link xlink:href="Caesar/tm.c">
                 <filename>bhax/thematic_tutorials/bhax_textbook_IgyNeveldaProgramozod/Caesar/tm.c</filename>
             </link> 
         </para>
-        <programlisting language="c"><![CDATA[#include <stdio.h>
-#include <stdlib.h>
-
-int
-main ()
-{
-    int nr = 5;
-    double **tm;
-
-    if ((tm = (double **) malloc (nr * sizeof (double *))) == NULL)
-    {
-        return -1;
-    }
-
-    for (int i = 0; i < nr; ++i)
-    {
-        if ((tm[i] = (double *) malloc ((i + 1) * sizeof (double))) == NULL)
-        {
-            return -1;
-        }
-
-    }
-
-    for (int i = 0; i < nr; ++i)
-        for (int j = 0; j < i + 1; ++j)
-            tm[i][j] = i * (i + 1) / 2 + j;
-
-    for (int i = 0; i < nr; ++i)
-    {
-        for (int j = 0; j < i + 1; ++j)
-            printf ("%f, ", tm[i][j]);
-        printf ("\n");
-    }
-
-    tm[3][0] = 42.0;
-    (*(tm + 3))[1] = 43.0;	// mi van, ha itt hiányzik a külső ()
-    *(tm[3] + 2) = 44.0;
-    *(*(tm + 3) + 3) = 45.0;
-
-    for (int i = 0; i < nr; ++i)
-    {
-        for (int j = 0; j < i + 1; ++j)
-            printf ("%f, ", tm[i][j]);
-        printf ("\n");
-    }
-
-    for (int i = 0; i < nr; ++i)
-        free (tm[i]);
-
-    free (tm);
-
-    return 0;
-}]]></programlisting>
+        <programlisting language="c" linenumbering="numbered">
+          <textobject><textdata fileref="Caesar/tm.c"/></textobject>
+        </programlisting>
+        <para>Bennt hagytam Tanár Úr képét mert jobb mint az enyém.</para>
         <figure>
             <title>A <type>double **</type> háromszögmátrix a memóriában</title>
             <mediaobject>
@@ -86,8 +166,14 @@ main ()
             </mediaobject>
         </figure>                             
         <para>
-            Tanulságok, tapasztalatok, magyarázat...
-        </para>            
+            A lényeg az egészből az, ha más nem is, hogy azért szertjük a cpp-t, mert nem kézzel kell takarítani, hanem vannak smart pointerek.
+            Sajnos azonban shared_ptr esetén overhead-je van a dolognak.
+            Illetve azt is érdemes fejben tartani, hogy "kivétel kezelés" esetén a memória kezelést nem szabad elfelejteni.
+        </para>
+        <para>Ha valaki kíváncsi a címekre</para>
+      <programlisting language="c" linenumbering="numbered">
+          <textobject><textdata fileref="Caesar/tmmore.c"/></textobject>
+        </programlisting>        
     </section>        
     <section>
         <title>C EXOR titkosító</title>
@@ -95,14 +181,110 @@ main ()
             Írj egy EXOR titkosítót C-ben!
         </para>
         <para>
-            Megoldás videó:
+          XOR-ral már találkoztunk a swap feladatnál. Ott már tárgyaltuk, hogy a XOR 
+          nagyon különleges művelet tulajdonságai miatt: kommutatív, asszociatív, létezik identitás elem, azaz létezik I, hogy bármely A esetén A XOR I = A.
+          Minden bitminta önmagával XOR-ozva Identitást ad, és azt már tisztáztuk hogy A XOR I = A.
         </para>
         <para>
-            Megoldás forrása:                
+          Ezek alapján az exor program a következő módon működik:
+          Vesszük a titkosítandó szöveget és egy kulcsot. Képzeljük úgy, hogy a kulcsot többször a titkosítandó alá terítjük, és az egymás alatt álló karakterek össze XOR-ozásával kapjuk a titkosított szöveget.
+        </para>
+<literallayout>
+ez egy uzenet
+kulcskulcskul
+
+Az első lépés "e" XOR "k"
+(e) 01100101
+(k) 01101011
+    00001110
+...
+</literallayout>
+        <para>
+          Természetesen, ha titkosított szöveget ugyanazzal a kulccsal mégegyszer le xor-ozzuk, akkor az eredeti szöveget kapjuk vissza:
+        </para>
+<literallayout>
+    00001110
+(k) 01101011
+(e) 01100101
+</literallayout>
+        <para>
+          Természetesen, ha titkosított szöveget ugyanazzal a kulccsal mégegyszer le xor-ozzuk, akkor az eredeti szöveget kapjuk vissza:
         </para>
         <para>
-            Tanulságok, tapasztalatok, magyarázat...
-        </para>            
+          Most viszont nézzük meg az implementáció specifikus részleteket.
+        </para>
+        <para>
+          A kódban használunk preprocesszornak szánt utasításokat:
+        </para>
+<literallayout>
+#define MAX_KULCS 100
+#define BUFFER_MERET 256
+</literallayout>
+        <para>
+          Ez egyszerűen annyit tesz, hogy a preprocesszor, ha belefut bármikor <literal>MAX_KULCS</literal> vagy <literal>BUFFER_MERET</literal> karakterláncokba, akkor ezeket a megadott int literalokra cseréli.
+          Ezek egyébként technikailag azért kellenek, mert tömbökkel fogunk dolgozni és ezek méretét compile time közölni kell a rendszerrel.
+          Azért, hogy ne csak számokat arjunk be, ezért olyan nevekkel láttuk el ezeket a preprocesszoros módszerrel, mely a gépi kódot nem változtatja meg, de nekünk segít a kód olvasásban.
+        </para>
+        <para>
+          Nézzük, most a bementről olvasást! Mivel karakteres módban meglepetések érhetnek minket, ehelyett binárisan akarjuk olvasni a dolgokat.
+          Tanár Úr megoldásától eltérően én DIREKT NEM stdin és stdout-tal dolgoztam. Ugyanis Mingw esetén csak és kizárólag binary mode-ban lehet a titkosított szöveget normálisan beolvasni.
+          Szóval annyit csináltam, hogy fopennel az első explicit futtatási argumentum alapján próbálok READ és BINARY módban nyitni egy fájlt (ugyanezt kimenthez is).
+          A lényeg, hogy ha sikeres akkor egy a fájlra mutató ptr-et kapok vissza.
+        </para>
+<literallayout>
+FILE *fdi = 0;
+fdi = fopen(argv[2], "rb");
+</literallayout>      
+      <para>Ezekután kezdődhet a beolvasás. 
+      <literal>fread</literal>-nek először átadunk egy ptr-t(buffer) ami az általa használható memória területre mutat (ide fogja írni a fájlból olvasott értékeket). 
+      Ezután az 1 konstans annyit mond, hogy minden egység 1 byte (ez sajnos elég veszélyes, lásd encoding).
+      Ezután írjuk a max egyhuzamban olvasandó elem számot, ez a mi esetünkben a buffer mérete.
+      Végül pedig a ptr az olvasandó fájlra.
+      Vissza adott érték az olvasott bájtok száma. Ha 0 az olvasott bájtok száma, a while ciklus fejbeli conditional hamissá válik, azaz abbahagyjuk a ciklus futtatását.
+      </para>
+<literallayout>
+while ((olvasott_bajtok = fread (buffer, 1, BUFFER_MERET, fdi)))
+</literallayout>
+      <para>Ha sikeres az olvasás, akkor amíg az olvasott bájtok számát el nem érjük karakterenként össze xor-ozzuk a kiindulási szöveg és a kulcs egy karakterének bitjeit.</para>
+      <para>Mivel a kulcsot wraparoundolni kell, ezért egész osztást alkamazunk. (Azaz, ha pl kulcsméret 8, és kulcsindex+1=8 lenne akkor az új kulcsindex 8%8=1 ezáltal elkerülve az index out of bounds esetet)</para>
+<literallayout>
+for (int i = 0; i &lt; olvasott_bajtok; ++i)
+{
+  buffer[i] = buffer[i] ^ kulcs[kulcs_index];
+  kulcs_index = (kulcs_index + 1) % kulcs_meret;
+}
+</literallayout>
+    <para>Ha ezzel meg vagyunk, akkor a mostmár "titkosított" buffer-t kiírjuk a kimenetre</para>
+<literallayout>
+fwrite (buffer,1, olvasott_bajtok,fdo);
+</literallayout>
+      <figure>
+          <title>exorcmd</title>
+          <mediaobject>
+              <imageobject>
+                  <imagedata fileref="img/exorcmd.png" scale="100" />
+              </imageobject>
+              <textobject>
+                  <phrase>exorcmd</phrase>
+              </textobject>
+          </mediaobject>
+      </figure>
+<para>A példának a facebook csoportba 2017-ben feladott secret.txt-t használtam.</para>
+<literallayout>
+Bár az RSA jól adja át a nyilvános kulcsú titkosítás tulajdonságait, egy dolgot még nem tárgyaltunk, mely a titkosítás egyik alapkövetelménye, miszerint hogyan tehetjük biztossá, hogy tényleg a feladótól kaptuk az üzenetet, és nem valaki más küldött az ő nevében? Az alábbiakban ezt tárgyaljuk.
+
+Tegyük fel, hogy Alíz (A) Bob (B) nyilvános kulcsát használja, hogy egy titkosított üzenetet küldjön neki. Az üzenetében bizonygathatja, hogy ő valóban A, de B-nek mégsem lesz semmi konkrét bizonyítéka, hogy ténylegesen A írt neki, hiszen a nyilvános kulcsát mindenki használhatja arra hogy titkos üzenetet írjon neki. Ilyen bizonytalanságok elkerülése végett is használható az RSA, hogy RSA szintű biztonsággal tanúsíthassuk szerzői kilétünket. Ezzel a lépéssel pedig az RSA valódi nyilvános kulcsú titkosító eljárássá növi ki magát.
+
+Tehát A szeretne küldeni egy üzenetet B-nek. Kivág az üzenetéből egy kis töredéket – ebből lesz a megjelölt üzenet – veszi ennek mondjuk az ASCII értékét, ezt az értéket felemeli a d-edik hatványára, majd veszi a kapott számot modulo N (pont így csinálná, amikor dekódolna egy üzenetet), s a kapott végeredményt aláírásként hozzácsatolja az egyszerű módon titkosított üzenethez. (Mint látjuk ez is ugyanolyan hatásos mint ha az egész üzenetével az előbb vázolt műveleteket hajtotta volna végre csupán így sokkal gyorsabbá vált, hogy csak egy kis töredék értékre mutatta meg, hogy tényleg A az üzenet szerzője).
+
+Hogyan dekódolja az aláírást B?
+
+Mikor megkapja a megjelölt üzenetet, az aláírást felemeli A nyilvános e kitevőjére, s veszi modulo N az értéket (pont, mint amikor A-nak kódolna egy üzenetet), mivel a két művelet egymás inverzei, ezért összehasonlítja az eredményként kapott kivágott üzenetet az üzenetben szereplő egyszerű módon kódolt szövegrészlettel, s ha a kettő megegyezik, B biztosan tudhatja, hogy az üzenet szerzője A titkos kulcsának birtokában volt.
+
+</literallayout>
+        <programlisting language="c" linenumbering="numbered">
+          <textobject><textdata fileref="Caesar/exor.c"/></textobject>
+        </programlisting>        
     </section>        
     <section>
         <title>Java EXOR titkosító</title>
@@ -125,14 +307,83 @@ main ()
             Írj egy olyan C programot, amely megtöri az első feladatban előállított titkos szövegeket!
         </para>
         <para>
-            Megoldás videó:
+            A sima exor-hoz képest annyi a csavarás a feladaton, hogy nem tudjuk a kulcsot, illetve nem tudjuk hogy minek kell lennie a végeredménynek.
         </para>
         <para>
-            Megoldás forrása:                
+            Az első problémát viszonylag egyszerű módon oldottuk meg, egyszerűen csak keresztül tekerünk egymásba ágyazott for loopokkal
+            az összes lehetséges kulcson. Feltételezve, hogy a kulcs csak olyan 0,1,2,3,4,5,6,7,8,9 karakterekből állhat, és a kulcsméret BIZTOSAN 8.
         </para>
         <para>
-            Tanulságok, tapasztalatok, magyarázat...
-        </para>            
+            A második probléma nehezebb! Hogyan tudjuk, hogy amit törtünk az, nos hogy jó-e?
+            A program ezt heurisztikus módon oldja meg...vagy nem oldja meg.
+            A lényeg annyi, hogy az algoritmus addig fog futni, amíg az összes kulcsot ki nem próbálta,
+            viszont ha felmerül a gyanúja, hogy jó lehet a kulcs amit próbál, akkor stdoutra kiírja a siker gyanús kulcsot és a vele előállított szöveget.
+        </para>
+        <para>
+          A sikeresség eldöntéséhez két dolgot használunk: átlagos szóhossz és gyakori szavak
+        </para>
+        <para>
+          Az átlagos szóhossz...nos elég ember nyelv specifikus, mert , nos inkább nézzük:
+          Mivel a space-eket összeszámolja és leosztja a szöveghosszat vele, ezért "aaa aaa aaa " = 4 "aaaaaaaaaaaa   "=4
+        </para>
+        <para>
+          A gyakori szavakat csak simán megpróbálja megtalálni a szövegben (ignore case módban).
+          Sajnos az élet nem olyan egyszerű, ezért mingw esetén <literal>strcasestr</literal>-t meg kell írni.
+          Nem, itt tényleg nem segít a <literal>#define _GNU_SOURCE</literal> string header előtt...
+        </para>
+        <para>Na de lássuk a while fejből a read-et!(kicsit megtördeltem)</para>
+<literallayout>
+olvasott_bajtok
+=
+read ( 0, 
+      (void *) p,
+      (p - titkos + OLVASAS_BUFFER &lt; MAX_TITKOS) ? OLVASAS_BUFFER : titkos + MAX_TITKOS - p))
+</literallayout>
+        <para>Első arg 0, tehát stdin, eddig OK. következő egy p ptr, ami a buffer a read szempontjából. Most nézzük a ternary-t önmagában!</para>
+        <para>Már a fájl elején észre vehetjük <literal>MAX_TITKOS</literal> és <literal>OLVASAS_BUFFER</literal>-ből, 
+        hogy gyakorlatilag annyiról van szó, hogy max 4096 bájtot fogunk összvissz beolvasni, de ezt 256-os falatokban.
+        Na de nézzük inkább a kódot, a ternary-t átírtam magyarázat miatt inkább egy if-re alább!
+        (NE FELDJÜK: A read 3. argját számítjuk, ami azt adja meg hány bájtot kell olvasni a read-nek. Azaz az egésznek egy számot kell visszaadnia ami megmondja mennyit olvasson a read...)
+        </para>
+<literallayout>
+int num;
+if(p - titkos + OLVASAS_BUFFER &lt; MAX_TITKOS) 
+{
+  num = OLVASAS_BUFFER;
+}else{
+  num = titkos + MAX_TITKOS - p
+}
+</literallayout>
+    <para>Magyarázattal együtt:</para>
+<literallayout>
+bool a = (p - titkos + OLVASAS_BUFFER &lt; MAX_TITKOS);
+Próbáljuk ki pár értéken:
+(p - titkos + 256 &lt; 4096)=?
+
+Let p=1024, titkos=1024
+(1024 - 1024 + 256 &lt; 4096)=(256 &lt; 4096)=true
+Ekkor ugye azt mondjuk read-nek hogy OLVASAS_BUFFER-nyit tudunk olvasson, szóval p-t növeljük 256-tal!
+
+Let p=4864, titkos=1024
+(4864 - 1024 + 256 &lt; 4096)=((3840+256) &lt; 4096)=((4096) &lt; 4096)=false
+Ekkor ugye azt mondjuk read-nek hogy (titkos + MAX_TITKOS - p)-nyit olvasson.
+Ez jelen esetben (1024 + 4096 - 4864)=256
+
+Most pedig nézzük mi lesz ezután:
+ugye p-t 256-tal növeltük, szóval most p=4864+256=5120
+(5120 - 1024 + 256 &lt; 4096)=((4096+256) &lt; 4096)=((4352) &lt; 4096)=false
+Ekkor ugye azt mondjuk read-nek hogy (titkos + MAX_TITKOS - p)-nyit olvasson.
+Ez jelen esetben (1024 + 4096 - 5120)=0
+
+Ez 0 bájt beolvasásával fog járni, ezáltal kiesünk a while-ból.
+</literallayout>
+  <para>Ezekután annyi történik, hogyha a buffer nem telt meg teljesen akkor kinullázzuk, nehogy a mem szemét véletlenül infonak hasson...illetve string terminálás miatt (általában érdemes null terminálni a c stringeket)</para>
+  <para>Ezekután pedig csak simán a fentebb leírt xor-ozást és tiszta szöveg heurisztikus keresgetés zajlik.</para>    
+  <para>Egyetlen fontos dolog van még: Ha titkost lexorozom, akkor a következő körben friss kulccsal baj lesz, hisz nem az eredetit hanem egy törtet kezdenék újratörni.</para>   
+  <para>A probléma megoldása simán annyi (a xor műveleti tulajdonságai miatt), hogy nem plusz memóriát használok egy tiszta verzió tartására, hanem vissza xorozom ugyanazon array-t. ÉS ugye emlékszünk hogy (A XOR B) XOR B = A </para>
+   <programlisting language="c" linenumbering="numbered">
+          <textobject><textdata fileref="Caesar/exor_breaker.c"/></textobject>
+        </programlisting>         
     </section>        
     <section>
         <title>Neurális OR, AND és EXOR kapu</title>
@@ -152,18 +403,217 @@ main ()
     <section>
         <title>Hiba-visszaterjesztéses perceptron</title>
         <para>
-            C++
+          Ebben a feladatban a double*** handling a lényeg, de mindez cpp-ben, azaz malloc és free helyett new és delete.
+          Tanár Úr kódját fogom használni, de a nem szükséges részeket kivettem (hisz egyébként 900 sor és például backpropagation nem kell...). 
         </para>
         <para>
-            Megoldás videó: <link xlink:href="https://youtu.be/XpBnR31BRJY">https://youtu.be/XpBnR31BRJY</link>
+          Mielőtt nekiugrunk a feladatnak nézzük végig matematikailag mit akart elérni Tanár Úr, és csak ezután nézzük a kódot.
+          Ez így talán megfogja könnyíteni a megértést, hisz például a var arg handling nem a feedforward része, úgyhogy csak azután fogunk kitérni rá, hogy az alap matek megvan.
+          Backproppal most nem fogunk foglalkozni, csak feedforward-al. Tegyük fel egy 3x3as "képből" indulunk ki (nem rgb, csak fekete és fehér).
+          A 3x3-asból előállítunk egy vektort. Ez lesz az input adata a hálónak.
         </para>
         <para>
-            Megoldás forrása: <link xlink:href="https://github.com/nbatfai/nahshon/blob/master/ql.hpp#L64">https://github.com/nbatfai/nahshon/blob/master/ql.hpp#L64</link>               
+          Feladat legyen a következő: Kapunk egy 3x3-as fekete képet. Ezt beküldjük egy neurális háló kezdeménybe, és a végén például egy 1 elemű vektort kapunk.
+          A vektor 0. eleme akkor és csak akkor 1 értékű, ha a képen mondjuk 4-es van. Cseresznye a torta tetején: Nincs bias.
         </para>
         <para>
-            Tanulságok, tapasztalatok, magyarázat...
-        </para>            
-    </section>        
-        
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        
+          Első hallásra bonyolult, de valójában egyszerű: 
+        </para>
+        <para>
+          A kép egy 3x3-as mátrix, lapítsuk egy vektorba. Ez lesz az input.
+        </para>
+        <figure>
+              <title>nn input</title>
+              <mediaobject>
+                  <imageobject>
+                      <imagedata fileref="img/nninputs.png" scale="50" />
+                  </imageobject>
+                  <textobject>
+                      <phrase>nn input</phrase>
+                  </textobject>
+              </mediaobject>
+        </figure>
+        <para>
+          A háló hasraütésszerűen (totál mindegy, csak kellettek a konkrét számok, hogy le tudjam rajzolni) 9-5-3-1
+        </para>
+        <figure>
+              <title>nn layers</title>
+              <mediaobject>
+                  <imageobject>
+                      <imagedata fileref="img/nnlayers.png" scale="50" />
+                  </imageobject>
+                  <textobject>
+                      <phrase>nn layers</phrase>
+                  </textobject>
+              </mediaobject>
+        </figure>
+        <para>
+          A háló a következő módon működik: nincs benne feedback, azaz i-edik layeren lévő node csak és kizárólag i-1-edik node-ot használhat inputnak. 
+        </para>
+        <para>
+          Ahelyett, hogy hardcodeoljuk ki kihez kapcsolódik a pagerank-nél látott módon mátrixos formában írjuk fel.
+          Vegyük például a 9 elemű input layer és az 5 elemű layer (ő az eső hidden layer) kapcsolatát leíró mátrixot.
+          A layerek gyakorlatilag vektorok.
+          A lényeg, hogy kell egy M kapcsolati mátrix. A célja annyi, hogyha megszorzom egy 9 elemű-vel, akkor egy 5 eleműt kapjak.
+          A kapcsolati mátrix tehát pl. 5x9-es, hisz M*A=B:
+        </para>
+ <literallayout>
+          | ? |
+          | ? |
+          | ? |
+
+| ? ? ? |       = | ? |
+| ? ? ? |         | ? |
+</literallayout>
+        <para>Azaz, ha kapok egy inputot, akkor össze szorzom a 9-5 közti trafó mátrixxal, és megkapom az 5 elemű layer értékeit. Utána ezt megszorzom az 5-3 trafóval, majd ezt megszorzom a 3-1 trafóval és kijön a végeredmény:</para>
+        <figure>
+              <title>nnmxmult</title>
+              <mediaobject>
+                  <imageobject>
+                      <imagedata fileref="img/nnmxmult.png" scale="50" />
+                  </imageobject>
+                  <textobject>
+                      <phrase>nnmxmult</phrase>
+                  </textobject>
+              </mediaobject>
+        </figure>
+        <para>
+          Azaz, az egész egy mátrix vektor szorzás lánc (sőt, mivel nincs bias ezért még elméletben sem kell trükközni).
+          Egyetlen egy komoly trükk van. Mikor kijön egy mátrix-vektor szorzás segítségével egy új vektor, akkor minden elemén alkalmazzuk a sigmoid funkciót.
+          Ez egy folytonos jellegű vágó függvény.
+        </para>
+        <figure>
+              <title>sigmoid</title>
+              <mediaobject>
+                  <imageobject>
+                      <imagedata fileref="img/sigmoid.png" scale="50" />
+                  </imageobject>
+                  <textobject>
+                      <phrase>sigmoid</phrase>
+                  </textobject>
+              </mediaobject>
+        </figure>
+        <para>
+            Ez alapján próbáljuk meg meghatározni milyen adatokra lesz szüksége az n layer számú Perceptron-nak. El kell tárolni n darab vektort. El kell tárolni n-1 darab transzformációs mátrixot.
+            Mivel kicsit C-sen fogjuk írni a kódot, ezért nem csak az értékeket, ha nem a tömb méreteket is. Szóval el kell tárolni hogy hány layer van. El kell tárolni, hogy MINDEN vektor hosszát. A trafó mátrixok hosszait nem kell eltárolni, mert ahogy az ábrák is mutatják a vektor hosszakból számolhatóak.
+        </para>
+        <para>
+          Mielőtt belemegyünk a kódba, egy dolgot még tisztáznunk kell: Milyen értékei legyenek a weight mátrixoknak? Nos, teljesen random [-1,1] tartománybeli double.
+        </para> 
+        <para>
+          Most nézzük a kódot. Létrehozzuk a Perceptron osztályt. Ctor-ban inicializáljuk
+        </para>  
+        <para>
+          A Perceptron ( int nof, ... ) kicsit furcsának tűnhet mert var arg-os, de nem kell megijedni. Simán annit jelent, hogy int nof után véges sok argumentum jöhet.
+        </para>
+<literallayout>
+va_list vap;
+va_start ( vap, nof );
+</literallayout>
+        <para>
+        va_list-ből pedig va_arg-gal pedig megpróbálunk egy általunk megadott explicit típusú értéket "kiszedni" a listából.
+        (Ezek makrók nem function call-ok, azaz ezeket a preprocesszor expandálni fogja.)
+        </para>
+<literallayout>
+n_units[i] = va_arg ( vap, int );
+</literallayout>
+        <para>
+          Egyből jön a kérdés, hogy itt akkor elméletileg bug-ok keletkezhetnek <link xlink:href="https://en.cppreference.com/w/cpp/language/variadic_arguments">default arg promotion</link> miatt. Igen ez így van de mi ezzel most nem foglalkozunk.
+          Másik kérdés, hogy mi történik akkor, ha nof nem egyezik a megadott argumentumok száma -1-el.
+        </para>
+        <para>
+          Mikor megvagyunk a va_list traversalt illető makró használattal <literal>va_end</literal>-et használunk.
+        </para>
+<literallayout>
+va_end ( vap );
+</literallayout> 
+      <para>
+        Nézzük a ctor-t pici részekben:
+      </para>      
+<literallayout>
+n_layers = nof;
+    units = new double*[n_layers];
+    n_units = new int[n_layers];
+    va_list vap;
+    va_start ( vap, nof );
+    for ( int i {0}; i &lt; n_layers; ++i ){
+      n_units[i] = va_arg ( vap, int );
+      if ( i ){units[i] = new double [n_units[i]];}
+    }
+    va_end ( vap );
+</literallayout>
+        <para>
+          A Perceptron osztályt ctor-ban egy int-et kap, azaz a layer számot, illetve var arg-ként int-eket, amik az egyes layer-ekben lévő neuron számokat adják meg (azaz hogy melyik layer hány elemű vektor).
+          Ezt simán átmásoljuk <literal>n_units</literal>-ba, ami egy int-ekből álló tömb. A <literal>units</literal> tárolja a vektorainkat, szóval érthető hogy ez miért is double** (n darab vektor matematikailag).
+          Természetesen egyrészt magát <literal>units</literal>-ot initelni kell, és az általa mutatott double array-ket is. Ugyan értékeket még nem tudunk, de a szükséges hosszakat igen, hisz ezt a user megadta var arg-ban.
+        </para> 
+      <para>Annyit vegyünk észre, hogy ha i == 0, akkor nem kérünk helyet egy double array-nek. Ez amiatt van így, mert ez az inputunk, inputot meg nem fogjuk átmásolni, hanem majd <literal>units[0]</literal>-t megadjuk az input címének (hisz ugye units[0] egy double ptr!)</para>
+      <para>A másik nagyon fontos dolog, amit észre kell vennünk az az hogy nem malloc-ot használunk hanem new-t. Méghozzá úgy hogy new-nak nem adunk címet ahova hívja a ctor-t, azaz new MEMÓRIÁT IS FOGLAL és még ráadásul MEG IS HÍVJA a ctor-t. Persze kérhettün volna malloc-cal címet és a ptr-et megadva new-nak nem kért volna memóriát csak a megadott címen meghívta volna a ctor-t.</para> 
+      <para>Na de most nézzük a weight mátrixot! Gyors kérdés kód előtt: Mit várunk?</para>
+      <para>Ugye <literal>weights</literal> egy csomó mátrix, tehát weights = mátrix*? Viszont mátrix egy csomó sor, vagy szám n-es, stb., azaz mátrix=sor*. Sor viszont egy csomó double, vektor=double*. Azaz weights double*** lesz.</para>
+<literallayout>     
+weights = new double**[n_layers-1];
+    std::default_random_engine gen;
+    std::uniform_real_distribution&lt;double&gt; dist ( -1.0, 1.0 );
+    for ( int i {1}; i &lt; n_layers; ++i ){
+      weights[i-1] = new double *[n_units[i]];
+      for ( int j {0}; j &lt; n_units[i]; ++j ){
+        weights[i-1][j] = new double [n_units[i-1]];
+        for ( int k {0}; k &lt; n_units[i-1]; ++k )
+        {
+          weights[i-1][j][k] = dist ( gen );
+        }
+      }
+    }
+</literallayout>
+  <para>Ahogy fent láthatjuk, kérünk helyet weights-nek (aki egy double***), aztán weights egyes mátrixainak (double**), mátrixok sorainak (double*) majd a sorok értékeinél egy [-1,1] tartománybeli random számot adunk. </para>
+  <para>A sigmoid-ot valamiért a class-ba raktuk(inkább rakjuk majd egy header file-ba inline-olva saját implementációban, hátha kelleni fog máshol is), de nem igényel túl sok magyarázatot.</para>
+<literallayout>  
+  double sigmoid ( double x ) {
+    return 1.0/ ( 1.0 + exp ( -x ) );
+  }
+</literallayout>
+  <para>Most pedig jöhet az <literal>operator()</literal> overload. Ő fogja csinálni azt a mátrix vektor szorzási láncot amit fentebb rajzolgattunk.</para>
+  <para>Kicsit álljunk meg, tippeljük meg előre mit fog csinálni!</para>
+  <para>Valószínűleg lesz egy argumentuma, ami egy double* lesz. Ez lesz az input layer bemeneti adata. Ezt KELL hogy assignolja units[0]-ra, hisz units[0]-nak nem kértünk egy új double*-t(és jelenleg ráadásul szuper veszélyes, mert nem állítottuk nullptr-re, hanem mem szemét van rajta, szóval ha most meghívnánk akkor jó esetben segfaultolnánk.)</para>
+  <para>Ezekután pedig végig fogunk iterálni az összes trafón és elvégezzük őket. DE EMLÉKEZZÜNK n darab vektorunk van, amihez n-1 trafó társul, azaz biztosan n-1-ig fogunk iterálni.</para>
+  <para>Egy adott i-edik iterációban pedig i-edik mátrixot i-edik vektorral szorozva i+1-edik vektort fogjuk kapni.</para>
+  <para>Technikailag mielőtt elvégezzük i+1 elem kiszámítását, vaószínűleg 0-ra fogjuk állítani, mert adja magát, hogy += használjunk.</para>
+  <para>Miután kijönnek az értékek vagy egyben a végén, vagy még benn a loopban, az mátrix-vektor szorzatként kapott i+1 vektor értékét átírjuk  a sigmoid által hozzárendelt értékre</para>
+  <para>Nézzük a kódot</para>
+<literallayout>  
+  double operator() ( double image [] )
+  {
+    units[0] = image;
+    for ( int i {1}; i &lt; n_layers; ++i ){
+      for ( int j = 0; j &lt; n_units[i]; ++j ){
+        units[i][j] = 0.0;
+        for ( int k = 0; k &lt; n_units[i-1]; ++k ){
+          units[i][j] += weights[i-1][j][k] * units[i-1][k];
+        }
+        units[i][j] = sigmoid ( units[i][j] );
+      }
+    }
+    return sigmoid ( units[n_layers - 1][0] );
+  }
+</literallayout>
+  <para>Az egyetlen váratlan dolog, hogy az ouptput vektor 0. elemének értékéhez a sigmoid által hozzárendelt értéket visszaadjuk.
+    Biztos a nagyobb progi így működött, azaz hogy valami miatt az output vektor 0. eleme fontos volt neki. Persze ez ne tévesszen meg senkit. Egy klasszifikciós probléma lehet olyan lesz, hogy mondjuk 10 output node lesz, és akkor kell felvillania mondjuk az 5-ös indexűnek mikor 5-öst lát, vagy mondjuk valami játékról van szó, és akkor kell felvillania egy 4 elemű vektor 2 elemének, ha keyboard S lenyomást akarunk szimbolizálni (FPS-eknél ez a hátra)
+  </para>
+  <para>
+    Alább az egész kód félig Cpp félig C-ben:
+  </para>
+  <programlisting language="c" linenumbering="numbered">
+    <textobject><textdata fileref="Caesar/ql_min.cpp"/></textobject>
+  </programlisting> 
+  <para>
+    Alább az egész kód Java-ban kilapított mátrixokkal. Itt az API-ban annyi változás van, hogy a full output vektort visszaadjuk.
+  </para>
+  <programlisting language="java" linenumbering="numbered">
+    <textobject><textdata fileref="Caesar/ql_min.java"/></textobject>
+  </programlisting> 
+  <para>
+    Többszálazással stb. nem foglalkoztam, mert a feladat az array hendlingről szólt. (Backproppal sem, mert explicit ki lett mondva hogy elég a feedforward)
+  </para>
+    </section>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  
 </chapter>                

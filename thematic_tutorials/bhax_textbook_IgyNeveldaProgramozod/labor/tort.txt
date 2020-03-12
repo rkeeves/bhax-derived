@@ -1,0 +1,9 @@
+Bár az RSA jól adja át a nyilvános kulcsú titkosítás tulajdonságait, egy dolgot még nem tárgyaltunk, mely a titkosítás egyik alapkövetelménye, miszerint hogyan tehetjük biztossá, hogy tényleg a feladótól kaptuk az üzenetet, és nem valaki más küldött az ő nevében? Az alábbiakban ezt tárgyaljuk.
+
+Tegyük fel, hogy Alíz (A) Bob (B) nyilvános kulcsát használja, hogy egy titkosított üzenetet küldjön neki. Az üzenetében bizonygathatja, hogy ő valóban A, de B-nek mégsem lesz semmi konkrét bizonyítéka, hogy ténylegesen A írt neki, hiszen a nyilvános kulcsát mindenki használhatja arra hogy titkos üzenetet írjon neki. Ilyen bizonytalanságok elkerülése végett is használható az RSA, hogy RSA szintű biztonsággal tanúsíthassuk szerzői kilétünket. Ezzel a lépéssel pedig az RSA valódi nyilvános kulcsú titkosító eljárássá növi ki magát.
+
+Tehát A szeretne küldeni egy üzenetet B-nek. Kivág az üzenetéből egy kis töredéket – ebből lesz a megjelölt üzenet – veszi ennek mondjuk az ASCII értékét, ezt az értéket felemeli a d-edik hatványára, majd veszi a kapott számot modulo N (pont így csinálná, amikor dekódolna egy üzenetet), s a kapott végeredményt aláírásként hozzácsatolja az egyszerű módon titkosított üzenethez. (Mint látjuk ez is ugyanolyan hatásos mint ha az egész üzenetével az előbb vázolt műveleteket hajtotta volna végre csupán így sokkal gyorsabbá vált, hogy csak egy kis töredék értékre mutatta meg, hogy tényleg A az üzenet szerzője).
+
+Hogyan dekódolja az aláírást B?
+
+Mikor megkapja a megjelölt üzenetet, az aláírást felemeli A nyilvános e kitevőjére, s veszi modulo N az értéket (pont, mint amikor A-nak kódolna egy üzenetet), mivel a két művelet egymás inverzei, ezért összehasonlítja az eredményként kapott kivágott üzenetet az üzenetben szereplő egyszerű módon kódolt szövegrészlettel, s ha a kettő megegyezik, B biztosan tudhatja, hogy az üzenet szerzője A titkos kulcsának birtokában volt.
