@@ -11,88 +11,184 @@
             Írj olyan C programot, amely kiszámolja a Mandelbrot halmazt!     
         </para>
         <para>
-            Megoldás videó: <link xlink:href="https://youtu.be/gvaqijHlRUs">https://youtu.be/gvaqijHlRUs</link>
+            A Mandelbrot halmaz számításához egy kis matekra lesz szükség. Nagyon vizualizációba most nem fogunk kód oldalról belemenni, mert egy másik alfejezet pont erről fog szólni...
         </para>
+<literallayout>
+z[0] = 0
+z[1] = z[0]^2+c
+z[2] = z[1]^2+c
+...
+z[n] = z[n-1]^2+c 
+</literallayout>
         <para>
-            Megoldás forrása:                
- <link xlink:href="../../../bhax/attention_raising/CUDA/mandelpngt.c++">
-                <filename>bhax/attention_raising/CUDA/mandelpngt.c++</filename>
-            </link> nevű állománya.            
+          Azaz mindig 0, 0 pontból indulunk, majd négyzetét vesszük és egy konstans számot hozzáadunk. Nézzünk pár esetet! Az ábrákon valós tengely vízszintes, míg képzetes függőleges. Az ábrán piros X-el jelöltem a konstanst és az step-eket fekete pontokkal (össze is kötöttem őket).
         </para>
-                <figure>
-            <title>A Mandelbrot halmaz a komplex síkon</title>
+        <figure>
+            <title>c = {0,0}</title>
             <mediaobject>
                 <imageobject>
-                    <imagedata fileref="img/mandel.png" scale="50" />
+                    <imagedata fileref="img/mandelstep00.png" scale="100" />
                 </imageobject>
                 <textobject>
-                    <phrase>A Mandelbrot halmaz a komplex síkon</phrase>
+                    <phrase>c = {0,0}</phrase>
+                </textobject>
+            </mediaobject>
+        </figure>
+        <figure>
+            <title>c = {0.3 ,0}</title>
+            <mediaobject>
+                <imageobject>
+                    <imagedata fileref="img/mandelstep01.png" scale="100" />
+                </imageobject>
+                <textobject>
+                    <phrase>c = {0.3 ,0}</phrase>
+                </textobject>
+            </mediaobject>
+        </figure>
+        <figure>
+            <title>c = {0.3 ,0.1}</title>
+            <mediaobject>
+                <imageobject>
+                    <imagedata fileref="img/mandelstep02.png" scale="100" />
+                </imageobject>
+                <textobject>
+                    <phrase>c = {0.3 ,0.1}</phrase>
+                </textobject>
+            </mediaobject>
+        </figure>
+         <figure>
+            <title>c = {0.3 ,0.2}</title>
+            <mediaobject>
+                <imageobject>
+                    <imagedata fileref="img/mandelstep03.png" scale="100" />
+                </imageobject>
+                <textobject>
+                    <phrase>c = {0.3 ,0.2}</phrase>
                 </textobject>
             </mediaobject>
         </figure>
         <para>
-            A Mandelbrot halmazt 1980-ban találta meg Benoit Mandelbrot a 
-            komplex számsíkon. Komplex számok azok a számok, amelyek körében 
-            válaszolni lehet az olyan egyébként értelmezhetetlen kérdésekre, 
-            hogy melyik az a két szám, amelyet összeszorozva -9-et kapunk, 
-            mert ez a szám például a 3i komplex szám.
+         Ha a konstant például 0.3, 0.7 akkor nagyon gyorsan "elszáll" az érték.
         </para>
-        <para>             
-            A Mandelbrot halmazt úgy láthatjuk meg, hogy a sík origója középpontú 4 
-            oldalhosszúságú négyzetbe lefektetünk egy, mondjuk 800x800-as 
-            rácsot és kiszámoljuk, hogy a rács pontjai mely komplex számoknak 
-            felelnek meg. A rács minden pontját megvizsgáljuk a 
-            z<subscript>n+1</subscript>=z<subscript>n</subscript>
-            <superscript>2</superscript>+c, 
-            (0&lt;=n) képlet alapján úgy, hogy a c az éppen vizsgált rácspont. 
-            A z0 az origó. Alkalmazva a képletet a 
-        </para>
-        <itemizedlist>
-            <listitem>
-                <para>
-                    z<subscript>0</subscript> = 0
-                </para>
-            </listitem>
-            <listitem>
-                <para>
-                    z<subscript>1</subscript> = 0<superscript>2</superscript>+c = c
-                </para>
-            </listitem>
-            <listitem>
-                <para>
-                    z<subscript>2</subscript> = c<superscript>2</superscript>+c
-                </para>
-            </listitem>
-            <listitem>
-                <para>
-                    z<subscript>3</subscript> = (c<superscript>2</superscript>+c)<superscript>2</superscript>+c
-                </para>
-            </listitem>
-            <listitem>
-                <para>
-                    z<subscript>4</subscript> = ((c<superscript>2</superscript>+c)<superscript>2</superscript>+c)<superscript>2</superscript>+c
-                </para>
-            </listitem>
-            <listitem>
-                <para>
-                    ... s így tovább.
-                </para>
-            </listitem>
-        </itemizedlist>
+        <figure>
+            <title>c = {0.3 ,0.7}</title>
+            <mediaobject>
+                <imageobject>
+                    <imagedata fileref="img/mandelstep08.png" scale="100" />
+                </imageobject>
+                <textobject>
+                    <phrase>c = {0.3 ,0.7}</phrase>
+                </textobject>
+            </mediaobject>
+        </figure>
         <para>
-            Azaz kiindulunk az origóból (z<subscript>0</subscript>) 
-            és elugrunk a rács első pontjába a z<subscript>1</subscript> = c-be, 
-            aztán a c-től függően a további z-kbe. Ha ez az utazás kivezet a 
-            2 sugarú körből, akkor azt mondjuk, hogy az a vizsgált rácspont 
-            nem a Mandelbrot halmaz eleme. Nyilván nem tudunk végtelen sok 
-            z-t megvizsgálni, ezért csak véges sok z elemet nézünk meg minden 
-            rácsponthoz. Ha eközben nem lép ki a körből, akkor feketére 
-            színezzük, hogy az a c rácspont a halmaz része. (Színes meg úgy 
-            lesz a kép, hogy változatosan színezzük, például minél későbbi 
-            z-nél lép ki a körből, annál sötétebbre). 
-        </para>       
-        <para>        
+          Mit is csináltunk tulajdonképpen? Nos, rögzítettük 0,3 re értéket, és elkezdtük "pásztázni" im értékeket 0,1-es lépés közzel.
+          A kódban is ezt fogjuk csinálni, csak minden pásztázott ponthoz (re im pár) rögzíteni fogjuk mennyi iteráció után kerültek ki az origó 2 sugarú köréből. 
+          Azért hogy ne fusson a végetelenségig, ezért az iterációknak lesz egy teteje.
+          Azaz ha a max iter számot elérjük akkor meg fogunk állni.
         </para>
+        <para>
+          A user megad egy re alsó és felső határt (mettől meddig pásztázunk Re tengelyen), illetve ugyanezt Im tengelyen.
+          A lépésszám állítható is lenne, de mivel a legvégén terminálra akarunk írni, ezért ettől most eltekintünk.
+        </para>
+        <para>
+          Tanár Úrtól eltérően én feldaraboltam a kódot, de csak azért hogy egyszerűbb legyen bemutatni.
+        </para>
+        <para>
+          Az első kód részlet egy olyan funkció, aminek adunk egy komplex konstanst és egy max iter számot, és ez a fent bemutatott algoritmust végigcsinálja.
+          A visszaadott érték az iter szám. Ha ez alacsony akkor nagyon gyorsan elszállt a számítás, ha magas akkor sokáig stabil volt.
+        </para>
+<literallayout>
+int mandel(
+    float c_re, 
+    float c_im, 
+    int max_iter)
+{
+  int i = 0;
+  float temp=0.0, z_re=0.0, z_im=0.0;
+  while ( ( ((z_re*z_re)+(z_im*z_im)) &lt; 4.0 ) &amp;&amp; ( i &lt; max_iter ) )
+  {
+    temp =(z_re*z_re)-(z_im*z_im)+c_re;
+    z_im = 2.0*(z_re*z_im)+c_im;
+    z_re=temp;
+    i++;
+  }
+  return i;
+}
+</literallayout>
+        <para>
+          A második kód részlet már csak boilerplate kód.
+          Erősen átírtam Tanár Úréhoz képest, direkt hogy int**-t használjunk.
+          A másik dolog, hogy Tanár Úré valami miatt a második for bodyban számolja c reál és imaginárius részét is érthetőség miatt, én ezt egy picit optimáltam.(elég a külsőben számolni az egyiket)
+          Annyi történik, hogy végig járjuk a kapott rácsot és kitöltögetjük, hogy melyik komplex konstans-hoz mennyi iter tartozik.
+        </para>
+<literallayout>
+void apply_mandel(
+    int** quad_mx, 
+    int re_size, 
+    int im_size,
+    float re_lo, 
+    float re_hi, 
+    float im_lo, 
+    float im_hi, 
+    int max_iter)
+{
+  
+  int re_step,im_step,itercount;
+  float d_re,d_im,c_re,c_im;
+  if(quad_mx == NULL || re_size &lt; 1 || im_size &lt; 1) return;
+  d_re = (re_hi-re_lo)/re_size;
+  d_im = (im_hi-im_lo)/im_size;
+  for(re_step = 0; re_step &lt; re_size;++re_step){
+    c_re = re_lo + d_re * re_step;
+    for(im_step = 0; im_step &lt; im_size;++im_step){
+      c_im = im_hi - d_im * im_step;
+      itercount = mandel( c_re,c_im,max_iter);
+      quad_mx[re_step][im_step]=mandel( c_re,c_im,max_iter);
+    }
+  }
+}
+</literallayout>
+        <para>
+          A harmadik rész maga a main. Csak beolvassuk a usertől mely határok között számoljunk, illetve deklaráljuk initeljük az int ptr ptr-t, plusz a végén feltakarítunk.
+        </para>
+    <programlisting language="c" linenumbering="numbered">
+    <textobject><textdata fileref="Mandel/mandel.c"/></textobject>
+  </programlisting>
+        <figure>
+            <title>A Mandelbrot halmaz win, csak iter számok</title>
+            <mediaobject>
+                <imageobject>
+                    <imagedata fileref="img/mandelnums.png" scale="50" />
+                </imageobject>
+                <textobject>
+                    <phrase>A Mandelbrot halmaz win, csak iter számok</phrase>
+                </textobject>
+            </mediaobject>
+        </figure>
+        <figure>
+            <title>A Mandelbrot halmaz win, színes</title>
+            <mediaobject>
+                <imageobject>
+                    <imagedata fileref="img/mandel0.png" scale="50" />
+                </imageobject>
+                <textobject>
+                    <phrase>A Mandelbrot halmaz win, színes</phrase>
+                </textobject>
+            </mediaobject>
+        </figure>
+         <figure>
+            <title>A Mandelbrot halmaz win, színes, határ állítás</title>
+            <mediaobject>
+                <imageobject>
+                    <imagedata fileref="img/mandel1.png" scale="50" />
+                </imageobject>
+                <textobject>
+                    <phrase>A Mandelbrot halmaz win, színes, határ állítás</phrase>
+                </textobject>
+            </mediaobject>
+        </figure>
+        
 
     </section>        
         

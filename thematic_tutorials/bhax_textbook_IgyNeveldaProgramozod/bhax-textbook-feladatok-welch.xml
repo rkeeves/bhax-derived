@@ -28,55 +28,397 @@
     <section>
         <title>LZW</title>
         <para>
-            Valósítsd meg C-ben az LZW algoritmus fa-építését!
+          Mielőtt neki ugrunk egy kis áttekintés a <link xlink:href="https://progpater.blog.hu/2011/03/05/labormeres_otthon_avagy_hogyan_dolgozok_fel_egy_pedat">progpater</link> alapján.
         </para>
         <para>
-            Megoldás videó:
+          A programunk kapni fog egy {0,1} karakterekből (bár lehetnének bitek is) álló mintát. Ez alapján memóriában 
         </para>
+<literallayout>
+01111001001001000111
+</literallayout>
         <para>
-            Megoldás forrása:                
+          A kapott minta alapján memóriában létre kell hoznunk egy fát.
+          A fa csomópontokból áll. Minden csomóponthoz tartozik egy érték illetve lehet két gyermeke, továbbiakban jobb és bal.
+          A fa továbbá tartalmaz egy segéd ptr-t arra a csomópontra, ahol éppen állunk.
+          A következő szabályok szerint építjük a fát:
         </para>
+        <itemizedlist mark='bullet'>
+          <listitem>
+            <para>Alapból a gyökér létezik értéke /, és ezen gyökér csomóponton állunk(erre mutat a segéd ptr).</para>
+          </listitem>
+          <listitem>
+            <para>Ha 0-t kapunk, és létezik bal gyermek, akkor a segéd ptr-rel innentől erre fogunk mutatni.</para>
+          </listitem>
+          <listitem>
+            <para>Ha 0-t kapunk, és nem létezik bal gyermek, akkor segéd ptr által mutatott node bal gyermekeként létrehozzuk. Segéd ptr-rel pedig gyökérre mutatunk innentől.</para>
+          </listitem>
+          <listitem>
+            <para>Ha 1-t kapunk, akkor teljesen szimmetrikusan a fenti két szabályt jobb gyerekre alkalmazzuk.</para>
+          </listitem>
+        </itemizedlist>
+        <para>Pici példácskán, mondjuk 0110-re, nézzük meg hogy működik! Minden lépésnél ábrázolni fogom a fát is! Csillaggal árbázoljuk hol áll éppen a segéd ptr!</para>
+<literallayout>
+Feldolgozva=[]
+---/*
+Feldolgozva=[0]
+---/*
+------0
+Feldolgozva=[01]
+------1
+---/*
+------0
+Feldolgozva=[011]
+------1*
+---/
+------0
+Feldolgozva=[0110]
+------1
+---------0
+---/*
+------0
+</literallayout>
+        <para>Most nézzük meg mi ez az egész max, átlag, szórás!</para>
+        <para>Két fogalmat azonban be kell hozzá vezetni. Az egyik a levél, a másik a mélység.</para>
+        <para>Egy csomópontot levélnek nevezünk, ha nincsenek gyermekei.</para>
+        <para>Egy csomópont mélységén azt értjük (ezen esetben) hogy a hány csomópont érintésével tudunk eljutni gyökér nodeból az adott node-ba.</para>
+        <para>Vegyük propateres példát és írjuk fel rá kézzel az értékeket!</para>
+<literallayout>
+------------1(3)
+---------1(2)
+------1(1)
+---------0(2)
+------------0(3)
+---------------0(4)
+---/(0)
+---------1(2)
+------0(1)
+---------0(2)
+melyseg=4
+altag=2.750000
+szoras=0.957427
+</literallayout>
+        <para>Max mélység alatt a legnagyobb mélységet értjük, azaz 4-et.</para>
+        <para>Átlagmélység a leaf mélységek összege osztva a leaf számmal, azaz:</para>
+<literallayout>
+hosszak={3,4,2,2}
+leafs=4
+
+atlag=4/3+4/4+2/4+2/4
+atlag=0.75+1+0.5+0.5
+atlag=2.75
+
+</literallayout>
+        <para>A teljes fa szórása alatt a szórásösszeg és a levél szám hányadosának négyzetgyökét értjük. Meg kell jegyezni, hogy valójában leaf számnál eggyel kisebb számot használunk 1-nél nagyobb leaf számú esetekben.</para>
+        <para>Szórásösszeg, az összes levél szórásának összege.</para>
+        <para>Egy node szórása alatt az adott node mélységének átlagmélységtől vett különbségének négyzetét értjük.</para>
+<literallayout>
+hosszak={3,4,2,2}
+leafs=4
+atlag=2.75
+
+szorasosszeg=(3-2.75)^2+(4-2.75)^2+(2-2.75)^2+(2-2.75)^2
+szorasosszeg=0.0625+1.5625+0.5625+0.5625
+szorasosszeg=2.75
+szoras=(2.75/4-1)^0.5
+szoras=(0.9166667)^0.5
+szoras=0.957427
+</literallayout>
+    <para>Most hogy kézzel kiszámoltuk, írjuk át C-re.</para>
+    <para>A C kódban akét komoly eltérés a Tanár Úr féle kódtól:</para>
+    <itemizedlist mark='bullet'>
+      <listitem>
+        <para>allokáció/felaszabadításnál a ptr-t kiírjuk standard output-ra</para>
+      </listitem>
+      <listitem>
+        <para>Általános traversalokat használunk funtcion ptr-ekkel</para>
+      </listitem>
+    </itemizedlist>
+    <para>A ptr-ek kilogolása csak amiatt fontos hogy grafikus visszajelzést is kapjunk, hiszen most ugye dinamikusan allokált adatokkal dolgozunk, amelyeket kézileg kell életciklus menedzselni.</para>
+<literallayout>
+void free_node(int depth, Node* node, UserData*ud)
+{
+  if(node == NULL) return;
+  #ifdef CUSTOM_DEBUG_OUT
+    printf("Free node %p\n",node);
+  #endif
+  free(node);
+}
+</literallayout>
+    <para>Az általános traversal amiatt kellett, hogy egy kicsit az stl-es algorithm-re hajazva, legyen lehetősége a user-nek megadnia, hogy mi történjen, a fa pedig csak a helyes traversalért legyen felelős.</para>
+    <para>Nézzünk egy példát!</para>
+<literallayout>
+void foreach_inorder(int depth,Node* root, traversal_fn fptr, UserData* ud )
+{
+  if(root == NULL) return;
+  foreach_inorder(depth+1,root->right, fptr, ud );
+  fptr(depth,root,ud);
+  foreach_inorder(depth+1,root->left, fptr, ud );
+}
+</literallayout>
+  <para>Láthatóan a fenti funckió simán rekurzívan hívja magát a két child-ra. A fn ptr csak akkor jön be a képbe mikor magát az adott subtree root-ját dolgozzuk fel. UserData csak egy typedef-elt void ptr, hogy a user állapotot is betudjon adni, ne csak viselkedést.
+  Egy példa fn amit fn ptr-ként beküldhetünk legyen a print</para>
+<literallayout>
+void print_node(int depth, Node* node, UserData*ud)
+{
+  int i;
+  if(node == NULL) return;
+  for(i=0;i&lt;depth; ++i){printf("---"); }
+  printf("%c (%d) %p\n",node-&gt;value, depth,node);
+}
+</literallayout>
+  <para>A számolásokhoz simán végigszaladunk a leafeken és mivel nem tudjuk előre a leaf számot, ezért egy dinamikusan allokált helyre gyűjtjük be a leaf-ek mélységeit. De csinálhattuk volna úgyis hogy többször megyünk végig a leaf-eken és akkor kevesebb memóriát használtun volna, azaz CPU vs. MEM tradeoff.</para>
+  <para>Igen... <literal>LeafCountData</literal>-t totál kikerülhettük volna: bedobhattuk volna simán a nyers ptr-t aztán inkrementáltuk volna...</para>
+  <para>Alább a progpater-es példa inputként kimeneten.</para>
+    <figure>
+        <title>Lzw C output</title>
+        <mediaobject>
+            <imageobject>
+                <imagedata fileref="img/btreec.png" scale="100" />
+            </imageobject>
+            <textobject>
+                <phrase>Lzw C output</phrase>
+            </textobject>
+        </mediaobject>
+    </figure>
+    <para>Alább a C forrás</para>
+    <programlisting language="c" linenumbering="numbered">
+      <textobject><textdata fileref="Welch/btreec.c"/></textobject>
+    </programlisting>
     </section>        
         
     <section>
         <title>Fabejárás</title>
         <para>
-            Járd be az előző (inorder bejárású) fát pre- és posztorder is!
+          Az előző feladatban még a free-t is a function ptr-es traversallal csináltuk, azaz az előző feladatban ez részletezésre került.
+          Alábbi kód részleten látszik, hogy az előző részben bevezetett módon elég egyszerű a dolog.
         </para>
-        <para>
-            Megoldás videó:
-        </para>
-        <para>
-            Megoldás forrása:                
-        </para>
+<literallayout>
+  printf("\nPREORDER\n");
+  foreach_preorder(0,bt->root,print_node,NULL);
+  printf("\nPOSTORDER\n");
+  foreach_postorder(0,bt->root,print_node,NULL);
+</literallayout>
+        <para>A hangsúly a fn ptr alkalmazásán van. Ha azt értjük, akkor az alábbi kép nem lesz meglepő.</para>
+        <figure>
+        <title>Traversals</title>
+        <mediaobject>
+            <imageobject>
+                <imagedata fileref="img/traverslasc.png" scale="100" />
+            </imageobject>
+            <textobject>
+                <phrase>Traversals</phrase>
+            </textobject>
+        </mediaobject>
+    </figure>
     </section>        
                         
     <section>
         <title>Tag a gyökér</title>
         <para>
-            Az LZW algoritmust ültesd át egy C++ osztályba, legyen egy Tree és egy beágyazott Node
-            osztálya. A gyökér csomópont legyen kompozícióban a fával!
+          A Twitch-es nbatfai megoldást fogom átszerkeszteni.
+          A builderezést és lambdázást a mozgató szemantika részben fogom csinálni, ahol tényleg nullából újra írom.
         </para>
         <para>
-            Megoldás videó:
+          Mivel az nbatfai root ptr-esre alapszik, és azt a következő fejezetben dolgoztam ki, itt effektíve csak egy diff-et írok doksiba.
         </para>
         <para>
-            Megoldás forrása:                
+          Mielőtt belemegyünk, annyit érdemes tisztázni, hogy ValueType-tól nem várhatjuk el, hogy lesz default ctor-a, így sajnos a tree ctor-ához hozzá kell nyúlni.
         </para>
+        <para>
+          Magyarul, ha biztosra tudnánk venni, hogy ValueType halmaznak van egy speciális eleme ami a halmaz alját, vagy null-t vagy stb.-t jelentené, akkor nem kéne mindenképpen értéket kérni a tree ctorban.
+          Azonban ez elég erős megkötés lenne.
+        </para>
+        <para>
+          Kilenc helyen értem hozzá a kódhoz, ezek tételes felsorolása és magyarázata alább következik.
+        </para>
+        <para>
+          Az első módosítás a tree ctor. Én úgy gondolom érdemes mindenképpen explicit értéket kérni, mert különben arra kéne hagyatkoznunk, hogy ValueType-nak van default ctor-a.
+          Természetesen treep-t root címére kell állítanunk.
+        </para> 
+<literallayout>
+BinTree(ValueType rootval) : root(rootval), treep(&amp;root), depth(0)
+</literallayout>
+        <para>
+          Az második módosítás a dtor-t illeti. Mivel root kompozíciós tag, ezért csak a child node-okra kell hívnunk a rekurzív delete-t.
+        </para>
+<literallayout>
+deltree(root.left_child() );
+deltree(root.right_child() );
+</literallayout>
+        <para>
+          A harmadik módosítás a bintree leftshiftet érinti. Root ptr-es esetben vizsgálni kell, hogy root létezik-e, viszont ezen esetben ha tree létezik akkor root-is (Java-ban swing-ben van erre sok példa, hogy van egy default úgymond implicit root mindig.).
+        </para>
+        <para>
+          A negyedik módosítás hasonlóan a bintree leftshiftet érinti. Treep-nek magát root-ot nem assignolhatjuk, hanem root címe fog kelleni.
+        </para>
+<literallayout>
+treep = &amp;root;
+</literallayout>
+        <para>
+          Az ötödik módosítás <literal>ZLWTree</literal> template mentesítése. Enélkül az eredeti kód implicit konverziókat fog végezni és a leftshift is rosszul fog működni char-tól eltérő datatype esetén.
+        </para>
+        <para>
+          A hatodik módosítás valójában csak annyi, hogy delegáltuk a node példányosítást BinTree ctor-nak.
+        </para>
+<literallayout>
+ZLWTree() : BinTree&lt;char&gt;('/')
+</literallayout>
+        <para>
+          A hetedik, nyolcadik és kilencedik módosítás valójában csak annyi, hogy root címe kell treep-nek hisz az pointer.
+        </para>
+        <programlisting language="c++" linenumbering="numbered">
+          <textobject><textdata fileref="Welch/zlwtreerootcomp.cpp"/></textobject>
+        </programlisting>
     </section>        
                 
     <section>
         <title>Mutató a gyökér</title>
         <para>
-            Írd át az előző forrást, hogy a gyökér csomópont ne kompozícióban, csak aggregációban legyen a 
-            fával!
+          A kísérleti nbatfai twitch adásban látható megoldás lehet egy példa erre.
         </para>
         <para>
-            Megoldás videó: 
+          Áttekintve annyiról van szó, hogy a egyszerre egy bináris fát és egy lzw fát fogunk csinálni.
+          Kód duplikáció elkerülése végett pedig inheritance-t használunk.
+          Apró kellemetlenség hogy egyenesen cpp-be megy, de mozgató szemantikás feladatban a saját megoldásomban úgyis nulláról újraírom az egészet, és ott már header is lesz.
         </para>
         <para>
-            Megoldás forrása:  
+          Úgy döntöttem <literal>ZLWTree</literal>-t template mentesítem és explicit <literal>BinTree&lt;char&gt;</literal>-ról származtatom, mert ctor és left shift esetében alul definiált lenne.
         </para>
+        <para>
+          Úgy döntöttünk hogy nesteljük bele a node osztályt.
+          Talán ennek a bemutatásával érdemes kezdeni a dolgot:
+        </para>
+<literallayout>
+class Node
+  {
+    ...
+    ValueType value;
+    Node* left;
+    Node* right;
+    int count;
+  };
+</literallayout>
+      <para>ValueType BinTree template paramétere, ezt (mivel inner class), használhatjuk Node esetén is.</para>
+      <para>Left right a gyermekekre mutató, ctor-ban nullptr-re initelt pointerek.</para>
+      <para>Count a bináris kereső fa miatt fontos állapotváltozó. Egyszerűen annyiról van szó, hogyha például egy Bintree&lt;int&gt; be kétszer left shiftelek mondjuk 9-et, akkor ne két külön node jöjjön létre 9-es value-val. Ehelyett ilyen esetben a már létező 9-es értékű node count állapotváltozóját fogjuk a második 9-es miatt inkrementálni.</para>
+      <para>A funkciók csak egyszerű setter-ek getter-ek. Incr count pedig csak egy shortcut, mert a count setter-t get_count()+1 kéne hívni.</para>
+      <para>Most nézzük tree állapotváltozóit!</para>
+      <para>Root a gyökérre mutató ptr. Treep a fenti manuális példákban a segéd ptr, míg depth egy internal változó, amit a traversalnál fogunk használni annak adminisztrálására, hogy milyen mélyen vagyunk.</para>
+      <para>Persze, treep és depth nem kell törvényserűleg BinTree-be rakni. A mozgató szemantikás delegáljuk is majd ezt a felelősséget egy iterátornak ami csak és kizárólag a faépítéséért felelős.</para>
+      <literallayout>
+template&lt;typename ValueType&gt;
+class BinTree
+  {
+    ...
+    Node* root;
+    Node* treep;
+    int depth;
+  };
+</literallayout>
+    <para>Viselkedések közül a left shift a legfontosabb, hiszen ez a node példányosítást végzi.</para>
+<literallayout>
+template&lt;typename ValueType&gt;
+BinTree&lt;ValueType&gt;&amp; BinTree&lt;ValueType&gt;::operator&lt;&lt;(ValueType value)
+{
+  if(!treep){
+    root = treep = new Node(value);
+  }else if(treep-&gt;get_value() == value){
+    treep-&gt;incr_count();
+  }else if(treep-&gt;get_value() &gt; value){
+    if(!treep-&gt;left_child()){
+      treep-&gt;left_child(new Node(value));
+    }else{
+      treep = treep-&gt;left_child();
+      *this&lt;&lt;value;
+    }
+  }else{
+    if(!treep-&gt;right_child()){
+      treep-&gt;right_child(new Node(value));
+    }else{
+      treep = treep-&gt;right_child();
+      *this&lt;&lt;value;
+    }
+  }
+  treep = root;
+  return *this;
+}
+</literallayout>
+    <para>Class-on kívül definiáltuk, de természetesen továbbra is template-es.</para>
+    <para>A funkció minden esetben azzal zár hogy visszaugrunk root-ra.</para>
+    <para>Ha a value egyenlő azzal a value-va amit a jelenlegi segéd ptr mutat, akkor csak inkrementálni fogjuk.</para>
+    <para>Ha a value kisebb akkor bal irányba fogunk "mozdulni".</para>
+    <para>Ha balra nincs még node, akkor létrehozunk egy bal gyermek node-ot a jelenleg treep által mutatott node-on.</para>
+    <para>Ha balra van már node, akkor treep-t áthelyezzük és rekurzívan újra meghívjuk a funkciót (de ugye nem ugyanaz fog történni, hisz treep már máshol áll!).</para>
+    <para>Ha az érték nagyobb akkor teljesen szimmetrikusan jobb irányba végezzük el ugyanezt</para>
+    <para>print egy egyszerű inorder bejárást végez. Ezt a C-s példában fn ptr-el, a mozgatósban később pedig functorral fogjuk kiváltani.</para>
+    <para>Itt annyit érdemes megjegyezni, hogy depth az <literal>BinTree</literal>osztály tulajdonsága.</para>
+<literallayout> 
+template&lt;typename ValueType&gt;
+void BinTree&lt;ValueType&gt;::print(Node* node, std::ostream&amp; os)
+{
+  if(node){
+    ++depth;
+    print(node-&gt;right_child(),os );
+    for(int i = 1; i &lt; depth; ++i){os &lt;&lt; "---";}
+    os &lt;&lt; node-&gt;get_value() &lt;&lt; " " &lt;&lt; depth &lt;&lt; " " &lt;&lt; node-&gt;get_count() &lt;&lt; std::endl;
+    print(node-&gt;left_child(),os );
+    --depth;
+  }
+}
+</literallayout>
+  <para>deltree csak postorder-ben végig járja a node gyökerű subtree-t és felszabadítja a foglalt memóriát. A C-s kódban ez az a rész amit direkt címre pontosan ki is irattam.</para>
+<literallayout>
+template&lt;typename ValueType&gt;
+void BinTree&lt;ValueType&gt;::deltree(typename BinTree&lt;ValueType&gt;::Node* node)
+{
+  if(node){
+    deltree(node-&gt;left_child() );
+    deltree(node-&gt;right_child() );
+    delete node;
+  }
+}
+</literallayout>
+<para>ZLWTree esetén kicsit más a left shift. Ezt manuálisan levezettük feljebb. Az egyetlen külön említést érdemlő dolog az az hogy, 
+  mivel class-on kívül írjuk a definíciót ezért globál namespace-ben nincs csak úgy benne Node varázsütésre.
+  Ez látható a node példányosításos sorokban.</para>
+<literallayout>
+ZLWTree&amp; ZLWTree::operator&lt;&lt;(char value)
+{
+  if(value=='0'){
+    if(!this-&gt;treep-&gt;left_child()){
+      typename BinTree&lt;char&gt;::Node* node = new typename BinTree&lt;char&gt;::Node(value);
+      this-&gt;treep-&gt;left_child(node);
+      this-&gt;treep = this-&gt;root;
+    }else{
+      this-&gt;treep = this-&gt;treep-&gt;left_child();
+    }
+  }else{
+    if(!this-&gt;treep-&gt;right_child()){
+      typename BinTree&lt;char&gt;::Node* node = new typename BinTree&lt;char&gt;::Node(value);
+      this-&gt;treep-&gt;right_child(node);
+      this-&gt;treep = this-&gt;root;
+    }else{
+      this-&gt;treep = this-&gt;treep-&gt;right_child();
+    }
+  }
+  return *this;
+}
+</literallayout>
+  <para>Alább ltható a zlw progi kimenete</para>
+    <figure>
+        <title>ZLW out</title>
+        <mediaobject>
+            <imageobject>
+                <imagedata fileref="img/zlwout.png" scale="100" />
+            </imageobject>
+            <textobject>
+                <phrase>ZLW out</phrase>
+            </textobject>
+        </mediaobject>
+    </figure>
+    <programlisting language="c++" linenumbering="numbered">
+          <textobject><textdata fileref="Welch/zlwtreerootptr.cpp"/></textobject>
+        </programlisting>
     </section>                     
 
     <section>

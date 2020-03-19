@@ -1,0 +1,155 @@
+#include <iostream>
+template<typename ValueType>
+class BinTree
+{
+protected:
+  class Node
+  {
+  public:
+    Node(ValueType value) : value(value), left(nullptr), right(nullptr), count(0){}
+  private:
+    // TODO impl rule of five
+    Node(const Node&);
+    Node& operator=(const Node&);
+    Node(const Node&&);
+    Node& operator=(const Node&&);
+  public:
+    ValueType get_value(){ return value;}
+    Node* left_child(){ return left;}
+    Node* right_child(){ return right;}
+    void left_child(Node* node){ this->left=node;}
+    void right_child(Node* node){ this->right=node;}
+    int get_count(){ return count;};
+    void incr_count(){ this->count++;}
+  private:
+    ValueType value;
+    Node* left;
+    Node* right;
+    int count;
+  }; /* class Node */
+public:
+  BinTree(Node* root=nullptr, Node* treep=nullptr) : root(root), treep(treep), depth(0)
+  {
+    
+  }
+  ~BinTree()
+  {
+    deltree(root);
+  }
+private:
+  // TODO impl rule of five
+  BinTree(const BinTree&);
+  BinTree& operator=(const BinTree&);
+  BinTree(const BinTree&&);
+  BinTree& operator=(const BinTree&&);
+
+
+public:
+  BinTree& operator<<(ValueType);
+  void print(){ print(root, std::cout);}
+  void print(Node* node, std::ostream& os);
+  void deltree(Node* node);
+protected:
+  Node* root;
+  Node* treep;
+  int depth;
+}; /* class Tree */
+
+template<typename ValueType>
+BinTree<ValueType>& BinTree<ValueType>::operator<<(ValueType value)
+{
+  if(!treep){
+    root = treep = new Node(value);
+  }else if(treep->get_value() == value){
+    treep->incr_count();
+  }else if(treep->get_value() > value){
+    if(!treep->left_child()){
+      treep->left_child(new Node(value));
+    }else{
+      treep = treep->left_child();
+      *this<<value;
+    }
+  }else{
+    if(!treep->right_child()){
+      treep->right_child(new Node(value));
+    }else{
+      treep = treep->right_child();
+      *this<<value;
+    }
+  }
+  treep = root;
+  return *this;
+}
+
+template<typename ValueType>
+void BinTree<ValueType>::print(Node* node, std::ostream& os)
+{
+  if(node){
+    ++depth;
+    print(node->right_child(),os );
+    for(int i = 1; i < depth; ++i){os << "---";}
+    os << node->get_value() << " " << depth << " " << node->get_count() << std::endl;
+    print(node->left_child(),os );
+    --depth;
+  }
+}
+
+
+template<typename ValueType>
+void BinTree<ValueType>::deltree(typename BinTree<ValueType>::Node* node)
+{
+  if(node){
+    deltree(node->left_child() );
+    deltree(node->right_child() );
+    delete node;
+  }
+}
+  
+class ZLWTree : public BinTree<char>
+{
+public:
+  ZLWTree() : BinTree<char>(new typename BinTree<char>::Node('/'))
+  {
+    this->treep = this->root;
+  }
+private:
+public:
+  ZLWTree& operator<<(char);
+private:
+  
+};
+
+ZLWTree& ZLWTree::operator<<(char value)
+{
+  if(value=='0'){
+    if(!this->treep->left_child()){
+      typename BinTree<char>::Node* node = new typename BinTree<char>::Node(value);
+      this->treep->left_child(node);
+      this->treep = this->root;
+    }else{
+      this->treep = this->treep->left_child();
+    }
+  }else{
+    if(!this->treep->right_child()){
+      typename BinTree<char>::Node* node = new typename BinTree<char>::Node(value);
+      this->treep->right_child(node);
+      this->treep = this->root;
+    }else{
+      this->treep = this->treep->right_child();
+    }
+  }
+  return *this;
+}
+
+
+int main(int argc, char** argv, char** env)
+{
+  BinTree<int> bt;
+  bt <<8<<9<<5<<2<<7;
+  bt.print();
+  std::cout << std::endl;
+  ZLWTree zt;
+  zt<<'0'<<'1'<<'1'<<'1'<<'1'<<'0'<<'0'<<'1'<<'0'<<'0'<<'1'<<'0'<<'0'<<'1'<<'0'<<'0'<<'0'<<'1'<<'1'<<'1';
+  zt.print();
+  return 0;
+}
