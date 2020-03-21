@@ -8,21 +8,47 @@
     <section>
         <title>Első osztályom</title>
         <para>
-            Valósítsd meg C++-ban és Java-ban az módosított polártranszformációs algoritmust! A matek háttér 
-            teljesen irreleváns, csak annyiban érdekes, hogy az algoritmus egy számítása során két normálist
-            számol ki, az egyiket elspájzolod és egy további logikai taggal az osztályban jelzed, hogy van vagy
-            nincs eltéve kiszámolt szám.
+            A lényeg, hogy adott egy számítási algoritmus melyet meghívva nem csak a következő értéket, hanem a rákövetkezőt is megkapjuk.
+            Azaz az 1. hívásnál kell számítani, de a 2. hívásnál nem kell, hiszen az 1. számítás a 2. értékét is kiszámította előre.
+            Azért hogy ezt kezeljük egy egyszerű osztályt fogunk írni.
+            Ahhoz hogy ezt a "bufferelést" megoldjuk két változót vezetünk be: magát a tárolt értéket, illetve egy boolean-t, hogy jelenleg úgy szólván szabad-e aktívnak tekinteni a tárolt értéket.
+        </para>
+<literallayout>
+boolean store_empty;
+double stored;
+</literallayout>
+        <para>
+            Maga az algoritmus csak simán annyiról szól, hogy ha store_empty true, akkor kell számítást végezni.
+            A számítás első eredményét visszaadjuk, a másikat betároljuk, és a store_empty-t false-re állítjuk.
+            Ha store_empty false, akkor store_empty-t true-ra állítjuk, hisz úgymond ürítjük a buffert, és visszaadjuk a tárolt értéket.
         </para>
         <para>
-            Megoldás videó:
+          A feladat könnyebb megértéséhez egy hackelt verzió az eredeti java class-ból.
         </para>
+      <programlisting language="java" linenumbering="numbered">
+        <textobject><textdata fileref="Welch/PolarGen2.java"/></textobject>
+      </programlisting>
+       <para>
+           Alább az eredeti feladat:        
+       </para>
+      <programlisting language="java" linenumbering="numbered">
+        <textobject><textdata fileref="Welch/PolarGen.java"/></textobject>
+      </programlisting>
+       <para>
+          C++ esetben három különbség lesz: random, sqrt és log. 
+       </para>
+       <para>
+          [0,1) tartományon random double generálását végezhetjük az alábbi módon. Ehhez szükség lesz stdio-ra rnd() illetve RAND_MAX miatt.
+       </para>
+<literallayout>
+double rnd01(){return rand() / (RAND_MAX + 1.);}
+</literallayout>
         <para>
-            Megoldás forrása:                
-        </para>
-        <para>
-            Tanulságok, tapasztalatok, magyarázat... térj ki arra is, hogy a JDK forrásaiban a Sun programozói
-            pont úgy csinálták meg ahogyan te is, azaz az OO nemhogy nem nehéz, hanem éppen természetes neked!
-        </para>                
+          sqrt és log a már ismert math lib-ben van, azaz ne felejtsük include-olni.
+       </para>
+       <programlisting language="c++" linenumbering="numbered">
+        <textobject><textdata fileref="Welch/PolarGen.cpp"/></textobject>
+      </programlisting>
     </section>        
 
     <section>
@@ -269,6 +295,10 @@ ZLWTree() : BinTree&lt;char&gt;('/')
         <programlisting language="c++" linenumbering="numbered">
           <textobject><textdata fileref="Welch/zlwtreerootcomp.cpp"/></textobject>
         </programlisting>
+        <para>Persze hogy ne legyen baj, akár a ctorba is bepasszolhatjuk argként root és leftshift comparatorban használt value-t</para>
+        <programlisting language="c++" linenumbering="numbered">
+          <textobject><textdata fileref="Welch/zlwtreerootcomp2.cpp"/></textobject>
+        </programlisting>
     </section>        
                 
     <section>
@@ -404,7 +434,7 @@ ZLWTree&amp; ZLWTree::operator&lt;&lt;(char value)
   return *this;
 }
 </literallayout>
-  <para>Alább ltható a zlw progi kimenete</para>
+  <para>Alább látható a zlw progi kimenete</para>
     <figure>
         <title>ZLW out</title>
         <mediaobject>
@@ -416,23 +446,146 @@ ZLWTree&amp; ZLWTree::operator&lt;&lt;(char value)
             </textobject>
         </mediaobject>
     </figure>
-    <programlisting language="c++" linenumbering="numbered">
-          <textobject><textdata fileref="Welch/zlwtreerootptr.cpp"/></textobject>
-        </programlisting>
+      <programlisting language="c++" linenumbering="numbered">
+        <textobject><textdata fileref="Welch/zlwtreerootptr.cpp"/></textobject>
+      </programlisting>
     </section>                     
 
     <section>
-        <title>Mozgató szemantika</title>
+        <title>Mozgató és másoló szemantika</title>
         <para>
-            Írj az előző programhoz mozgató konstruktort és értékadást, a mozgató konstruktor legyen a mozgató
-            értékadásra alapozva!
+          Az előbbiekben megírt osztáy(oka)t fogjuk felkészíteni mozgatásra és másolásra.
+          Ez a következő viselkedések implementációját vonja maga után:
+        </para>
+        <itemizedlist mark='bullet'>
+          <listitem>
+            <para>Copy ctor</para>
+          </listitem>
+          <listitem>
+            <para>Copy assigment</para>
+          </listitem>
+          <listitem>
+            <para>Move ctor</para>
+          </listitem>
+          <listitem>
+            <para>Move assigment</para>
+          </listitem>
+        </itemizedlist>
+        <para>
+          Először a copy-val és utána  a move-al fogunk foglalkozni.
         </para>
         <para>
-            Megoldás videó: 
+          Nézzük a copy ctor-t! Sajnos nem egyszerű a dolgunk. Gondoljunk bele, hogyha másolni akarjuk a fát, 
+          akkor a root node-ot át kell másolnunk az újba. Viszont ha itt megállunk, akkor az új root node-unk a régi root node gyerekeire fog muattni,
+          és amikor az egyik fa törlődik, akkor szépen ki fogja törölni a másik fa alól is a gyerekeket.
+          Emiatt nem elég root-ot másolni, hanem deltree-hez hasonlóan rekurzívan másolni kell minden node-ot, effektíve klónozva a fát.
+          Ezt nevezzük deep copy-nak (shallow copy lenne, ha csak pl. root-ot másolnánk.)
+          Ilyet automata módon a compiler nem csinál, ezért nekünk kell megírni.
         </para>
         <para>
-            Megoldás forrása:  
+          Sajnos még mindig van egy baj. Ha a fentiek alapján megírnánk a kódot, akkor lenne két tökéletesen jó fánk A és B.
+          Ahogy A-ba shifteljük az értékeket, azok szépen jelennének meg A-ban. Mi lenne B esetben?
         </para>
+        <para>
+          Nos, azzal a buggal szembesülnénk, hogy ahogy shifteljük B-be az értékeket, azok A-n jelennek meg egy darabig olykor, hiszen B treep-je a régi A egy node-jára mutatna, amíg treep vissza nem ugrana root-ra.
+          Hogy ezt elkerüljük a deep copy során treep-t is menedzselni kell, azaz amikor épp azon node-ot másoljuk amin a régi treep van,
+          akkor a másik B fa treep-jét az új node-ra állítjuk.
+        </para>
+<literallayout>
+BinTree(const BinTree&amp; old)
+{
+  #ifdef LOG_TREE_LIFECYCLE
+    std::cout&lt;&lt;"btree copy ctor "&lt;&lt; static_cast&lt;void*&gt;(this) &lt;&lt; std::endl;
+  #endif
+  root = deep_copy(old.root,old.treep);
+}
+</literallayout>
+        <para>
+          Deep copy esetén első arg-ként a régi A tree egy node-ját, másodikként a régi treep-t kapjuk.
+          Ha a régi node nullptr akkor csak visszaadunk egy nullptr-t.
+          Ha azonban létezik, akkor csinálunk egy újat átmásoljuk az értéket (pontosabban a ctor-ba arg-ként küldjük), és átmásoljuk a count int típusú data membert.
+          A rekurzív rész most jön, ugyanis a gyerek node-okat nem a régi fa nodejaira akarjuk állítani, hanem újonnan készített node-okra.
+          Azaz ezekre újból rekurzívan hívjuk deep_copy-t.
+          Ezt persze mind bal mind jobb gyereknél meg kell csinálni.
+          A végén ellenőriznünk kell, hogy az a régi node amit jelenleg dolgoztunk fel éppen véletlenül az-e amire a régi treep mutatott.
+          Ha ez így van akkor az új fa treep-jét átállítjuk az új node-ra.
+        </para>
+<literallayout>
+Node* deep_copy(Node* old_n, Node* old_treep)
+{
+  Node* newn = nullptr; 
+  if(old_n){
+    newn = new Node(old_n-&gt;get_value());
+    newn-&gt;left_child(deep_copy(old_n-&gt;left_child(),old_treep));
+    newn-&gt;right_child( deep_copy(old_n-&gt;right_child(),old_treep));
+    if(old_n==old_treep){this-&gt;treep=newn;}
+  }
+  return newn;
+}
+</literallayout>
+    <para>
+      A következő a move assignment. Itt annyi történik, hogy a régi BinTree instance és az új BinTree instance root illetve treep pointereit megcseréljük.
+      Nem kell ki nullptr-ezni a saját root és treep-nket swap előtt, hiszen ha már move assignment hívódik, akkor ezek vagy eleve nullptr-ek, vagy valid ptr-ek.
+    </para>
+<literallayout>
+BinTree&amp; operator=(BinTree&amp;&amp; old)
+{
+  #ifdef LOG_TREE_LIFECYCLE
+    std::cout&lt;&lt;"btree move assign "&lt;&lt; static_cast&lt;void*&gt;(this) &lt;&lt; std::endl;
+  #endif
+  std::swap(old.root,root);
+  std::swap(old.treep,treep);
+  return *this;
+}
+</literallayout>
+    <para>
+      A következő a move ctor. Itt kihasználjuk move assignmentet.
+      Vegyük észre, hogy előtte a saját root és treep-t nullptr-e vesszük fel.
+       Ha nem így tennénk akkor ezek uninitialized-ok lennének, magyarul memória szemét lenne rajtuk, és invalid helyekre mutatnának.
+    </para>
+<literallayout>
+BinTree(BinTree&amp;&amp; old)
+{
+  #ifdef LOG_TREE_LIFECYCLE
+    std::cout&lt;&lt;"btree move ctor "&lt;&lt; static_cast&lt;void*&gt;(this) &lt;&lt; std::endl;
+  #endif
+  root = nullptr;
+  treep = nullptr;
+  *this=std::move(old);
+}
+</literallayout>
+  <para>
+    Copy assignment a copy ctor, move ctor és move assignment ismeretében egy trükkel könnyen megvalósítható.
+    Egyszerűen létrehozunk egy temp nevű ctor body scope-an létező lokális BinTree instance-t.
+    Ezen BinTree instance copy ctor-ral lemásolja a régit.
+    Ezután std::swap-el tmp és a jelenleg this által mutatott BinTree példányok közt cserét hajt végre.
+    Mikor elhagyjuk a ctor scope-ot a this által mutatott instance életben marad (ő az old másolat),
+    a régi pedig "elpusztul", azaz dtor hívódik az általta mutatott címre majd fel lesz szabadítva az általa foglalt memória terület.
+  </para>
+<literallayout>
+ BinTree&amp; operator=(const BinTree&amp; old)
+  {
+    #ifdef LOG_TREE_LIFECYCLE
+      std::cout&lt;&lt;"btree copy assign "&lt;&lt; static_cast&lt;void*&gt;(this) &lt;&lt; std::endl;
+    #endif
+    BinTree tmp(old);
+    std::swap(*this,tmp);
+    return *this;
+  }
+</literallayout>
+        <para>
+          Alább a teljes kód.
+        </para>
+      <programlisting language="c++" linenumbering="numbered">
+        <textobject><textdata fileref="Welch/zlwtreerootptr_mv_cp.cpp"/></textobject>
+      </programlisting>
+        <para>
+          Ha a traversalt esetleg egy user supplied lambdára akarjuk cserélni akkor alábbi kódban találhatunk rá megoldást:
+          Az előző kódhoz képest itt a számítást is megcsináltuk. Mármint node depth max, átlag, szórás.
+        </para>
+        <programlisting language="c++" linenumbering="numbered">
+        <textobject><textdata fileref="Welch/lzw.cpp"/></textobject>
+      </programlisting>
     </section>                     
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         
 </chapter>                
