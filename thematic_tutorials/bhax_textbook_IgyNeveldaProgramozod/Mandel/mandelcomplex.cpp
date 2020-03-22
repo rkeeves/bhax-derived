@@ -27,7 +27,7 @@
 
 
 #include <iostream>
-#include "png++-0.2.9/png.hpp"
+#include "png.hpp"
 #include <complex>
 
 int
