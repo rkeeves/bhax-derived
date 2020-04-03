@@ -1,0 +1,3 @@
+Selected points from (65,25) to (173,133)
+Zooming from re[-1,1] im[-1,1]
+Zooming to re[-0.566667,0.153333] im[-0.833333,-0.113333]

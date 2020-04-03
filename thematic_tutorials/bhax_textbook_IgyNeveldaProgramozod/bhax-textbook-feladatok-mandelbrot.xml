@@ -386,46 +386,82 @@ for ( int y = 0; y &lt; h; ++y ){
 
     <section>
         <title>Mandelbrot nagyító és utazó C++ nyelven</title>
-        <para>MUNKA ALATT</para>
-        <para>Mivel a koronavírus miatt kétszáz giga microsoft terméket kell felraknom és ppt-ket olvasnom, ezért a proper c++ wrapper-eket nem tudtam még megcsinálni.</para>
-        <para>A másik, hogy nem lehet egyenesen a screen-re írni, hanem létre fogok hozni egy background és foregrounf texture-t.</para>
-        <para>BG-re megy a mandelbrot, FG-re megy a kijelölés téglalapja plusz a pontból ugrálás.</para>
-        <para>Ez már nem fért bele az időmbe mert egyszerre tizenhat rendszerben kell regisztrálni a távoktatást...</para>
-        <para>A lényeg az egészből, hogy a barebones dolog már meg van c-ben. Balt nyomva tartva draggelsz egy téglalapot. Felengedéskor kiszámítja a nagyítottat. Jobb gombbal az eredetit számolja (nem mentettem ki bufferba csak az a,b,c,d számokat).</para>
-         <figure>
-            <title>mandeltrav0</title>
+        <para>SDL2. EventBus-t, vagy signal-slot rendszert DIREKT nem írtunk, de valós életben így kéne... helyette simán az állapotváltozókkal jeleztem a történéseket.</para>
+        <para>Argumentumok nélkül futtatható. Debug üzenetekért kimenetet irányítsuk log file-ba stb. Debug log-hoz megfelelő preproc #define-t uncommentelni...</para>
+        <para>Zoom-olást bal klikkel indítja az ember. Nyomva tartva a bal gombot téglalapot rajzol a program.</para>
+        <figure>
+            <title>zoom rect</title>
             <mediaobject>
                 <imageobject>
-                    <imagedata fileref="img/mandeltrav0.png" scale="100" />
+                    <imagedata fileref="img/mandeltrav2_zoom.png" scale="100" />
                 </imageobject>
                 <textobject>
-                    <phrase>mandeltrav0</phrase>
+                    <phrase>zoom rect</phrase>
                 </textobject>
             </mediaobject>
         </figure>
-         <figure>
-            <title>mandeltrav1</title>
+        <para>A téglalap húzgálásra DIREKT TARTJA a képernyő arányt.</para>
+        <para>Bal egérgomb felegendéskor a kijelölt téglalap alapján történik a nagyítás.</para>
+        <figure>
+            <title>zoom</title>
             <mediaobject>
                 <imageobject>
-                    <imagedata fileref="img/mandeltrav1.png" scale="100" />
+                    <imagedata fileref="img/mandeltrav2_zoom2.png" scale="100" />
                 </imageobject>
                 <textobject>
-                    <phrase>mandeltrav1</phrase>
+                    <phrase>zoom</phrase>
                 </textobject>
             </mediaobject>
         </figure>
+        <para>A nagyítás konkrét frame-jében nem a teljes képet számoljuk. Ehelyett dinamikus számú sornyi pixelt számolunk ki mindig. A lényeg hogy 60 FPS a cél, ha túl sok időt vesz igénybe adott frame-en a dolog, akkor abbahagyjuk a zsámítást, és majd következő frame-ben folytatjuk.</para>
+        <para>Ha épp számolódik a background, és újra nagyítunk DIREKT nem tisztítjuk a buffert.</para>
+        <para>
+          User szinten emiatt egy érdekes egymásra lapolódás lesz megfigyelhető. Alábbi ábrán egy futó számítás közben újra nagyítottunk.
+          Az előző számítási értékek természetesen egyből eltűnnek, ha a jelenleg futó számítás odaér a buffer írásban.
+        </para>
+        <figure>
+            <title>zoom quick succession overlap</title>
+            <mediaobject>
+                <imageobject>
+                    <imagedata fileref="img/mandeltrav2_zoom_quick_succession.png" scale="100" />
+                </imageobject>
+                <textobject>
+                    <phrase>zoom quick succession overlap</phrase>
+                </textobject>
+            </mediaobject>
+        </figure>
+        <para>A fentiekből következik, hogy a nagyítás DIREKT "lassul" és "gyorsul" olykor, nem hiba. Ha az épp most számolandó sorok gyorsan elszállnak, akkor gyorsan végez velük azaz szuper gyorsan végezni fog velük.
+        Ellenkező esetben ha a neki kiosztott sorok nagyon sokáig benn maradnak az R sugarú Q-beli körben, akkor kevés ilyen sort tud kiszámolni egy frame alatt, ezért úgy fog tűnni. mintha lassulna.</para>
+        
+        <para>Jobb gombbal kapcsoljuk be a tracert. Ez egy predefined iter számig végig számítja a komplex számokat. Ehhez c komplex számot(amit mindig hozzáadunk) a user egér pozíciója alapján veszi.</para>
+        <figure>
+            <title>tracer 0</title>
+            <mediaobject>
+                <imageobject>
+                    <imagedata fileref="img/mandeltrav2_tracer0.png" scale="100" />
+                </imageobject>
+                <textobject>
+                    <phrase>tracer 0</phrase>
+                </textobject>
+            </mediaobject>
+        </figure>
+        <figure>
+            <title>tracer 1</title>
+            <mediaobject>
+                <imageobject>
+                    <imagedata fileref="img/mandeltrav2_tracer1.png" scale="100" />
+                </imageobject>
+                <textobject>
+                    <phrase>tracer 1</phrase>
+                </textobject>
+            </mediaobject>
+        </figure>
+        <para>Egér középső gombot vagy görgőt megnyomva visszaugrik default zoomba. 
+        Összességében fájt event-ek nélkül, de meg lehet csinálni.
+        Huzzah...
+        </para>
         <programlisting language="c++" linenumbering="numbered">
-          <textobject><textdata fileref="Mandel/mandelcx_utazo.cpp"/></textobject>
+          <textobject><textdata fileref="Mandel/mandel_utazo2.cpp"/></textobject>
         </programlisting>
-        <para>
-            Építs GUI-t a Mandelbrot algoritmusra, lehessen egérrel nagyítani egy területet, illetve egy pontot
-            egérrel kiválasztva vizualizálja onnan a komplex iteréció bejárta z<subscript>n</subscript> komplex számokat!
-        </para>
-        <para>
-            Megoldás videó: <link xlink:href=""></link>
-            Illetve <link xlink:href="https://bhaxor.blog.hu/2018/09/02/ismerkedes_a_mandelbrot_halmazzal">https://bhaxor.blog.hu/2018/09/02/ismerkedes_a_mandelbrot_halmazzal</link>.        </para>
-        <para>
-            Megoldás forrása: <link xlink:href=""></link>
-        </para>
     </section>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       
 </chapter>                
