@@ -12,13 +12,41 @@
             készíts UML osztálydiagramot is!
         </para>
         <para>
+           Az nbatfais alap project fájlt pl módosítani kell. Project file-hoz például <literal>QMAKE_CXXFLAGS += -std=c++11</literal> lehet definiálni milyen flag-eket adunk hozzá.
+           Mivel a project file alapján generálja a makefile-t, ezért érdemes nem kihagyni a flag-eket különben compilertől függő mértékben lesz sírás.
+        </para>
+        <para>Miután meg van a makefile compile. Az applikációról alább két kép.</para>
+        <figure>
+            <title>qt alap hangya 0</title>
+            <mediaobject>
+                <imageobject>
+                    <imagedata fileref="img/ants0.png" scale="50" />
+                </imageobject>
+                <textobject>
+                    <phrase>qt alap hangya 0</phrase>
+                </textobject>
+            </mediaobject>
+        </figure>
+        <figure>
+            <title>qt alap hangya wraparound</title>
+            <mediaobject>
+                <imageobject>
+                    <imagedata fileref="img/ants1.png" scale="50" />
+                </imageobject>
+                <textobject>
+                    <phrase>qt alap hangya wraparound</phrase>
+                </textobject>
+            </mediaobject>
+        </figure>
+        <para>
             Megoldás videó: <link xlink:href="https://bhaxor.blog.hu/2018/10/10/myrmecologist">https://bhaxor.blog.hu/2018/10/10/myrmecologist</link>
         </para>
         <para>
-            Megoldás forrása: <link xlink:href=""></link>               
+            Megoldás forrása: <link xlink:href="https://gitlab.com/nbatfai/bhax/-/tree/master/attention_raising%2FMyrmecologist">https://gitlab.com/nbatfai/bhax/-/tree/master/attention_raising%2FMyrmecologist</link>               
         </para>
         <para>
-            Tanulságok, tapasztalatok, magyarázat...
+            Tanulságok, tapasztalatok, magyarázat... ezt kell az olvasónak kidolgoznia, mint labor- vagy otthoni mérési feladatot!
+            Ha mi már megtettük, akkor használd azt, dolgozd fel, javítsd, adj hozzá értéket!
         </para>            
     </section>        
     <section>
@@ -28,13 +56,11 @@
             valósítsa meg a sikló-kilövőt!
         </para>
         <para>
-            Megoldás videó: 
+            Megoldás forrása: <link xlink:href="https://regi.tankonyvtar.hu/hu/tartalom/tkt/javat-tanitok-javat/apb.html#conway">https://regi.tankonyvtar.hu/hu/tartalom/tkt/javat-tanitok-javat/apb.html#conway</link>               
         </para>
         <para>
-            Megoldás forrása: <link xlink:href=""></link>               
-        </para>
-        <para>
-            Tanulságok, tapasztalatok, magyarázat...
+            Tanulságok, tapasztalatok, magyarázat... ezt kell az olvasónak kidolgoznia, mint labor- vagy otthoni mérési feladatot!
+            Ha mi már megtettük, akkor használd azt, dolgozd fel, javítsd, adj hozzá értéket!
         </para>            
     </section>        
     <section>
@@ -43,13 +69,14 @@
             Most Qt C++-ban!
         </para>
         <para>
-            Megoldás videó: 
+            Megoldás forrása: <link xlink:href="https://bhaxor.blog.hu/2018/09/09/ismerkedes_az_eletjatekkal">https://bhaxor.blog.hu/2018/09/09/ismerkedes_az_eletjatekkal</link>               
         </para>
         <para>
-            Megoldás forrása: <link xlink:href=""></link>               
+            Megoldás videó: a hivatkozott blogba ágyazva. 
         </para>
         <para>
-            Tanulságok, tapasztalatok, magyarázat...
+            Tanulságok, tapasztalatok, magyarázat... ezt kell az olvasónak kidolgoznia, mint labor- vagy otthoni mérési feladatot!
+            Ha mi már megtettük, akkor használd azt, dolgozd fel, javítsd, adj hozzá értéket!
         </para>            
     </section>        
     <section>
@@ -57,14 +84,29 @@
         <para>
         </para>
         <para>
-            Megoldás videó: 
+            Megoldás videó: initial hack: <link xlink:href="https://www.twitch.tv/videos/139186614">https://www.twitch.tv/videos/139186614</link>
         </para>
         <para>
-            Megoldás forrása: <link xlink:href=""></link>               
+            Megoldás forrása: <link xlink:href="https://github.com/nbatfai/esport-talent-search">https://github.com/nbatfai/esport-talent-search</link>               
         </para>
         <para>
-            Tanulságok, tapasztalatok, magyarázat...
+            Tanulságok, tapasztalatok, magyarázat... ezt kell az olvasónak kidolgoznia, mint labor- vagy otthoni mérési feladatot!
+            Ha mi már megtettük, akkor használd azt, dolgozd fel, javítsd, adj hozzá értéket!
         </para>            
     </section>        
+    <section>
+        <title>Vörös Pipacs Pokol/19 RF</title>
+        <para>
+            Megoldás videó: <link xlink:href="https://youtu.be/VP0kfvRYD1Y">https://youtu.be/VP0kfvRYD1Y</link>      
+        </para>
+        <para>
+            Megoldás forrása: <link xlink:href="https://github.com/nbatfai/RedFlowerHell">https://github.com/nbatfai/RedFlowerHell</link>               
+        </para>
+        <para>
+            Tanulságok, tapasztalatok, magyarázat... ezt kell az olvasónak kidolgoznia, mint labor- vagy otthoni mérési feladatot!
+            Ha mi már megtettük, akkor használd azt, dolgozd fel, javítsd, adj hozzá értéket!
+        </para>            
+    </section>     
+       
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         
 </chapter>                

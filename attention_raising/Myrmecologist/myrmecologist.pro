@@ -1,7 +1,7 @@
 # BHAX Myrmecologist
 #
 # Copyright (C) 2019
-# Norbert BÃ¡tfai, batfai.norbert@inf.unideb.hu
+# Norbert Bátfai, batfai.norbert@inf.unideb.hu
 #
 #  This program is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -28,3 +28,4 @@ INCLUDEPATH += .
 
 HEADERS += ant.h antwin.h antthread.h
 SOURCES += main.cpp antwin.cpp antthread.cpp
+QMAKE_CXXFLAGS += -std=c++11

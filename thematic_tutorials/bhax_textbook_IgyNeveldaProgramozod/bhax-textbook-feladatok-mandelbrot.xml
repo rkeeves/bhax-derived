@@ -386,7 +386,16 @@ for ( int y = 0; y &lt; h; ++y ){
 
     <section>
         <title>Mandelbrot nagyító és utazó C++ nyelven</title>
-        <para>SDL2. EventBus-t, vagy signal-slot rendszert DIREKT nem írtunk, de valós életben így kéne... helyette simán az állapotváltozókkal jeleztem a történéseket.</para>
+        <para>SDL2. C++ wrapperrel SDL C API körül. A signal slot barebones verziója<link xlink:href="https://github.com/larspensjo/SimpleSignal">Simple Signal</link></para>
+        <para>
+            <link xlink:href="https://github.com/rkeeves/bhax-derived/blob/master/thematic_tutorials/bhax_textbook_IgyNeveldaProgramozod/Mandel/mandelutazo3.cpp">mandelbrot utazó</link>               
+        </para>
+        <para>
+            <link xlink:href="https://github.com/rkeeves/bhax-derived/blob/master/thematic_tutorials/bhax_textbook_IgyNeveldaProgramozod/Mandel/sdl_wrapper.hpp">wrappers</link>               
+        </para>
+        <para>
+            <link xlink:href="https://github.com/rkeeves/bhax-derived/blob/master/thematic_tutorials/bhax_textbook_IgyNeveldaProgramozod/Mandel/mandel_utazo2.cpp">old bad c</link>               
+        </para>
         <para>Argumentumok nélkül futtatható. Debug üzenetekért kimenetet irányítsuk log file-ba stb. Debug log-hoz megfelelő preproc #define-t uncommentelni...</para>
         <para>Zoom-olást bal klikkel indítja az ember. Nyomva tartva a bal gombot téglalapot rajzol a program.</para>
         <figure>
@@ -456,12 +465,12 @@ for ( int y = 0; y &lt; h; ++y ){
                 </textobject>
             </mediaobject>
         </figure>
-        <para>Egér középső gombot vagy görgőt megnyomva visszaugrik default zoomba. 
-        Összességében fájt event-ek nélkül, de meg lehet csinálni.
-        Huzzah...
+        <para>
+          Egér középső gombot vagy görgőt megnyomva visszaugrik default zoomba. 
+          Az átláhatóság és rövidség rovására ment, de próbáltam amennyire lehet elszeparálni a különböző alrendszereket.
         </para>
         <programlisting language="c++" linenumbering="numbered">
-          <textobject><textdata fileref="Mandel/mandel_utazo2.cpp"/></textobject>
+          <textobject><textdata fileref="Mandel/mandelutazo3.cpp"/></textobject>
         </programlisting>
     </section>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       
 </chapter>                

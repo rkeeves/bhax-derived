@@ -414,7 +414,6 @@ void App::update_mandel(const FPSBasedDelayer& fps)
   ComplexIter cit(0,0,0,0);
   int y = bg_calc_y;
   while(y<limit && fps.remaining_time()>0){
-    
     c_im = dim.im0 + y * d_im;
     for ( int x = 0; x < WIDTH; ++x ){
       c_re = dim.re0 + x * d_re;
