@@ -536,11 +536,837 @@ infixr precedence nm1 nm2 ...
 <literallayout>
 infixl 5 _+_
 </literallayout> 
-        </section> 
+        </section>
+        <section>
+          <title>Utasítások</title>
+          <para>
+            Az utasítások az algoritmusok egyes lépéseit megadó egységek. 
+            A fordító ezek segítségével készíti a forrás kódunkból a tárgykódot.
+            <itemizedlist>
+              <listitem>
+                  <para>deklarációs</para>
+              </listitem>
+              <listitem>
+                  <para>végrehajtható</para>
+              </listitem>
+            </itemizedlist>
+          </para>
+          <section>
+            <title>Deklarációs Utasítások</title>
+            <para>
+            A deklarációs utasítások hatására nem generálódik tárgykód.
+            Ezek magának a fordítónak kiadott utasítások. Pl.:szolgáltatás kérés, üzemmódot beállítás stb.
+            Természetesen befolyásolják a generált tárgykódot, de önnön maguk nem kerülnek fordításra.
+            </para>
+          </section>
+          <section>
+            <title>Végrehajtható Utasítások</title>
+            <para>
+            Ezek tárgykóddá fordulnak deklarációsakkal ellentétben(...optimalizálás miatt ez nem teljesen 100%-ban igaz).
+            Következő csoportokra bonthatjuk ezen nagy csoportot:
+            <itemizedlist>
+              <listitem>
+                  <para>Értékadó utasítás</para>
+              </listitem>
+              <listitem>
+                  <para>Üres utasítás</para>
+              </listitem>
+              <listitem>
+                  <para>Ugró utasítás</para>
+              </listitem>
+              <listitem>
+                  <para>Elágaztató utasítások</para>
+              </listitem>
+              <listitem>
+                  <para>Ciklusszervező utasítások</para>
+              </listitem>
+              <listitem>
+                  <para>Hívó utasítás</para>
+              </listitem>
+              <listitem>
+                  <para>Vezérlésátadó utasítások</para>
+              </listitem>
+              <listitem>
+                  <para>I/O utasítások</para>
+              </listitem>
+              <listitem>
+                  <para>Egyéb utasítások</para>
+              </listitem>
+            </itemizedlist>
+            </para>
+            <para>
+            Az ugró, elágaztató, ciklusszervező, hívó és vezérlésátadó utasítások az ún. vezérlési szerkezetet megvalósító utasítások.
+            Az egyéb utasítás csoportba tartozóból nincs ilyen C-ben, viszont egyes helyeken van belılük (pl. PL/I).
+            </para>
+            <section>
+              <title>Értékadó utasítás</title>
+              <para>Feladata változókhoz érték rendelése, vagy ezen érték módosítása.</para>
+            </section>
+            <section>
+              <title>Üres utasítás</title>
+              <para>Az üres utasítás hatására a processzor egy üres gépi utasítást hajt végre. Inkább szemantikai okokból létezik egyes nyelvekben</para>
+            </section>
+            <section>
+              <title>Ugró utasítás</title>
+              <para>Ezen utasítással feltétel nélkül ugorhatunk egy label-el definiált pontjára a kódnak.</para>
+            </section>
+            <section>
+              <title>Elágaztató utasítások</title>
+               <section>
+                <title>Kétirányú elágaztató utasítás</title>
+                <para>Általában a <literal>IF feltétel THEN tevékenység [ ELSE tevékenység ]</literal> alakot követi.</para>
+                <para>A <literal>feltétel</literal> egy igaz-hamis eldönthető predikátum (vagy durva esetekben implicit type conversion-nel meg is lehet trükközni a dolgot)</para>
+                <para>A <literal>tevékenység</literal> nyelv függő. Van ahol csak és kizárólag egyetlen utasítás állhat itt. 
+                Máshol lehet több utasítás csoportosítására utasítás zárójeleket használni pl. BEGIN END, ezt így utasítás csoportnak nevezzük.
+                Végül pedig C-ben például tevékenység helyén vagy egy utasítás vagy egy blokk állhat.
+                </para>
+                <para>
+                  Ha nincs else ág akkor rövid alakról, else ág megléte esetén hosszú alakról beszélünk.
+                </para>
+                <para>
+                  Természetesen egymásba ágyazhatóak az elágaztatások, és ilyenkor merül fel a csellengő else problémája.
+                  Ezt persze mindig ki lehet kerülni ha pedantikusan a hosszú alakot használjuk. Más esetben implementáció és nyelvtan függő módon kell eljárnunk.
+                </para>
+              </section>
+              <section>
+                <title>Többirányú elágaztató utasítás</title>
+                <para>
+                  A többirányú elágaztató utasítás arra szolgál, hogy a program egy adott pontján egymást
+                  kölcsönösen kizáró n tevékenység közül egyet végrehajtsunk. 
+                  A végrehajtandó tevékenység kiválasztását egy konkrét kifejezés értékei szerint tesszük meg.        
+                </para>
+                <para>
+                  Nyelv függő. C Példa:
+                </para>
+<literallayout>
+SWITCH (kifejezes) {
+CASE egesz_konstans_kifejezes : [ tevekenyseg ]
+[ CASE egesz_konstans_kifejezes : [tevekenyseg ]]…
+[ DEFAULT: tevekenyseg ]
+};
+</literallayout>
+              <para>
+                A kifejezés típusának numerikus egészre konvertálhatónak kell lennie.
+                Az ágak értékei nem tartalmazhatnak duplikációkat. 
+                A tevékenység végrehajtható utasítás, vagy blokk lehet. 
+                A DEFAULT-ág bárhol szerepelhet.
+              </para>
+              <para>
+                Kiértékelődik a kifejezés, majd szépen a forráskódi felírási sorrendben megpróbálunk végigmeni az összes ágon.
+                Ha egy ág-hoz megadott egész konstans kifejezéssel megegyezik az érték, akkor azon ág tevékenysége végrehjatódik.
+                Ha nem volt egyezés, akkor a default ág végrehajtódik. Ha nincs default ág, akkor üres utasítás hajtódik végre.
+                Mindez egyben azt is jelenti, hogy pl. BREAK-et használva egy ág tevékenységében el kell hagyni a switch-et.
+              </para>
+              </section>
+            </section>
+            <section>
+              <title>Ciklusszervező utasítások</title>
+              <para>
+              A ciklusszervező utasítások lehetővé teszik, hogy a program egy adott pontján egy bizonyos tevékenységet többször is megismételjünk.
+              Ciklus fejből, magból és végből ál.
+              Az ismétlést meghatározó információk vagy a ciklus fejben vagy a ciklus végben találhatóak.
+              Maga az ismétlendő tevékenység a magban található.
+              Két szélsőséges esetről külön beszélünk.
+              Egyik az üres ciklus, mikor egyszer sem fut le a ciklus.
+              A másik a végtelen ciklus, mikor a ciklus soha sem áll le.
+              </para>
+              <para>
+               A következő ciklusfajtákat különböztetjük meg:
+                <itemizedlist>
+                  <listitem>
+                      <para>feltételes</para>
+                  </listitem>
+                  <listitem>
+                      <para>előírt lépésszámú</para>
+                  </listitem>
+                  <listitem>
+                      <para>felsorolásos</para>
+                  </listitem>
+                  <listitem>
+                      <para>végtelen</para>
+                  </listitem>
+                  <listitem>
+                      <para>összetett</para>
+                  </listitem>
+                </itemizedlist>
+              </para>
+              <section>
+                <title>Feltételes ciklus</title>
+                <para>
+                  Ennél a ciklusnál az ismétlődést egy feltétel határozza meg.
+                  A feltétel vagy a fejben vagy a végben van.
+                  Kezdő- és végfeltételes ciklusról beszélhetünk.
+                </para>
+                <para>
+                  Kezdőfeltételes ciklus esetén először kiértékelődik a feltétel. 
+                  Ha igaz(hamis, nyelv függő lehet) belépünk a magba és végrehajtjuk az ott írtakat, majd újra a feltétel kiértékelésre ugrunk és indulunk újra. 
+                  Ha hamis(igaz, nyelv függő lehet) akkor nem lépünk be a magba plusz kilépünk a ciklusból.
+                </para>
+                <para>
+                  Végfeltételes ciklus esetén először végrehajtjuk a magot, majd kiértékelődik a feltétel. 
+                  Ha igaz(hamis, nyelv függő lehet) vissza ugrunk és újrakezdjük a mag végrehajtását. 
+                  Ha hamis(igaz, nyelv függő lehet) akkor kilépünk a ciklusból.
+                  Azaz ezen esetben egyszer mindenképp lefut a mag.
+                </para>
+              </section>
+              <section>
+                <title>Előírt lépésszámú ciklus</title>
+                <para>
+                  Ezen esetben a fejben találhatóak a végrehajtásra vonatkozó információk.
+                  Minden esetben tartozik hozzá egy ciklusváltozó.
+                  A változó által felvett értékekre fut le a ciklusmag.
+                  A változó az értékeit egy általunk megadott tartományból veheti föl.
+                  A változó bejárhatja a tartományt csökkenőleg vagy növekvőleg.
+                  Ha a változó nem akarjuk hogy felvegye az összes értéket a tartomáynból, akkor érdemes megadnunk lépésközt.
+                </para>
+                <para>
+                  A ciklusváltozó típusa nyelvenként eltérő lehet.
+                  A lépésköz és ciklusváltozó típusa vagy megegyezőnek kell lennie, vagy konvertálhtónak kell lennie.
+                  
+                </para>
+                <para>
+                  A ciklusváltozó értékének megadásához minden nyelv esetén megengedett a literál, változó és nevesített konstans.
+                  Egyes nyelveknél kifejezéssel is megadható.
+                </para>
+                <para>
+                  A lépésköz előjele dönti el – ha pozitív, akkor növekvő, ha negatív, akkor csökkenő.
+                  Általában azok a nyelvek vallják ezt, melyekben a ciklusváltozó csak numerikus típusú lehet.
+                  Egyes nyelveknél külön alapszót kell használni.
+                </para>
+                  
+                <para>
+                  A ciklusparaméterek egyes nyelvek esetén csak egyszer értékelődnek ki, míg más nyelveknél minden mag végrehajtás után.
+                </para>
+                <para>
+                  Általában a ciklus végrehajtás vagy a feltétel nem teljesülése miatt ér véget, vagy akár a magban kiadott speciális utasítás miatt.
+                  A GOTO-val történő ciklusból történő kilépést nem tekintjük szabályosnak.
+                </para>
+                <para>
+                  A ciklusváltozó értéke nyelv függő lehet a ciklus elhagyása után. Három eset van: értéke az utolsó amire lefutott a mag, értéke az utolsó amit felvett, undefined.
+                </para>
+              </section>
+              <section>
+                <title>Felsorolásos ciklus</title>
+                <para>
+                  A felsorolásos ciklus az elıőrt lépésszámú ciklus egyfajta általánosításának tekinthető.
+                  Van ciklusváltozója, amely explicit módon megadott értékeket vesz fel, 
+                  és minden felvett érték mellett lefut a mag. 
+                  A ciklusváltozót és az értékeket a fejben adjuk meg, ez utóbbiakat kifejezéssel.
+                  A ciklusváltozó típusa általában tetszőleges.
+                  Nem lehet sem üres, sem végtelen ciklus.
+                </para>
+                <para>
+                </para>
+              </section>
+              <section>
+                <title>Végtelen ciklus</title>
+                <para>
+                  Sem a fejben sem a végben nincs információ ciklus elhagyással kapcsolatban, tehát a magban kell lennie olyan utasításnak amely miatt eltudjuk hagyni a ciklust.
+                </para>
+              </section>
+              <section>
+                <title>Összetett ciklus</title>
+                <para>
+                  Az előző négy ciklusfajta kombinációiból áll össze.
+                </para>
+              </section>
+              <section>
+                <title>C példák</title>
+                <para>
+                <itemizedlist>
+                  <listitem>
+                      <para><literal>WHILE(feltétel) végrehajtható_utasítás</literal></para>
+                  </listitem>
+                  <listitem>
+                      <para><literal>DO végrehajtható_utasítás WHILE(feltétel);</literal></para>
+                  </listitem>
+                  <listitem>
+                      <para><literal>FOR([kifejezés1]; [kifejezés2]; [kifejezés3]) végrehajtható_utasítás</literal></para>
+                  </listitem>
+                </itemizedlist>
+                </para>
+              </section>
+            </section>
+            <section>
+              <title>Vezérlő utasítások C-ben</title>
+              <para><literal>CONTINUE</literal> ciklus hátralévő utasításait nem hajtja végre és újra indul a feltétel kiértékelés stb. </para>
+              <para><literal>BREAK</literal>szabályos kilépés a ciklusból magon belül kiadhatóan.</para>
+              <para><literal>RETURN</literal> befejezteti a függvényt és visszaadja a kontrollt a hívónak.</para>
+            </section>
+          </section>
+        </section>
+        <section>
+          <title>A programok szerkezete</title>
+          <para>
+            Az eljárásorientált programnyelvekben a program szövege többé-kevésbé független, önálló részekre, ún. programegységekre tagolható.
+            Ezen kis egységekből nyelvtől és implementációtól függően három módon állhat össze a teljes program:
+            Fizikailag önálló részek,
+            Nem önálló részek (strukturáltan egymásba ágyazott)
+            Fenti kettő kombinációja.
+            Az eljárásorientált nyelvekben az alábbi programegységek léteznek:
+            <itemizedlist>
+              <listitem>
+                  <para>alprogram</para>
+              </listitem>
+              <listitem>
+                  <para>blokk</para>
+              </listitem>
+              <listitem>
+                  <para>csomag</para>
+              </listitem>
+              <listitem>
+                  <para>taszk</para>
+              </listitem>
+            </itemizedlist>
+          </para>
+          <section>
+            <title>Alprogramok</title>
+            <para>Túl szép mondat hogy kihagyjam 
+            <quote>Az alprogram az eljárásorientált nyelvekben a procedurális absztrakció elsı megjelenési
+            formája, alapvető szerepet játszik ebben a paradigmában, sőt meghatározója annak.</quote></para>
+            <para>
+              Ezen alprogramokat próbáljuk elszeparálni a lehető legjobban, például minden szükséges információt formális paraméterként átadni.
+              A céunk ezzel, hogy működése legkevésbé függjön az őt körbevevő kontextustól, főként csak az általunk megadott (szűkebb) formális paraméterektől.
+              Sok pozitív tulajdonsága lesz így az alprogramnak, de a legfőbb a mi szempontunkból a code reuse.
+            </para>
+            <para>
+              Formálisan fej (specifikáció), törzs (implementáció) és végből állnak.
+            </para>
+            <para>
+              <itemizedlist>
+                <listitem>
+                    <para>név</para>
+                </listitem>
+                <listitem>
+                    <para>formális paraméter lista</para>
+                </listitem>
+                <listitem>
+                    <para>törzs</para>
+                </listitem>
+                <listitem>
+                    <para>környezet</para>
+                </listitem>
+              </itemizedlist>
+            </para>
+            <para>
+              A név egy azonosító, a fejben szerepel. 
+              
+            </para>
+            <para>
+              A formális paraméter lista is a specifikáció része. 
+              A formális paraméter listában azonosítók szerepelnek(...ez szerintem nyelv függő...mármint pl. Haskell Agda totál másképp közelíti meg pattern matching miatt a dolgokat), ezek a törzsben saját
+              programozási eszközök nevei lehetnek, és egy általános szerepkört írnak le, amelyet a hívás
+              helyén konkretizálni kell az aktuális paraméterek segítségével.
+            </para>
+            <para>
+              A korai nyelvekben a formális paraméter listán csak a paraméterek nevei szerepelhettek.
+              A mai modern nyelveknél azonban olyan egyéb információk mellyel a paraméterek viselkedését szabályozhatjuk.
+              A formális paraméter lista kerek zárójelek között áll (általában). 
+              A nyelvek egy része szerint a zárójelek a formális paraméter listához, mások szerint a névhez tartoznak.
+              A formális paraméter lista lehet üres is, ekkor paraméter nélküli alprogramról beszélünk.
+            </para>
+            <para>
+              A törzsben deklarációs és végrehajtható utasítások szerepelnek.
+              A nyelvek egy része azt mondja, hogy ezeket el kell különíteni egymástól, tehát a törzsnek van egy deklarációs és egy végrehajtható része. 
+              Erre a fenti mondatra már effektíve ki is tértünk a C standard-ek összehasonlításánál.
+              Más nyelvek szerint viszont a kétféle utasítás tetszőlegesen keverhető.
+              Az alprogramban deklarált programozási eszközök kívülről nem láthatóak azaz ezek az alprogram scope-jában élnek 
+              (aka variables decalred in the block are considered to be local to that block and they are visible only in that scope or from another which has visibility on that scope).
+              Persze global scope-ba is rakhatjuk a dolgokat, de ez általában nagyon erősen kerülendő.
+            </para>
+            <para>
+              Az alprogramoknak két fajtája van: eljárás és függvény.
+            </para>
+            <para>
+              Az eljárás a hatását a paramétereinek vagy a környezetének megváltoztatásával illetve a törzsben elhelyezett végrehajtható utasítások által meghatározott tevékenység elvégzésével fejti ki.
+            </para>
+            <para>
+              A függvény elsődlegesen egy értéket szolgáltat vissza.
+              Mellékhatás ha a függvény környezetét vagy paramétereit módosítja.
+              Tiszta esetben ennyi a lényege és nincs mellékhatása.
+              Sajnos a való életben főként a mellékhatásos verzióval futhatunk össze.
+              Ez pontosan ugyanolyan veszélyes és megkerülhetetlen, mint az eljárás.
+            </para>
+            <para>
+              A könyv mellékhatás definíciója...mármint biztos jó...de szerintem eljárás maga és a függvény is, 
+              ha bármit módosít a környezetből paraméterből az már mellékhatás.
+              Ezt arra alapozom, hogy pl. ha optimálni akarok egy kódot, akkor csak akkor hagyhatok ki dolgokat, ha tudom, hogy kihagyásukkal semmilyen módon nem változik a program eredménye és az állapot.
+            </para>
+            <para>
+              Az eljárást aktivizálásához utasításszerűen hívnunk kell azt (gyakran még valami alapszó-t is elé kell írni). Például a lenti (absztrakt) módon:
+            </para>
+<literallayout>
+[alapszo] eljarasnev(aktualis_parameter_lista)
+</literallayout>
+            <para>
+              Egy eljárás szabályosan befejeződhet ha elérjük a végét.
+              Másik út, hogy külön utasítással befejeztetjük, ez bárhol kiadható az eljárás törzsében.
+              Szabályos befejezıdés esetén a program a hívást követő utasításon folytatódik.
+              Általában nem szabályos befejezésnek tekintjük a következőket:
+              A nyelvek általában megengedik, hogy GOTO-val kiugorjunk eljárásból.
+            </para>
+            <para>
+            Függvényt kifejezés alakban lehet hívni.
+            </para>
+<literallayout>
+fuggvenynev(aktualis_parameter_lista)
+</literallayout>
+            <para>
+              A függvényhívás után normális befejeződést feltételezve a vezérlés a kifejezésbe tér vissza, és továbbfolytatódik annak a kiértékelése.
+            </para>
+            <para>
+               Egy függvény a következő módokon határozhatja meg a visszatérési értékét:
+              <itemizedlist>
+                <listitem>
+                    <para>A függvényneve változóként szabadon változtatható. Visszatérésnél utolsó felvett értéke lesz használva.</para>
+                </listitem>
+                <listitem>
+                    <para>A függvénynevének értéket kell adni, de nem használható szabadon. Visszatérésnél utolsó felvett értéke lesz használva.</para>
+                </listitem>
+                <listitem>
+                    <para>Külön befejeztető utasítással megadjuk az értéket és befejezzük a függvényt</para>
+                </listitem>
+              </itemizedlist>
+            </para>
+            <para>
+              A függvény szabályosan befejezıdhet, ha:
+              <itemizedlist>
+                <listitem>
+                    <para>elérjük a végét, és már van visszatérési érték</para>
+                </listitem>
+                <listitem>
+                    <para>Külön befejeztető utasítás, és már van visszatérési érték,</para>
+                </listitem>
+                <listitem>
+                    <para>Külön befejeztető utasítás ami meghatározza az értéket</para>
+                </listitem>
+              </itemizedlist>
+              Ha ezek nem állnak fenn, akkor nem szabályos a kilépés. Tehát pl.: GOTO szabálytalan.
+            </para>
+            <para>
+              Az eljárásorientált programozási nyelvekben megírt minden programban kötelezően lennie egy főprogramnak.
+              Egy program szabályos befejeződése a főprogram befejeződésével történik meg, 
+              ekkor a vezérlés visszakerül az operációs rendszerhez.
+            </para>
+          </section>
+          <section>
+            <title>Hívási lánc, rekurzió</title>
+            <para>
+              Ha egy programegység meghív egy másikat majd az egy másikat stb. akkor kialakul egy call chain, hívás lánc.
+              A hívási lánc első tagja mindig a főprogram.
+              A hívási lánc minden tagja aktív de csak a legvégső fut éppen (mármint igazából a schedulertől függ hogy ez megfog-e történni valaha :).
+              Mikor a hívási lánc egyik tagja befejeződik az előző programegység végrehajtási folytatódik.
+            </para>
+            <para>
+              Mikor egy aktív alprogramot hívunk meg, azt rekurziónak nevezzük.
+              Rekurzió lehet közvetlen, mikor önmagát hívja az alprogram.
+              Lehet közvetett, mikor a hívási lánc más tagja hívja az alprogramot.
+            </para>
+            <para>
+              Rekurzió általában átírható iteratív megoldássá.
+              Iteratív jobb, hiszen kevesebb erőforrást igényel (rövidebb call chain, nem kell annyi mindent állapotot kimenteni és cipelni).
+              Vannak olyan nyelvek amelyek főként a rekurziót preferálják, pl. Haskell.
+            </para>
+          </section>
+          <section>
+            <title>Másodlagos belépési pontok</title>
+            <para>
+              Egyes nyelvek megengedik, hogy egy alprogramot meghívni ne csak a fejen keresztül
+              lehessen, hanem a törzsben ki lehessen alakítani ún. másodlagos belépési pontokat, így vagy a
+              fejben megadott névvel vagy a másodlagos belépési pont nevével lehet hivatkozni az
+              alprogramra. 
+            </para>
+          </section>
+          <section>
+            <title>Paraméterkiértékelés</title>
+            <para>
+              Egy alprogram hívásakor a hívásban megadott aktuális paraméterek a formálisakhoz rendelődnek.
+              Ezt paraméterkiértékelésnek hívjuk.
+            </para>
+            <para>
+              Hogy melyik formálishoz, melyik aktuális param rendelődik, több módon kezelhetik a nyelvek:
+              Sorrendi, vagy név szerinti kötés (binding)
+              A sorrendi esetében a lista beli heylük alapján történik az összerendelés.
+              Név szerinti esetben a nevesített aktuális paramétereket explicit rendeljük össze a nevesített formálisakkal.
+            </para>
+            <para>
+              Nyelvtől eltérő hogy mennyi aktuális paramétert kell megadni.
+              Alapesetben persze annyit, amennyi a formális elemszáma, de egyes nyelvekben lehet kevesebbet, és ekkor default értékek rendelhetőek a fennmaradó formálisakhoz.
+              Van változó számú (nem rögzített) eset is. Var args.
+            </para>
+            <para>
+              Egyes nyelvek esetén az aktuális és formális paraméter típusának meg kell egyeznie.
+              Más nyelvek esetén elegendő ha típuskényszerítéssel elérhető legyen a konverzió.
+            </para>
+          </section>
+          <section>
+            <title>Paraméterátadás</title>
+            <para>
+              Mikor egy alprogram(hívó) meghív egy másik alprogramot, olyankor a kommunikációt paraméterátadásnak nevezzük.
+            </para>
+            <para>
+            Paraméterátadás fajtái:
+              <itemizedlist>
+                <listitem>
+                    <para>érték szerinti</para>
+                </listitem>
+                <listitem>
+                    <para>cím szerinti</para>
+                </listitem>
+                <listitem>
+                    <para>eredmény szerinti</para>
+                </listitem>
+                <listitem>
+                    <para>érték-eredmény szerinti szerinti</para>
+                </listitem>
+                <listitem>
+                    <para>név szerinti</para>
+                </listitem>
+                <listitem>
+                    <para>szöveg szerinti</para>
+                </listitem>
+              </itemizedlist>
+            </para>
+            <section>
+              <title>érték szerinti</title>
+              <para>
+                A hívott területén a paramétereknek van címkomponensük.
+                A hívó oldalon kell hogy legyen érték komponensük.
+                Az hívó oldali érték átmásolódik a hívott oldali területre.
+                A hívó nem fogja látni a változtatásokat saját oldalon.
+              </para>
+            </section>
+            <section>
+              <title>cím szerinti</title>
+              <para>
+                Hívott oldalon nincs címkomponens, viszont hívó oldalon van.
+                Ezen esetben hívó oldalon hívás után látni fogjuk a hívó általi változtatásokat.
+              </para>
+            </section>
+            <section>
+              <title>eredmény szerinti</title>
+              <para>
+                Hívó oldalon és hívott oldalon egyaránt címkomponens.
+                Hívott nem használja a hívott oldali címet, simán local formálisba dolgozik.
+                Szabályos visszatéréskor, local formális értéke átmásolódik a hívott oldali címre.
+              </para>
+            </section>
+            <section>
+              <title>érték-eredmény szerinti szerinti</title>
+              <para>
+                Hívó oldalról átmásolódik az érték a hívott oldalra ez lesz a helyi kezdőérték.
+                Szabályos visszatéréskor a hívott oldali végleges érték átmásolódik hívó oldalra. 
+              </para>
+            </section>
+            <section>
+              <title>név szerinti</title>
+              <para>
+                A formális paraméter nevének összes előfordulása hívott oldalon átíródik adott szimbólummá.
+              </para>
+            </section>
+            <section>
+              <title>szöveg szerinti</title>
+              <para>
+                A név szerinti, egyetlen eltérés, hogy hívottban a név felülírás csak akkor fut le, amikor formális param első előfordulását elérjük.
+              </para>
+            </section>
+          </section>
+          <section>
+            <title>A blokk</title>
+            <para>
+              Programegységben helyezkedik el, azon kívül sohasem álhat.
+              Van kezdete, törzse, vége.
+              A kezdetet és a véget egy-egy speciális karaktersorozat vagy alapszó jelzi. 
+              A törzsben lehetnek deklarációs és végrehajtható utasítások.
+            </para>
+            <para>Blokk általában úgy kezdődik hogy vagy kezdetére ér a végrehajtás, vagy GOTO-t követő ugrás.</para>
+            <para>Blokk általában úgy végződik hogy vagy végére ér a végrehajtás, vagy GOTO-t követő ugrással kiugrunk belőle.</para>
+            <para>Fő szerepe a nevek hatáskörének tárolása. ÉLETCIKLUS!!!! PROPER CLEANUP ORDER!!!! Gyakorlatilag enélkül nem lenne smart ptr :)</para>
+            <section>
+              <title>Hatáskör</title>
+              <para>
+                A hatáskör a nevekhez kapcsolódó fogalom.
+                Egy név hatásköre alatt értjük a program szövegének azon részét, 
+                ahol az adott név ugyanazt a programozási eszközt hivatkozza, tehát jelentése, 
+                felhasználási módja, jellemzői azonosak. 
+                A hatáskör szinonimája a láthatóság.
+                Ez egyébként legegyszerűbben logikából lett bemutatva először a képzés során.
+                Ott is például elég komoly átnevezéseket kellett olykor elvégezni, és ezek csak akkor történhettek meg, ha nem volt szabad és tudtuk mi köti pontosan.
+              </para>
+              <para>
+                A név hatásköre az eljárásorientált programnyelvekben a programegységekhez, illetve a fordítási egységekhez kapcsolódik.
+              </para>
+              <para>
+                Egy programegységben deklarált nevet a programegység lokális nevének nevezzük.
+                Azt a nevet, amelyet nem a programegységben deklaráltunk, de ott hivatkozunk rá, szabad névnek hívjuk.
+                (Emlékezzünk logikából is, hogy átnvezést nem hajhattunk pl ilyen esetben végre stb.)
+              </para>
+              <para>
+                Azt a tevékenységet, mikor egy név hatáskörét megállapítjuk, hatáskörkezelésnek hívjuk.
+                Kétféle hatáskörkezelést ismerünk, a statikus és a dinamikus hatáskörkezelést.
+              </para>
+              <para>
+                Statikus esetben fordítás időben current scope-ban próbáljuk megtalálni az adott nevet.
+                Ha ez nem található akkor addig keresünk a felsőbb scope-okban amíg meg nem találjuk, vagy ki nem érünk.
+                (Példa, ctor arg "a" de class-nak van a data member-e. Mivel legszűkebb scope-omban keresek először ezért ha simán a-t írok be, akkor a ctor argra fogok hivatkozni huzzah.)
+                Ha nem található a név a legkülsőben, akkor egyes nyelvek esetén hiba áll elő.
+                Más nyelvek ilyenkor a legkülső scope-ban auto deklarálják.
+              </para>
+              <para>
+                Hatáskör befelé terjed kifelé soha.
+              </para>
+
+              <para>
+               A dinamikus hatáskörkezelés futás idejű.
+               Ha nem talál egy nevet a futtató rendszer akkor a hívási láncban kezd visszafele keresni.
+               Ilyen esetben a hatásköre egy névnek a programegység ahol deklaráltuk, és minden belőle induló hívási láncban elhelyezkedő programegység.
+              </para>
+              <para>
+                Az eljárásorientált nyelvek a statikus hatáskörkezelést valósítják meg. 
+                Az alprogramok formális paraméterei az alprogramra lokálisak.
+                A kulcsszavak, mint nevek a program bármely pontjáról láthatók. 
+                A program egységek nevei azonban globális láthatóak. (azért ez sem így egy az egyben c++-ban)
+              </para>
+            </section>
+            <section>
+              <title>Fordítási egység</title>
+              <para>
+                Az eljárásorientált nyelvekben a program közvetlenül fordítási egységekbıl épül föl. 
+                Ezek olyan forrásszöveg-részek, melyek önállóan, a program többi részétől fizikailag különválasztva fordíthatók le.
+                Az egyes nyelvekben a fordítási egységek felépítése igen eltérő lehet. 
+                A fordítási egységek általában hatásköri és gyakran élettartam definiáló egységek is.
+              </para>
+            </section>
+          </section>
+          <section>
+              <title>C</title>
+              <para>
+                A C nyelv a function-t és a block-ot ismeri.
+                Egy function a másikba nem ágyazható, de function-be block igen és block-ba block igen.
+              </para>
+              <para>Block</para>
+<literallayout>
+{
+deklaraciok
+vegrehajthato_utasitasok
+}
+</literallayout>
+            <para>Function</para>
+<literallayout>
+[típus] név([formális_paraméter_lista])
+block
+</literallayout>
+            <para>Ha nem szerepel a típus, akkor az alapértelmezés int. Ha void a típus, akkor lényegében egy eljárásról van szó.</para>
+            <para>A fő program main, mely maga egy function.</para>
+            <para>Függvény befejeződhet RETURN-el. Ezen esetben void típusú funckióval szokásos visszatérés, míg egyéb T típus esetén nem definiált visszatérési érték.
+             Vigyázzunk ez C++-ban is maradt...
+             </para>
+            <para>
+              <literal>RETURN kifejezes;</literal> esetén a visszatérési érték a kifejezés kiértékelt értéke.
+            </para>
+            <para>
+              A formális paramétereket vesszővel elválasztva, explicite típust megadva tudjuk definiálni.
+              A C-ben a programozó tud nem fix paraméterszámú függvényt deklarálni úgy, hogy megad legalább egy formális paramétert, és a formális paraméter listát ... zárja. 
+              Az üres formális paraméter listát explicit módon jelölhetjük a void alapszó megadásával.
+            </para>
+            <para>
+              Sorrendi kötés, típuskényszerítés (elég vad) és fix paraméterszám esetén számbeli egyeztetés van.
+               A paraméterátadás érték szerinti.
+            </para>
+            <para>
+              A C-ben a fordítási egység a forrásállomány. 
+              Ez ún. külső deklarációkat (nevesített konstans,változó, típus, függvény) tartalmaz. 
+              A fordítási egység elején más olyan fordítási egységekre, amelyek eszközeit használni akarjuk, a
+            <literal> #include &lt;forrásállománynév&gt; </literal> preprocesszor utasítással hivatkozhatunk.
+            </para>
+            <para>
+              A C a hatáskör és élettartam szabályozására bevezeti a tárolási osztály attribútumokat:
+              <itemizedlist>
+                <listitem>
+                    <para>extern</para>
+                </listitem>
+                <listitem>
+                    <para>auto</para>
+                </listitem>
+                <listitem>
+                    <para>register</para>
+                </listitem>
+                <listitem>
+                    <para>static</para>
+                </listitem>
+              </itemizedlist>
+            </para>
+            <section>
+              <title>extern</title>
+              <para>
+                A fordítási egység szintjén deklarált nevek alapértelmezett tárolási osztálya.
+                Lokális neveknél explicit módon meg kell adni.
+                Az ilyen nevek hatásköre a teljes program, élettartamuk a program futási ideje. 
+                Van automatikus kezdőértékük.
+              </para>
+            </section>
+            <section>
+              <title>auto</title>
+              <para>
+                lokális nevek alapértelmezett tárolási osztálya.
+                Hatáskörkezelésük statikus, decsak a deklarációtól kezdve láthatók. 
+                Élettartamuk dinamikus. Nincs automatikus kezdőértékük.</para>
+            </section>
+            <section>
+              <title>register</title>
+              <para>Speciális auto, amelynek értéke regiszterben tárolódik, ha van szabad regiszter, egyébként nincs különbség.</para>
+            </section>
+            <section>
+              <title>static</title>
+              <para>
+              Bármely névnél explicit módon meg kell adni. 
+              Hatáskörük a fordítási egység, élettartamuk a program futási ideje. 
+              Van automatikus kezdőértékük.</para>
+            </section>
+            </section>
+        </section>
+        <section>
+          <title>IO</title>
+          <para>
+            Az I/O az a területe a programnyelveknek, ahol azok leginkább eltérnek egymástól.
+            Az I/O platform-, operációs rendszer-, implementációfüggő.
+            Egyes nyelvek nem is tartalmaznak eszközt ennek megvalósítására, eleve az implementációra bízzák a megoldást.
+          </para>
+          <para>
+            A perifériákkal való kommunikációról szól összességében az IO.
+            Az IO hogy egységesen tudja tárgyalni a témát, azért az absztakt állomány fogalmat vezeti be.
+            A programnyelvi fogalom fedésben van ezen absztrakt állomány fogalommal.
+            A programban a logikai állomány egy olyan programozási eszköz, amely nevesített, és
+            amelynél az absztrakt állományjellemzők (rekordfelépítés, rekordformátum, elérés, szerkezet,
+            blokkolás, rekordazonosító stb.) attribútumként jelennek meg.
+            A fizikai állomány pedig az op rendszer szintű impl. azaz perifériákon megjelenő adatokat tartalmazó állomány.
+          </para>
+          <para>
+            Egy állomány funkció szerint lehet:
+             <itemizedlist>
+              <listitem>
+                  <para>input állomány: feldolgozás előtt létezik, nem változik</para>
+              </listitem>
+              <listitem>
+                  <para>output állomány: feldolgozás előtt NEM létezik, változik , írni lehet</para>
+              </listitem>
+              <listitem>
+                  <para>input-output állomány: általában létezik a feldolgozás előtt és után is, változik, olvasni és írni is lehet.</para>
+              </listitem>
+            </itemizedlist>
+          </para>
+          <para>
+            Az IO során tár és a periféria között adatokat mozgatunk. 
+            A tárban és periféria ábrázolási módja eltérhet, ez felveti egy fajta konverzió szükségességének kérdését, illetve specifikációjának mikéntjét. 
+            Az alapján hogy történik-e konverzió megkülönböztetünk: folyamatos módú (van konverzió), és bináris, rekordalapút (nincs konverzió).
+          </para>
+            <para>
+              Folyamatos módú esetben a periférián tárolt adatokat egy folyamatos karaktersorként értelmezzük.
+              A tárban azonban a typusnak megfelelő ábrázolási mód szerint definiált bitsorozatok vannak.
+            </para>
+            <para>
+              Olvasáskor meg kell mondanunk, hogy a folytonos karaktersorozatot hogyan 
+              tördeljük fel olyan karaktercsoportokra, amelyek az egyedi adatokat jelentik, 
+              és hogy az adott karaktercsoport milyen típusú adatot jelent. 
+              Íráskor pedig azt kell meghatároznunk, hogy a tárban tárolt bitsorozatokat hogyan konvertáljuk át folytonos karaktersorozattá és milyen szabályokkal.
+            </para>
+            <para>
+              A fenti szabály megadása három módon történhet:
+              <itemizedlist>
+                <listitem>
+                    <para>formátumos módú adatátvitel</para>
+                </listitem>
+                <listitem>
+                    <para>szerkesztett módú adatátvitel</para>
+                </listitem>
+                <listitem>
+                    <para>listázott módú adatátvitel</para>
+                </listitem>
+              </itemizedlist>
+            </para>
+            <para>
+              Formátumos módú adatátvitelnél minden egyes egyedi adathoz a formátumok segítségével
+explicit módon meg kell adni a kezelendı karakterek darabszámát és a típust.
+            </para>
+            <para>
+              Szerkesztett módú adatátvitelnél minden egyes egyedi adathoz meg kell adni egy maszkot, amely szerkesztő és átviendő karakterekből áll. 
+              A maszk elemeinek száma határozza meg a kezelendő karakterek darabszámát.
+              A szerkesztő karakterek megadják, hogy az adott pozíción milyen kategóriájú karakternek kell megjelennie. 
+              A többi karakter változtatás nélkül átvitelre kerül.
+            </para>
+            <para>
+            Listázott módú adatátvitelnél a típusra nincs explicit módon megadott információ.
+            Viszont hogy hol van az egyedi adatok közt a határ azt magában a folyamatos karaktersorban elhelyezett speciális karakterek jelentik.
+            </para>
+            <para>
+            </para>
+           <para>Bináris módban a periféria és tár közötti kommunikáció során nem történik konverzió.</para>
+           <section>
+            <title>Állományok kezelése</title>
+            <para>
+              Az állomány kezelés a következő lépésekre bontható:
+              <itemizedlist>
+                <listitem>
+                    <para>Deklaráció</para>
+                </listitem>
+                <listitem>
+                    <para>Összerendelés</para>
+                </listitem>
+                <listitem>
+                    <para>Állomány megnyitása</para>
+                </listitem>
+                <listitem>
+                    <para>Feldolgozás</para>
+                </listitem>
+                <listitem>
+                    <para>Lezárás</para>
+                </listitem>
+              </itemizedlist>
+            </para>
+            <para>
+              Deklarációnál a nyelv által megszabott módon be kell vezetnünk a logikai állományt, megfelelő attribútumokkal.
+            </para>
+            <para>
+              Összerendelés során a logikai állományt egy OS által kezelt fizikai állománnyal rendeljük össze.
+              Ezekután a logikai állománnyal végzett tevékenyésgek az alatta lévő fizikaira fognak kihatni.
+            </para>
+            <para>
+              Állomány megnyitása során OS check-ek futnak le, hogy a logikai és fizikai állomány kompatibilis-e.
+              Ezenkívül például regisztrálódik, hogy általunk használatban van az erőforrás.
+              Másrészt olykor a funkció is itt tisztázódik (pl. read only célból nyitjuk).
+            </para>
+            <para>
+              A már nyitott állományból írhatunk, vagy olvashatunk.
+              Az írást/olvasást végző eszköznél a fenti fejezetek alapján folyamatos módban meg kell adni az információkat a konverzióhoz.
+            </para>
+            <para>
+              A lezárás ismét operációs rendszer rutinokat aktivizál.
+              Például itt veszi ki az OS az eddig általunk fogottnak jelzett állományokról, hogy elengedtük őket.
+              A könyvtárak információinak aktualizálása ilyenkor történik meg. 
+              A lezárás során a logikai és fizikai állomány közti kapcsolat megszűnik.
+              Általában a főprogram szabályos befejeződésekor az összes nyitott állomány bezáródik.
+              </para>
+            <para>
+              A programozási nyelvek a programozó számára megengedik azt, hogy input-output esetén ne
+              állományokban gondolkozzon, hanem az írás-olvasást úgy képzelje el, hogy az közvetlenül
+              valamelyik perifériával történik. 
+              Ezt hívjuk implicit állománynak. 
+              A megfelelő logikai és fizikai állomány most is létezik standard nevekkel és jellemzőkkel, 
+              de ezt a futtató rendszer automatikusan kezeli. T
+              ehát az implicit állományt nem kell deklarálni, összerendelni,
+              megnyitni és lezárni. 
+              Az implicit input állomány a szabvány rendszerbemeneti periféria
+              (általában a billentyűzet), az implicit output állomány a szabvány rendszerkimeneti periféria
+              (általában a képernyő).
+              A programozó bármely állományokkal kapcsolatos tevékenységet
+              elvégezhet explicit módon (pl. az implicit output állományhoz hozzárendelheti a nyomtatót).
+              Ha az író és olvasó eszközben nem adjuk meg a logikai állomány nevét, akkor a művelet az
+              implicit állománnyal történik.
+              Implicit helyett olykor érdemes lehet direkt explicitben nyitni, ugyanis ilyenkor nagyobb kontrollunk a módról.
+            </para>
+           </section>
+        </section>
     </section>
-    
-    
-    
     
     <section>
       <title>Programozás bevezetés</title>
@@ -550,6 +1376,11 @@ infixl 5 _+_
       <para>
         Előző alfejezetben a <citation>JUHASZ</citation> könyv kapcsán már lementünk assemblyig és vissza, szóval itt nem fogunk újra arról beszélni hogy mi az a bool, csak az új dolgok.
       </para>
+      <section>
+        <title>Functions</title>
+        <para></para>
+        <!-- TODO KR -->
+      </section>
       <section>
           <title>Functions</title>
          
@@ -565,7 +1396,7 @@ return_type fn_name (void | formal_param_list)
 }
 </literallayout>
           <para>
-            C-ben láthatóan statement után nem lehet decl. Ez például cpp-bennem így van, hisz pl a for scope-ban lokálisan deklarálhatunk i-t.
+            A könyv szerinti C standard szerint láthatóan statement után nem lehet decl. Ez például cpp-ben nem így van, hisz pl a for scope-ban lokálisan deklarálhatunk i-t.
           </para>
           <para>
             Másik dolog a forward decl. Ha valahol használunk egy funkciót, akkor előtte a deklarációját már említeni kell.
@@ -649,7 +1480,6 @@ return;
             A C-ben külön char és charray literal van. Egyik ' a másik "-t használ. Nagyon nem ugyanaz ezáltal 'a', és "a".
           </para>
         </section>
-       
         <section>
           <title>Decl</title>
           <para>
@@ -696,5 +1526,477 @@ int main()
         <para>                
             <citation>BMECPP</citation>
         </para>
-    </section>        
+        <section>
+            <title>C és C++</title>
+            <para>                
+              C-ben üres paramlista azt jelenti hogy tetszőleges számú parammal hívható.
+              C++-ban azonban ez konkrétan az alábbit jelenti:
+            </para>
+<literallayout>
+void foo(void){}
+</literallayout>
+            <para>
+              Ha azonban előre nem definiált számú paraméteres hívást akarunk, akkor használjuk a köv alakot:
+            </para>
+<literallayout>
+void foo(...){}
+</literallayout>
+          <para>
+            Másik eltérés a visszatérési típus explicit specifikálása:
+          </para>
+<literallayout>
+foo(...){}
+</literallayout>
+          <para>
+            Ez C-ben int visszatérési typusú lesz (ugyanis implicitly assigned by compiler under the hood :) )
+            C++ban ugyanez hiba compile time.
+          </para>
+          <para>
+            C++ban a főprogram két formája szabványos
+          </para>
+<literallayout>
+int main(){}
+</literallayout>
+<literallayout>
+int main(int argc, char* argv[]){}
+</literallayout>
+          <para>
+            C++-ban bevezetésre került kód olvashatóság miatt <literal>bool</literal> típus és ehhez kapcsolódóan
+            <literal>bool true false</literal> kulcsszavak.
+          </para>
+          <para>
+            C++-ban több bájtos karakterek reprezentációjára beépített típus a <literal>wchar_t</literal>.
+            String literal ezen esetben <literal>L"bar"</literal>.
+          </para>
+          <para>
+            C++-ban ahol utasítás állhat, ott állhat változó deklaráció is.
+            Azaz C-hez képest nem különíthető el a body deklarációs és utasításos részre.
+          </para>
+          <para>
+          </para>
+        </section>
+        <section>
+          <title>Function overloading</title>
+          <para>
+            C-ben egy függvényt neve azonosítja egyértelműen.
+            C++-ban azonban neve ÉS formális param listája együttesen.
+            Az overload során létrehozott változatoknak meg KELL egyezniük visszatérési típusukban.
+          </para>
+          <para>
+            C linker aláhúzás+function name-et használ, azonban C++ esetében az overload megvalósítása miatt mást alkalmaznak. 
+          </para>
+          <para>
+            C++ esetében a formális paraméterek alapján képzett prefixumot vagy posztfixumot adnak a függvény névhez.
+            Ez a name mangling. Ennek pontos kivitelezése egyrészt nem sztenderdizált, hanem implementáció függő.
+          </para>
+          <para>
+            Ez persze elég problémássá teszi a C és C++ közti hívást.
+            A non-mangling "bekapcsolható" ha <literal>extern</literal>-el specifikáljuk hogy mangling nélkül fordítsunk.
+          </para>
+<literallayout>
+extern "C" int foo(int flags)
+{
+}
+</literallayout>
+        </section>
+        <section>
+          <title>Alapértelmezett függvény argumentumok</title>
+          <para>
+            Lehetséges default értékek definiálására formális paraméterek számára.
+            Vegyünk egy példát.
+          </para>
+<literallayout>
+extern "C" int bar(int a, int b, int c){}
+</literallayout>
+          <para>
+            Default-olás hátulról indul és folyamatos kell hogy legyen.
+          </para>
+<literallayout>
+int bar(int a, int b = 10, int c = 10){} //Jó
+int bar(int a, int b=10, int c){}        //Rossz
+</literallayout>
+          <para>
+            Hívásnál hátulról kezdve hagyhatóak el.
+          </para>
+<literallayout>
+bar(0,0){}   //Jó
+bar(0,,0){}  //Rossz
+</literallayout>
+          <para>
+            Default-olni egyszer definícióban és deklarációban nem lehet.
+            (Érdemes decl-nél megadni, mert user úgyis a header-t fogja nézni.)
+          </para>
+<literallayout>
+int bar(int a, int b = 10, int c = 10);   //Idáig még oké 
+int bar(int a, int b = 10, int c = 10){}  //Ez pedig hiba
+</literallayout>
+        </section>
+        <section>
+          <title>Paraméterátadás referencia típussal</title>
+          <para>
+            C-ben by value pass érvényes, ezért amikor azt akarjuk hogy a hívott függvény hatása látszódjon 
+            hívónál cím szerinti átadást alkalmazunk.
+          </para>
+          <para>
+            C++-ban egy újabb lehetőséget vezet be. Ehhez először bevezeti a referencia típust melyet egy &amp; jellel jelezhetünk pl:
+          </para>
+<literallayout>
+void foo(int&amp; a)
+{
+  a = 5;
+}
+</literallayout>  
+          <para>
+            Fent vázolt esetben a hívó látni fogja az általa megadott aktuális paraméteren a változást.
+            Referenciát MINDIG inicializálni KELL.
+          </para>
+          <para>
+            Apró kis probléma a ref visszaadás. Ennek során egy ideiglenes ref változót hoz létre a fordító.
+          </para>
+<literallayout>
+int&amp; bar()
+{
+  int x = 5;
+  return x;
+}
+
+int calc(int a, int&amp; b)
+{
+  return 2*a*b;
+}
+int main()
+{
+  std::cout&lt;&lt;calc(a,bar());
+}
+</literallayout>  
+          <para>
+            Itt annyi történik, hogy invalid területre hivatkozunk, hogy x bar végrehajtásakor élt.
+            bar után nem garantált léte, és ha le is fut a dolog továbbra is a referencia a verem egy olyan helyére hivatkozik, ami nekünk nem állt szándékunkban.
+          </para>
+        </section>
+        <section>
+          <title>Objektum orientáltság</title>
+          <para>
+            A C++-ban lehetőség van összetartozó adatok és rajtuk végzendő műveletek egy egységbe való foglalására.
+            Az elv encapsulation(egységbe zárás), és a megfelelő adatok és műveletek összefogását a class-ok(osztályok) hivatottak elérni.
+            A class-oknak instance-ei (példányai) léteznek, és ezek konkrét adat értékei eltérőek, de típusaik és nevük megegyezik, illetve a műveletek egyeznek.
+            Inheritance-ről (öröklés) is beszélhtünk, ahol mind a műveletek, mind az állapotváltozók örökölhetőek.
+            Más nyelvek ezt direkt tiltják, mert kora 2000-es évekbeli inheritance rémálommá válhatnak a projektek, ezért csak interface-ek implementációját engedik.            
+            Data hidingról (Adatrejtés) akkor beszélhetünk, ha például nem akarjuk engedni, hogy valamilyen implementációs detailhez osztályon kívülről hozzáférhessenek.
+            A substitutability (behelyettesíthetőség) azon mélyebb elvet takarja, hogy ha egy általánosabb osztályon értelmezhető egy műveet például, akkor a specifikáltabb osztályon is értelmezhető az.
+          </para>
+          <para>
+            Az osztálynak tagváltozói, tag függvényei vannak. Maga az osztály egyébként egyben egy hatáskör is.
+            Ez azért van így, mert küönben name clash alakulhatna ki küönböző osztályok tag változói és tag függvényeinek nevei között.
+          </para>
+          <para>
+            A tagfüggvényeknek vagy egy láthatatlan első paraméterük, amiben megkapják a struktúrára mutató ptr-t.
+            Erre a <literal>this</literal>-el hivatkozhatunk.
+          </para>
+          <para>
+            Data hiding-ra private, public, protected használható.
+            Private esetben csak az osztályon belül elérhető. Public esetben belül kívül. Protected esetben az osztályon belülről és minden leszármazottban.
+          </para>
+          <para>
+            Az objektum inicializálását egy konstruktor végzi. Ha a konstruktornak nincsenek paraméterei akkor azt default constructor-nak hívjuk.
+            Ha egy paramétere van akkor azt gyakran konverziós konstruktornak nevezzük.
+            Az objektum életciklusa végén a destruktor hívódik meg.
+          </para>
+          <para>
+            C++ osztályok a C struct-okhoz képest nem feltétlenül az attribútumok által meghatározott méretben és rendben foglalnak helyet a memóriában.
+          </para>
+        </section>
+
+        <section>
+          <title>Dinamikus adattagot tartalmazó osztályok</title>
+          <para>
+            C-ben a <literal>malloc</literal> és <literal>free</literal> vot használatos a dinamikus foglalásra.
+            Malloc nem kezelte a típusokat, hanem egyenesen a lefoglalandó méretet várta
+          </para>
+          <para>
+            C++-ban a <literal>new</literal> és <literal>delete</literal> használatos amik már típus alapján képesek a méretet számítani.
+            Továbbá new egyben a ctor hívását is elvégzi a megadott argumnetumok alapján.
+            Mivel az új <literal>new</literal>-ba nem adhatjuk be explicit a méretet, ezért a C-style array malloc nem fog működni.
+            Emiatt <literal>new[]</literal> és <literal>delete[]</literal> került bevezetésre tömböknek történő helyfoglaláshoz és felszabadításhoz.
+            <literal>new[]</literal> esetén nem adhatunk meg argumentumokat ctor híváshoz ezért a default ctor hívódik meg.
+            Természetesen ha nem létezik default ctor, akkor compile time error-t fogunk kapni.
+          </para>
+          <para>
+            Amennyiben osztályunk dinamikus adattagot tartalmaz aminek életciklusáért mi vagyunk felelősek, 
+            akkor az osztály destruktorában el kell végeznünk a felszabadítást.
+          </para>
+          <para>
+            Másoló konstruktor esetén egy új objektumot hozunk létre egy előző alapján, az előző módosítása nélkül.
+            Ez beépített típusoknál viszonylag egyszerű bitenkénti átmásolást jelent, viszont user defined esetekben erről nekünk kell gondoskodnunk.
+          </para>
+<literallayout>
+T(const T&amp; o){}
+</literallayout>
+          <para>
+            Ha dinamikus tagot tartalmaz osztályunk aminek életciklusáért mi vagyunk felelősek, akkor előáll egy probléma:
+            Ha csak átmásoljuk a ptr-et A objektumból B ctorában, akkor ha A élete hamarabb véget ér (és lefut a dtor ezáltal felszabadítva a dinamikus tagot),
+            akkor mellékhatásként B egy mostmár nem valid memóriterületre fog mutatni és nem értesül a változásról.        
+          </para>
+          <para>
+            Ilyenkor lehetséges megoldás a ptr által mutatott adat(ok) teljes rekonstrukciója egy újonnan igényelt helyen a memóriában.
+            Ezt hívjuk deep copy-nak.
+            Amikor ilyenről nincs szó, akkor shallow copy-ról beszélünk. A compiler álta auto generált copy ctor shallow copy-t valósít meg.
+          </para>
+        </section>
+        <section>
+          <title>Friend függvények és osztályok</title>
+          <para>
+            C++-ban lehetsőég van, hogy egy osztály globális függvényeket, vagy más osztályok tagfüggvényiet feljogosítsa,
+            hogy tagváltozóihoz és tagfügvényeihez hozzáférjenek.
+          </para>
+          
+          <para>
+            Friend függvényekre példa:
+          </para>
+<literallayout>
+class Bar;
+
+void howdareyou(Bar&amp; b);
+
+class Stranger{
+void danger(Bar&amp;);
+};
+
+class Bar{
+int y;
+int x;
+friend void howdareyou(Bar&amp;);
+friend void Stranger::danger(Bar&amp;);
+};
+
+void Stranger::danger(Bar&amp; b){
+  b.x=b.y=0;
+}
+
+void howdareyou(Bar&amp; b){
+  b.x=b.y=0;
+}
+</literallayout>
+          <para>
+            Friend osztályra példa:
+          </para>
+          
+<literallayout>
+
+class Stranger;
+
+class Bar{
+int y;
+int x;
+friend class Stranger;
+};
+
+class Stranger{
+void danger(Bar&amp; b){
+b.x=b.y=0;
+}
+};
+</literallayout>
+          <para>
+            A class friend "jogosítványa" nem öröklődik subclass-okra. Illetve friend "jogosítvány" nem tranzitív.
+          </para>
+        </section>
+        <section>
+          <title>Tagvátozók inicializálása</title>
+          <para>
+            Először is tisztázzuk a az inicializálást és az értékadást!
+          </para>
+          <para>
+            Inicializálás
+          </para>
+<literallayout>
+int i = 0; 
+Foo foo1(1,2);
+int k;
+Foo foo1;
+</literallayout>
+          <para>
+            Értékadás
+          </para>
+<literallayout>
+int i; 
+i = 6;
+</literallayout>
+          <para>
+            Menjünk kicsit mélyebbre, nézzük meg Foo-t!
+          </para>
+<literallayout>
+class Foo
+{
+public:
+  Foo(int av, int bv)
+  { a=av; b=bv;}
+int a;
+int b;
+};
+</literallayout>
+          <para>
+            ctor testben <literal>a=av</literal> és <literal>b=bv</literal> már értékadásnak számítanak.
+            Ha mégis inicializálni akarjuk a dolgokat, akkor a C++ a ctor initializer listet nyújtja segítségül.
+          </para>
+<literallayout>
+class Foo
+{
+public:
+  Foo(int av, int bv) : a(av), b(bv){}
+int a;
+int b;
+};
+</literallayout>
+        <para>
+          Ez akkor lehet hasznos, amikor valami miatt tartózkodni akarunk az assignment-től. 
+          Bár gyakoribb hogy olyan taggal kell dologznunk akinek simán nincs default ctor-a.
+          Ezen esetben technikailag nincs más lehetőségünk mint ctor initializer list-et használni.
+        </para>
+        </section>
+        <section>
+          <title>Statikus tagok</title>
+          <para>Osztályok esetén lehetőségünk van olyan tagok létrehozására, melyek nem példányok, hanem az osztálynak részei.</para>
+          <para> Deklarálni static keyworddel tudjuk, viszont ez nem elég, ugyanis ez nem biztosít hely foglalást.</para>
+          <para>Azaz például a cpp fájlban külön fel kell tüntetni.</para>
+<literallayout>
+-- foo.hpp
+class Foo
+{
+public:
+  Foo(){}
+  static int a;
+};
+-- foo.cpp
+int Foo::a = 1;
+</literallayout>
+        <para>Kívülről az osztály namespace-én keresztül kell elérni, azaz</para>
+<literallayout>
+fn_int_consumer(Foo::a);
+</literallayout>
+        <para>
+          Statikus tagfüggvények is definiálhatóak, viszont ezekből (logikus módon) nem érhetőek el a példányokra jellemző tagok.
+          Sőt...logikus módon implicit egyedre mutató ptr-t sem kapnak (azaz this ne értelmezett, hisz nem példányra jellemző tagfüggvény).
+        </para>
+<literallayout>
+-- foo.hpp
+class Foo
+{
+public:
+  Foo(){}
+  static void naughty()
+  {
+    a = 0; HIBA!!!
+    this->a = 0; HIBA!!!
+  }
+  int a;
+};
+-- foo.cpp
+int Foo::a = 1;
+</literallayout>
+         <para>
+          A statikus tagváltozók a <literal>main</literal> előtt inicializálódnak!
+          Azaz nem garantálható egy C++ programban, hogy a main első sora lesz a kezdő sor. (plusz még ott vannak a globális változók initjei)
+         </para>
+        </section>
+        <section>
+          <title>Beágyazott (nested) definíciók</title>
+          <para>
+            C++ esetében lehetőség van enum, struct, class és typedef osztály definíción belüli megadására.
+            Ezek kívülről a teljesen mnősített nevükkel érhetőek el pl.
+          </para>
+<literallayout>
+class Foo
+{
+class Bar{};
+};
+-- Foo::Bar
+</literallayout>
+          <para>
+            Nestelt esetben sem a nestet megvalósító(tartalmazó) osztály sem a nestelt (tartalmazott) osztály nem kap a másik felé külön jogokat.
+            A külvilág számára a private után deklarált nestelt class-ok nem láthatóak.
+            STL-ben gyakran találkozhatunk ilyen nested class-okkal container-ek esetén.
+          </para>
+        </section>
+        <section>
+          <title>Konstansok és inline függvények</title>
+          <para>
+            C-ben konstansokra gyakran használják a preprocesszor adta lehetőségeket <literal>#define</literal>-al.
+            Ez azonban valójában csak nyers behelyettesítést jelent. Szószerint a preprocesszor csak felcseréli
+            a define-al definiált szimbólumsor összes előfordulását a megadott nyers értékkel.
+            Ezáltal type információt sem képes rögzíteni "magáról". 
+          </para>
+          <para>
+            C++ esetében a <literal>const</literal> type modifier-t használhatjuk.
+            Ezzel jelezzük a compiler számára, hogy az érték init után garantáltan nem fog változni,
+            és ha ilyet írnánk, kezelje hibaként.
+          </para>
+          <para>
+            Const ptr-ek esetén két különböző dolgot is megadhatunk
+          </para>
+          <para>
+            A mutatott érték ne legyen változtatható
+          </para>
+<literallayout>
+char t[10];
+const char* p = t;
+*p = 0;  HIBA!
+p++;     OK!
+</literallayout>
+          <para>
+            A mutató érték ne legyen változtatható
+          </para>
+<literallayout>
+char t[10];
+char* const p = t;
+*p = 0;   OK!
+p++;      HIBA!
+</literallayout>
+          <para>
+            Const függvény paraméterek esetén is használható.
+            Ekkor azt a jelentést beszi fel, hogy a paraméter olvasható, de nem változtatható.
+            Vegyük például referenciákat:
+          </para>
+<literallayout>
+void foo(Foo&amp; o)
+{
+  o.x=5;  OK!
+}
+
+void foo(const Foo&amp; o)
+{
+  o.x=5;  HIBA!
+}
+</literallayout>
+        <para>
+          Függvények visszatérési értéke is lehet konstans. Például std::string c_str tagfüggvénye.
+          A const overaload szempontjából megkülönböztető jelentőségű.
+        </para>
+        <para>
+          Osztályok tagváltozói is lehetnek konstansok.
+          Ezeket a ctor initializer list-ben KELL inicializálni.
+        </para>
+        <para>
+          Const függvények fejlécének végén is használható annak kifejezésére, hogy a függvénynek
+          garantáltan nincs olyan mellékhatása mely módosítani a példány állapotát.
+          Ha azonban egy const függvényben mégis módosítani akarunk egy tagváltozót,
+          akkor az nem lehet static vagy const és a <literal>mutable</literal>-t kell használni.
+        </para>
+<literallayout>
+class Foo
+{
+public:
+const int a;
+mutable int b;
+void safe() const{b = 7;}
+};
+</literallayout>
+        </section>
+        <section>
+          <title>C++ IO alapjai</title>
+          <para></para>
+        </section>
+    </section>  
+    <!-- TODO BMECPP -->  
+  
 </chapter>                
