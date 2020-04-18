@@ -1376,150 +1376,1195 @@ explicit módon meg kell adni a kezelendı karakterek darabszámát és a típus
       <para>
         Előző alfejezetben a <citation>JUHASZ</citation> könyv kapcsán már lementünk assemblyig és vissza, szóval itt nem fogunk újra arról beszélni hogy mi az a bool, csak az új dolgok.
       </para>
+      <!-- TODO KR -->
       <section>
-        <title>Functions</title>
-        <para></para>
-        <!-- TODO KR -->
+        <title>Alapismeretek</title>
+        <para>
+          A legegyszerűbb C program, <literal>gcc hw.c</literal>-vel compile-olunk.
+        </para>
+<literallayout>
+main ()
+{printf ("Hello World\n");} 
+</literallayout>
+        <para>
+          Ez a fejezet elég alap dolgokkal foglalkozik, inkább csak a lényeges részeket emeletem ki csak.
+          (Pl. for ciklusról volt egy pár mondatos rész, de erre úgyis egy egész afejezet lesz stb...)
+        </para>
+        <section>
+          <title>Adattípusok</title>
+          <para>
+          C-beli alaptípusok
+          <itemizedlist>
+              <listitem>
+                  <para>int    - egész szám</para>
+              </listitem>
+              <listitem>
+                  <para>float  - lebegőpontos szám</para>
+              </listitem>
+              <listitem>
+                  <para>char   - karakter, egyetlen byte</para>
+              </listitem>
+              <listitem>
+                  <para>short  - rövid egész szám</para>
+              </listitem>
+              <listitem>
+                  <para>long   - hosszú egész szám</para>
+              </listitem>
+              <listitem>
+                  <para>double - dupla pontnosságú lebegőpontos szám</para>
+              </listitem>
+          </itemizedlist>
+        </para>
+        <para>
+          Ezenkívül lehetőség van user defined struct-ok kialakítására, ahol a fenti adattípusokból és egyéb structokból
+          rakhatunk össze új típusú structokat, union-nal több struct típusból képezhetünk egy közös uniót stb.
+        </para>
+        </section>
+        <section>
+          <title>Változók és aritmetikai kifejezések</title>
+          <para>
+            A fordító minden, a /* és */ között előforduló karaktert és mid figyelmen kívül hagy, ezek kommentek.
+            A C nyelvben használat előtt minden változót deklarálni kell.
+            Mindezt (szabvénytól függően) az első végrehajtható utasítás előtt, ezáltal a függvény test 
+            egy deklarációs és végrehajtási részre tagolható.
+            A deklarációban egy típus megadását követően az ezen típusú változók neveinek felsorolását kell elvégeznünk.
+            Példa:
+          </para>
+<literallayout>
+int lower, upper, step; float fahr, celsius;
+</literallayout>
+          <para>
+            Értékadást a = operátorral érhetünk el, azaz pl.:
+          </para>
+<literallayout>
+int lower, upper, step; float fahr, celsius;
+lower = 0;
+</literallayout>
+          <para>
+            Persze az értékadás kiértékelődése miatt láncolhatjuk is a változókat:
+          </para>
+<literallayout>
+int lower, upper, step; float fahr, celsius;
+upper = lower = 0;
+</literallayout>
+
+<literallayout>
+main ()
+{
+  int lower, upper, step;
+  float fahr, celsius;
+        lower = 0;	/* A hőmérséklet-táblázat alsó határa */
+        upper = 300;	/* felső határ */
+        step = 20;	/* lépésköz */
+  fahr = lower;
+  while (fahr &lt;= upper) 
+  {
+        celsius = (5.0 / 9.0) * (fahr - 32.0);
+        printf ("%4.0f %6.1f \n", fahr, celsius);
+        fahr = fahr + step;
+  }     
+} 
+</literallayout>
+        <para>
+          Az előzőekben említett típusok fontosak, hiszen ezek szablyák meg a foglalt hey méretét.
+          Ez gép (architektúra) függő.
+        </para>
+        <para>
+          A printf első argumentumában lévő format karakterláncban minden egyes % konstrukcióhoz 
+          hozzárendelődik a neki megfelelő második, harmadik stb. argumentum.
+          Egyébként a printf nem része a C nyelvnek: a C nyelven belül a be- és kivitel nincs definiálva.
+          Formatálsához segítség:
+          <itemizedlist>
+              <listitem>
+                  <para>%d    decimális egész</para>
+              </listitem>
+              <listitem>
+                  <para>%6d   decimális egész, de legalább 6 char hosszan</para>
+              </listitem>
+              <listitem>
+                  <para>%f    lebegőpontos</para>
+              </listitem>
+              <listitem>
+                  <para>%6f   lebegőpontos, de legalább 6 char hosszan</para>
+              </listitem>
+              <listitem>
+                  <para>%.2f    decimális egész, kettő a tizedes veszző után</para>
+              </listitem>
+              <listitem>
+                  <para>%6.2d   lebegőpontos, de legalább 6 char hosszan, kettő a tizedes veszző után</para>
+              </listitem>
+          </itemizedlist>
+        </para>
+        </section>
+        <section>
+          <title>Változók és aritmetikai kifejezések</title>
+          <para>
+          </para>
+<literallayout>
+#include &lt;stdio.h&gt;
+main ()	/ * Fahrenheit-Celsius táblázat*/
+{
+  int fahr; 
+  for (fahr = 0; fahr &lt;= 300; fahr = fahr + 20){
+    printf ("%4d %6.1f \n", fahr, (5.0 / 9.0) * (fahr - 32));
+  }
+}
+</literallayout>
+        <para>
+          A <literal>for</literal> egy ciklusutasítás, tekinthetünk rá a while általánosításaként.
+          Három részt tartalmaz, amelyeket pontosvesszők választanak el.
+          Az első rész, fahr = 0 értékadása egyszer hajtódik végre a ciklusba való belépés előtt.
+          A második rész a ciklust vezérlő ellenőrzés vagy feltétel.
+          Minden alkalommal megvizsgáljuk hogy a feltétel teljesül-e, ha igen végrehajtjuk a ciklus magot,
+          amit az újrainicializáló lépés azaz <literal>fahr = fahr + 20</literal> követ.
+          A ciklus akkor ér véget, amikor a feltétel hamissá válik.
+          Csakúgy, mint a while esetében, a törzs vagy egyetlen utasítás, 
+          vagy pedig kapcsos zárójelek közé zárt utasítások csoportja. 
+          Az inicializáló és újrainicializáló tetszőleges kifejezés lehet. 
+          A ciklusnak nincs saját scope-ja C++-tól eltérően.
+        </para>
+        </section>
+        <section>
+          <title>Szimbolikus konstansok</title>
+          <para>
+            Az előfeldolgozó preprocesszor segítségével úgymond szimbolikus konstansokat használhatunk.
+            A preprocesszor compile előtt végig megy a forrás szövegen és ha olyan szimbólumba fut,
+            mely define-al értelmezve lett számára, akkor azon előfordulásokat cseréli a defineban megadott karakterláncra.
+            Ezek használatával az előző fahrenheit program.
+          </para>
+<literallayout>
+#include &lt;stdio.h&gt;
+#define LO 0
+#define UP 300
+#define STEP 20
+main ()	/ * Fahrenheit-Celsius táblázat*/
+{
+  int fahr; 
+  for (fahr = LO; fahr &lt;= UP; fahr = fahr + STEP){
+    printf ("%4d %6.1f \n", fahr, (5.0 / 9.0) * (fahr - 32));
+  }
+}
+</literallayout>
+        </section>
+        <section>
+          <title>Tömbök</title>
+          <para>
+            C-ben a tömb egy adott adattípusból n darabot tartalmazó adattároló.
+            Legfontosabb tulajdonsága, hogy memóriában az array egy egybefüggő helyen tárolódik.
+            Emiatt allokálásakor nem csak hogy elegendő szabad memóriával kell a gépnek rendelkeznie,
+            de kell lennie legalább egy olyan memória résznek, mely nem kisebb mint az igényelt terület az array által.
+            Ezen helyfoglalás miatt az array mérete utólag nem növelhető.
+            Az egyetlen módszer új elem hozzáadására, ha kérünk egy nagyobb array-t és átmásoljuk az elemeket a régiből az újba,
+            majd a régit felszabadítjuk stb.
+          </para>
+        </section>
+        <section>
+          <title>Argumentumok érték szerinti átadása</title>
+          <para>
+            C-ben az argumentumok érték szerint adódnak át, azaz a hívó nem fogja látni a hívott az argumentumokon
+            végzett változtatásokat. Példa:
+          </para>
+<literallayout>
+#include &lt;stdio.h&gt;
+
+int add(int x, int y)
+{
+  x = 5;
+  return x + y;
+}
+
+main ()	/ * Fahrenheit-Celsius táblázat*/
+{
+  int a = 1;
+  int b = 2;
+  add(a,b);
+}
+</literallayout>
+        <para>
+          Fenti példában az add által okozott változtatás <literal>x = 5;</literal>
+          nem lesz kihatással <literal>main</literal>-beli <literal>a</literal>-ra.
+        </para>
+        <para>
+          Ez amiatt van így, mert <literal>add</literal> hívásakor  <literal>main</literal>-beli <literal>a</literal>          
+          értéke átmásolódik add területén lévő x változóba.
+          x-en végzett bármilyen változtatás lokális add-ra, és kívülről nem is megfigyelhető.
+        </para>
+        <para>
+          A későbbiekben kifogunk térni egy megoldásra abban az esetben, ha olyan változást akarunk amit a hívónak is
+          látnia kellene. Ezt pointer-ekkel fogjuk megoldani (azaz a változtatandó változó értéke helyett a tárbeli címét küldjük a hívottnak.)
+        </para>
+        </section>
+        <section>
+          <title>Karakter tömbök</title>
+          <para>
+            A C nyelvben leggyakoribb tömbtípus valószínűleg a karaktertömb.
+            Érdemes felhívni a figyelmet, hogy egy 0 értékű zárókarakterrel a c karaktertömbök általában le vannak zárva.
+            Azaz például:
+         </para>
+<literallayout>
+"hello\n"
+['h','e','l','l','o','\n','\0']
+</literallayout>
+         <para>
+          Sok C funkció ha karakter tömböt fogad el, akkor elvárja hogy ezen szabványnak megfelelő módon előállított tömböt kapjon.
+          Más esetben nem definiált működésük.
+         </para>
+<literallayout>	       
+int getline(char s[], int lim)
+{
+  int c,i;
+  for(i=0;i&lt;lim-1&amp;&amp;(c=getchar())!=EOF&amp;&amp;c!='\n';++i){ 
+    s[i]=c;
+  }
+  if(c=='\n'){
+    s[i]=c;
+    ++i;
+  }
+  s[i]='\0';
+  return i;
+}
+
+void copy(char to[], char from[])
+{
+  int i;
+  i=0;
+  while((to[i]=from[i])!='\0'){
+    ++i;
+  }
+}
+</literallayout>
+         <para>
+          Fenti példában látható, hogy <literal>copy</literal> arra támaszkodik hogy null-terminated C char array-t kapjon.
+          <literal>getline</literal> esetében pedig láthatjuk hogy a végén garantáljuk, hogy az utolsó karakter a terminátor legyen.
+          Itt érdemes megjegyezni, hogy a fordító is hasonló technikával fordításközben átalakítja a forrásban található egymásután álló karaktereket egy nullterminált karaktertömbbé.
+         </para>
+        </section>
+        <section>
+          <title>Érvényességi határ, külső változók</title>
+          <para>
+            A main függvényen belüli változók (line, save stb.) a main-re nézve lokálisak. 
+            Mivel ezeket a main-en belül deklaráltuk, egyetlen más függvény sem tud közvetlenül hozzájuk férni.
+            Ez fennáll fordítva is, azaz egy másik funkciónak lokális változó nem látható main számára (és ezáltal nem is okoz összeférhetetlenséget névegyezés miatt).
+            A függvények lokális változói csak meghívásukkor jönnek létre, és megsemmisülnek a scope elhagyáskor.
+            Emiatt az ilyen változókat automatikus változóknak nevezzük. 
+            Ezek értéküket nem őrzik meg egyik hívástól a másikig, 
+            így minden belépéskor explicit módon értéket kell adni nekik. 
+            Ha azonban azt akarjuk hogy ne az előbb ismertetett "tranziens" módon viselkedjenek, 
+            akkor lehetőségünk van globális változókat használni.
+            Ezeket a globális változókat bármelyik függvény név szerint elérheti.
+           Az összes függvényen kívül kell definiálni, hogy ezzel tárolóhelyet foglaljunk le a számukra.
+           A változókat minden olyan függvényben, ahol használni akarjuk, vagy explicit módon az extern alapszóval, 
+           vagy implicit módon értelemszerűen, de deklarálnunk is kell. 
+          </para>
+        </section>
       </section>
       <section>
-          <title>Functions</title>
-         
-         <para>
-            C funkciók
-          </para>   
-    
+        <title>Típusok, Operátorok és Kifejezések</title>
+        <para>
+          A programokban változókat és állandókat használunk.
+          A deklarációk effektíve kijelentik a fordító számára az általunk
+          felhasználni kívánt változókat.
+          A fordítónak szüksége van emiatt a typusra, és esetleges kezdeti értékre is.
+          A kifejezésekkel és operátorokkal ezen változókat módosíthatjuk plusz számításokat végezhetünk rajtuk.
+          (Mármint a legvégén a legbonyolultabb dolog is egyszerű ALU által végrehajtható elemi máveletekké fog egyszerűsödni.)
+        </para>
+        <section>
+            <title>Változó nevek</title>
+            <para>
+              A nevek betűkből és számjegyekből állnak: az első karakter betű kell, hogy legyen.
+              Az aláhúzás karakter (_) betűnek számít: ezzel javíthatjuk a hosszú változónevek olvashatóságát.
+              Lehetőleg aláhúzással ne kezdjünk nevet (_) 
+              A nagy- és a kisbetű különbözőnek számít.
+              A belső nevekben és külső nevekben eltérés van.
+              Ugyan akármilyen hosszú nevet megadhatunk mindkét esetben, de szabványtól függ, hogy ezen karakterekből mennyi lesz szignifikáns.
+              Ezenkívül az olyan kulcsszavak, mint if, else, int, float stb. fenntartott szavak,
+              változónévként nem használhatók.
+            </para>
+          </section>
+          <section>
+            <title>Adattípus és méret</title>
+            <para>
+              A C-beli alaptípusok
+              <itemizedlist>
+                  <listitem>
+                      <para>int    - egész szám</para>
+                  </listitem>
+                  <listitem>
+                      <para>float  - lebegőpontos szám</para>
+                  </listitem>
+                  <listitem>
+                      <para>char   - karakter, egyetlen byte</para>
+                  </listitem>
+                  <listitem>
+                      <para>short  - rövid egész szám</para>
+                  </listitem>
+                  <listitem>
+                      <para>long   - hosszú egész szám</para>
+                  </listitem>
+                  <listitem>
+                      <para>double - dupla pontnosságú lebegőpontos szám</para>
+                  </listitem>
+              </itemizedlist>
+              int, short és long architektúrától eltérő, de a lényeges egymáshoz képest relatív reprezentált nagyságuk.
+              (pl. int és short 16 bit, long 32 bit)
+              <literal>char</literal> és <literal>int</literal> esetén tovább módosíthatjuk 
+              <literal>unsigned</literal> és <literal>signed</literal> hozzáadásával.
+              Ezek annyit jelentenek, hogy előjeles vagy nem előjeles megjelenítést és aritmetikát tervezünk használni.
+              Példa char esetén, hogy unsigned char [0,255] intervallumból, míg signed társa [-128,128] intervallumból vehet fel értékeket.
+              <literal>limits.h</literal> és <literal>float.h</literal> tartalmazza ezen típusokhoz tartozó utility konstansokat(pl. max).
+            </para>
+          </section>
+          <section>
+            <title>Konstansok</title>
+            <para>
+            int konstans és long
+            </para>
 <literallayout>
-return_type fn_name (void | formal_param_list)
-{
-  decls
-  statements
-}
+1234
+1234L
+</literallayout>
+            <para>
+            long int signed unsigned
+            </para>
+<literallayout>
+1234L
+1234UL
+</literallayout>
+            <para>
+              float
+            </para>
+<literallayout>
+123.4
+1e-2
 </literallayout>
           <para>
-            A könyv szerinti C standard szerint láthatóan statement után nem lehet decl. Ez például cpp-ben nem így van, hisz pl a for scope-ban lokálisan deklarálhatunk i-t.
+            Egy vezető 0 int előtt oktális, míg 0x vagy 0X hexadecimálist jelent
           </para>
+<literallayout>
+012
+0x1f
+</literallayout>
           <para>
-            Másik dolog a forward decl. Ha valahol használunk egy funkciót, akkor előtte a deklarációját már említeni kell.
+            Karakter konstanst aposztrófok közé írjuk. Newline és egyéb speciális karakterekhez escape char-t használhatunk ami backslash.
           </para>
 <literallayout>
-int main ()
-{
-  int bar;
-  bar = foo();
-  return 0;
-}
-
-int foo(void) {return 0;}
+'a'
+'\n'
 </literallayout>
-        <para>Ez nem jó, hisz bar=foo() esetén összeköti a szemöldökét a compiler, hiszen nincs deklarálva foo (jó esetben :).</para>
-<literallayout>
-int foo(void);
-
-int main ()
-{
-  int bar;
-  bar = foo();
-  return 0;
-}
-
-int foo(void) {return 0;}
-</literallayout>
-
-        <para>Azaz előre deklaráltuk forward decl...</para>
-       </section>
-
-        <section>
-          <title>Pass by value</title>
-          <para>C-ben function call-ok esetén tisztán értékeket adunk át. Felmerül a probléma, ok, de az lzw binfámat C free functionökkel akkor hogyan tudom változtatni. Emlékszünk még a raw ptr-ekre?
-            Nos mivel az csak egy egyszerű memória cím, ezért szépen átpasszoljuk a mem címet. Totál mindegy hogy a cím másolódik, hisz csak egy 64 bites minta. Ezekután ha megkaptuk akkor a funkcióban már csinálhatjuk a mellékhatást kedvünk szerint!
+          <para>
+            Stringeket idézőjelek közé írjuk
           </para>
-        </section>
-        <section>
-          <title>Extern</title>
-          <para>Fenti példában <literal>bar</literal> csak <literal>main scope-jában, vagy ez alatti scope-ban látható (pl. valami loop-ban hivatkozhatunk bar-ra)</literal></para>
-          <para>Másik lényeges dolog, hogy bar addig él amíg main él.</para>
-          <para>Ez... nos ezen probléma feloldására van az extern.</para>
-          <para>Extern, tehát externális az összes funkcióhoz képest, minden funkción kívüli stb. Ne ijedjünk meg semmi bonyolult</para>
 <literallayout>
-int counter;
-
-void foo(void);
-
-int main ()
-{
-  extern int counter;
-  int bar;
-  counter = 0;
-  foo();
-  foo();
-  bar = counter;
-  return 0;
-}
-
-void foo(void)
-{
-extern int counter;
-counter = counter + 1;
-return;
-}
+"aba"
+"ab" "a"
 </literallayout>
-        </section>
-       
-       
+          <para>
+            felsorolások (enum) a következő módon:
+          </para>
+<literallayout>
+enum foo{AAR,BAR,CAR}
+</literallayout>
+          <para>
+            Enum érték 0-ról indul, de megadhatunk mást is
+          </para>
+<literallayout>
+enum foo{AAR=1,BAR,CAR,UNDEF=0}
+</literallayout>
+          </section>
+          <section>
+            <title>Deklarációk</title>
+            <para>
+              Minden változót deklarálni kell használat előtt.
+               A deklaráció meghatároz egy típust, amelyet az illető típusú változó(ka)t megadó lista követ, mint például:
+              Külső vagy statikus változó esetén az inicializálás csak egyszer
+              értelemszerűen a program végrehajtásának megkezdése előtt - történik meg.
+              Az  explicit módon inicializált automatikus változók minden alkalommal inicializálódnak, amikor az őket tartalmazó függvényt egy program meghívja.
+              Az explicit inicializálás nélküli automatikus változók értéke határozatlan.
+              A külső és statikus változók kezdeti értéke alapértelmezés szerint nulla, de stilárisan helyesebb, ha minden esetben megadjuk a kezdeti értéket.
+                          
+            </para>
+<literallayout>
+int lower, upper, step; char c, line [1000];
+</literallayout>
+            <para>
+              A változók saját deklarációikban inicializálhatók is, bár ezzel kapcsolatban vannak megkötések. 
+              Ha a nevet egy egyenlőségjel és egy állandó követi, akkor az az illető változó kezdeti értékének megadását(inicializálását) jelenti.
+            </para>
+          </section>
+          <section>
+            <title>Aritmetikai műveletek</title>
+            <para>
+              Az aritmetikai operátorok a +, -, *, /  és a % (moduló) operátor. Van egyoperandusú -, de nincs egyoperandusú +.
+            Az egész típusú (integer) osztás levágja a tört részt. Az
+            x % y kifejezés az  x-nek y-nal történő osztásakor keletkező maradékot jelenti, tehát értéke nulla, ha x pontosan osztható y-nal.
+            </para>
+          </section>
+          <section>
+            <title>Relációs és logikai operátorok</title>
+            <para>
+              Relációs operátorok
+             <literal> &gt; &gt;= &lt; &lt;= = </literal>
+            </para>
+            <para>
+              Egyenlőséget vizsgáló operátorok
+             <literal> == != </literal>
+            </para>
+            <para>
+              Logikai operátorok
+             <literal> &amp;&amp; || </literal>
+            </para>
+          </section>
+          <section>
+            <title>Típus konverzió</title>
+            <para>
+              Ha egy kifejezésben különböző típusú operandusok fordulnak elő, 
+              a kifejezés kiértékeléséhez az operandusokat azonos típusúakká kell alakítani.
+              Belátható, hogy bizonyos esetekben a konverzió nem lehetséges, például a tört számot nem tudunk egész számként leképezni.
+              Azonban ha például egy float-ként tárolt szám valójában éppen egész értékű, akkor nem okoz adatvesztést a konverzió.
+              Bizonyos esetkeben a konverzió garantálhatóan sikeres lesz.
+              Ez például tegyük fel char-t akarunk int-é alakítani. Ez biztosan mindig megtörténhet, hiszen egy szűkebb intervallumon lévő elem biztos leképzehető egy olyan intervallum által aminek része ezen intervallum.
+              Általában csak az értelmes konverziók történnek meg automatikusan, 
+              például egész típusú mennyiségek átalakítása lebegőpontossá olyan kifejezésekben, 
+              mint f + i, ahol f float, i pedig int típusú. 
+              Az értelmetlen kifejezések, mint például a float indexként való használata, nem megengedettek.
+              A char és int típusú mennyiségek aritmetikai kifejezésekben szabadon keveredhetnek.
+              Konverziót kényszeríthetünk is, ezt az alábbi módon tehetjük meg:
+            </para>
+<literallayout>
+int a;
+char b;
+a = 5;
+b = (char)a;
+</literallayout>
+            <para>
+            </para>
+          </section>
+          <section>
+            <title>Bitenkénti műveletek</title>
+            <para>
+              A következő bitenkénti műveleteket használhatjuk.
+              <itemizedlist>
+                  <listitem>
+                      <para>&amp;	 - bitenkénti ÉS</para>
+                  </listitem>
+                  <listitem>
+                      <para>|  - bitenkénti megengedő (inkluzív) VAGY</para>
+                  </listitem>
+                  <listitem>
+                      <para>^	 - bitenkénti kizáró (exkluzív) VAGY,</para>
+                  </listitem>
+                  <listitem>
+                      <para>&lt;&lt;  - bitléptetés (shift) balra,</para>
+                  </listitem>
+                  <listitem>
+                      <para>&gt;&gt;  - bitléptetés (shift) jobbra,</para>
+                  </listitem>
+                  <listitem>
+                      <para>~ - egyes komplemens (egyoperandusú).</para>
+                  </listitem>
+              </itemizedlist>
+            </para>
+          </section>
+          <section>
+            <title>Értékadási operátorok és kifejezések</title>
+            
+            <para>
+            Az olyan kifejezések, mint i = i + 2 amelyekben a bal oldal a jobb oldalon megismétlődik, a +=
+            értékadó operátor segítségével az i += 2 tömörített alakban is írhatók.
+            A C-ben legtöbb aritemetikai művelet esetén van értékadó megfelelő.
+            Ne feledekezzünk meg az erősorrendről.
+            </para>
+<literallayout>
+x *= y + 1      // 1.
+x = x * (y + 1) // 2. ekvivalens 1.-vel
+x = x * y + 1   // Nem ekvivalens sem 1.-vel sem 2.-kal
+</literallayout>
+          </section>
+          <section>
+            <title>Feltételes kifejezések</title>
+            <para>
+            </para>
+<literallayout>
+if (a > b)
+z = a;
+else
+z = b;
+</literallayout>
+          <para>
+            A fenti feltételes utasítás eredményeként z a és b közül a nagyobbik értékét veszi fel.
+            A C-ben a háromoperandusú ?: operátor segítségével az ilyen
+            szerkezeteket sokkal rövidebben leírhatjuk.
+          </para>
+<literallayout>
+z = (a > b) ? a : b;
+</literallayout>
+          <para>
+            A feltételes kifejezésben az első kifejezést nem kötelező zárójelbe tenni, mivel ?: precedenciája igen alacsony (pontosan az értékadás fölötti). Zárójelezéssel azonban érthetőbbé tehetjük a kifejezés feltételrészét.
+          </para>
+          </section>
+          <section>
+            <title>Precedencia, kiértékelési sorrend</title>
+            <para>
+              Ha nem teljesen zárójelezett alakot adunk meg, akkor érdemes lehet tanuémányozni a <link xlink:href="https://en.cppreference.com/w/c/language/operator_precedence">precedencia táblát</link>.
+            </para>
+          </section>
+      </section>
       <section>
-          <title>Escaping</title>
+        <title>Vezérlési szerkezetek</title>
+        <para>
+          A nyelv vezérlésátadó utasításai a számítások végrehajtásának sorrendjét határozzák meg. 
+        </para>
+          <section>
+            <title>Utasítások, blokkok</title>
+            <para>
+              A C-ben a pontosvesszővel zárjuk az utasításokat.
+              A { és } kapcsos zárójelek felhasználásával deklarációkat 
+              és utasításokat egyetlen összetett utasításba vagy blokkba foghatunk össze. 
+              Ez szintaktikailag egyetlen utasítással egyenértékű.  
+              A blokkot  lezáró jobb oldali kapcsos zárójel után soha nincs pontosvesszô.
+              A blokkon belül deklarálási sorrendtől fordított sorrendben szűnik meg a változók élete.
+              (Ez később c++ esetén lehet hasznos amikor gurad-okat akarunk csinálni, és garantálni akarjuk hogy egy bizonyos dtor mindig a végén hívódjon meg.)
+            </para>
+          </section>
+          <section>
+            <title>If-else</title>
+            <para>
+              Elágaztatás esetén az if-else-t használjuk
+            </para>
+<literallayout>
+if(feltétel)
+egy utasítás vagy egy blokk
+else
+egy utasítás vagy egy blokk
+</literallayout>
+            <para>
+              Azaz például
+            </para>
+<literallayout>
+if(a&gt;5)
+  a=5
+else
+{
+a=b;
+c=2*d;
+b=c;
+}
+</literallayout>
           <para>
-            A <citation>JUHASZ</citation>-ban már beszéltünk változókról, viszont string literal-oknál az escape kimaradt.
-            Annyiról van szó, hogy egyes speciális karaktereket nem lehet csakúgy beírni, hisz különleges jelentéssel bírnak azon kontextusban.
-            Egyszerű példa &gt; xml-ben :). String literalba ugye hogyan írunk idézőjelet? Előtte esscape-elni kell.
+              Az else el is hagyható
           </para>
-        </section>
-        <section>
-          <title>Char vs char array</title>
+<literallayout>
+if(g&gt;5)
+  g=5
+</literallayout>
           <para>
-            A C-ben külön char és charray literal van. Egyik ' a másik "-t használ. Nagyon nem ugyanaz ezáltal 'a', és "a".
+            Emiatt azonban olykor nem teljesen egyértelmű hogy mely if hez tartozik egy else.
+            Ennek feloldására szabvány szerint  az else a hozzá legközelebbi else nélküli if-hez kapcsolódik. 
           </para>
-        </section>
-        <section>
-          <title>Decl</title>
+<literallayout>
+if (n &gt; 0)
+  if (a &gt; b)
+    z = a;
+  else
+    z = b;
+</literallayout> 
           <para>
-            Deklarációknál ha hasonló típusú változókról van szó egy sorban is deklarálhatjuk őket. Inicializálni = jellel tudunk.
+            Ha ettől eltérőt akarunk, akkor azt a blokk jelöléssel érhetjük el
           </para>
+<literallayout>
+if (n &gt; 0){
+  if (a &gt; b)
+    z = a;
+}else
+  z = b;
+</literallayout> 
+          </section>
+          <section>
+            <title>Else-if</title>
+            <para>
+              Else if az else és if közé akárhányszor beépíthatő
+            </para>
+<literallayout>
+if (feltetel0)
+  utasitas0
+else if (feltetel1)
+  utasitas1
+else if (feltetel2)
+  utasitas2
+else
+  utasitas3
+</literallayout> 
+          </section>
+          <section>
+            <title>Switch</title>
+            <para>
+              A switch utasítással a többirányban ágaztathatjuk a programot.
+            </para>
+<literallayout>
+switch (kifejezes)
+{
+  case konstans-kifejezes: utasitasok
+  case konstans-kifejezes: utasitasok
+  default: utasitasok
+}
+</literallayout> 
+            <para>
+              A switch először kiértékeli a zárójelek közötti kifejezést 
+              utána pedig egyenként forráskódbeli sorrendben összehasonlítja a case-eknél
+              megadott konstans kifejezesek értékeivel.
+              Minden case-t egész állandó kifejezéssel kell ellátni.
+              Ha egy case azonos a kifejezés értékével, akkor a casehez rendelt tevékenységek elfognak végződni. 
+              A default címkéjű case-re akkor kerül a vezérlés, ha a többi case egyike sem teljesül. 
+              A default elhagyható : ha nem szerepel és a case-ek egyike sem teljesül, semmi nem történik. 
+              A case-ek és a default tetszôleges sorrendben követhetik egymást. 
+              A case utasítások címkéinek különbözniük kell egymástól.
+              A break utasítás hatására a vezérlés azonnal kilép a switch-bôl. 
+              Mivel a case-ek címkeként működnek, miután valamelyik case-hez tartozó programrész 
+              végrehajtása befejezôdött, a vezérlés a következô case-re kerül, 
+              hacsak explicit módon nem intézkedünk a kilépésrôl. 
+              A switch-bôl való kilépés legközönségesebb módja a break és a return. 
+              Az egymást követô case-ekbe való belépés nem egyértelműen elônyös. 
+              A case-ken történô lépkedés azért is veszélyes, mert a vezérlés széteshet, 
+              ha a programot módosítjuk.  Azokat  az eseteket kivéve, 
+              amikor ugyanahhoz a számításhoz  több címke tartozik, 
+              a case-ek közötti átmenetek használatával célszerű takarékoskodni.  
+            </para> 
+          </section>
+          <section>
+            <title>Loops(for, while)</title>
+            <para>
+              a <literal>while</literal> esetében kiértékeljük a fejben lévő feltételt.
+              Ha igaz, akkor belépünk a magba és végrehajtjuk az utasításokat, majd visszaugrunk fejbe és újrakezdjük a folyamatot.
+              Ha hamis, akkor elhagyjuk a ciklust:
+            </para>
+<literallayout>
+while (kifejezes)
+  statement
+</literallayout> 
+            <para>
+              A <literal>for</literal> ciklus egy speciális while, ahogy azt az alábbi példa is mutatja:
+            </para>
+<literallayout>
+for (expr0;expr1;expr2)
+  statement
+//ami ekvivalens
+expr0
+while (expr1){
+  statement
+  expr2;
+}
+</literallayout>
+          </section>
+          <section>
+            <title>Loops(Do-while)</title>
+            <para>
+              A do-while esetében a mag egyszer garantáltan végrehajtódik.
+              Alább látható alakú:
+            </para>
+<literallayout>
+do
+utasitas
+while (kifejezes)
+</literallayout> 
+            <para>
+              Azaz utasitas mindig legelább egyszer végre fog hajtódni.
+            </para>
+          </section>
+          <section>
+            <title>Break and continue</title>
+            <para>
+              A ciklusból való kilépést vezérlhetjük nem csak a ciklus elején vagy végén való feltételvizsgálattal, 
+              hanem a magban kiadott utasítással is.      
+              A break utasítással a vizsgálat elôtt is ki lehet ugrani a for, while és do ciklusokból, csakúgy, mint a switch-bôl.
+              A break utasítás hatására a vezérlés azonnal kilép a legbelsô zárt ciklusból.
+            </para>
+            <para>
+              A continue utasítás a break-hez kapcsolódik, 
+              de a break-nél ritkábban használjuk.
+              A continue esetén a ciklus (for, while, do) a következô iterációjának  megkezdését idézi elô.
+              A while és a do  esetében ez azt jelenti, hogy azonnal végrehajtódik a feltételvizsgálat, 
+              a for esetében pedig a vezérlés azonnal az újrainicializálási lépésre kerül. 
+              Switch-re ez nem alkalmazható.
+            </para>
+          </section>
+      </section>
+      <section>
+        <title>Függvények és programstruktúra</title>
+        <para>
+          A függvények segítségével a nagy feladatokat kisebbekre tudjuk bontani, 
+          illetve kisebb problémákra adott megoldásokat újból felhasználni.  
+          A jól  megírt függvények gyakran elrejtik az implementációs részleteket így felsőbb szinten a program
+          áttekinhetőbbé válik.
+        </para>
+          <section>
+            <title>Alapok</title>
+            <para>
+              A függvényeket más helyekről a következő módon hívjuk:
+            </para>
+<literallayout>
+fuggvenyneve(aktualis_parameterek_listaja)
+</literallayout>
+            <para>
+             Azaz a függvény neve után zárójelek között felsoroljuk azon paramétereket melyeket aktuálisnak tekintünk,
+             és tovább akarunk adni.
+             Amikor a program ide ér végrehajtásban érték szerint átadja az aktuális paramétereket,
+             ezek a hívottban a formális paraméterek konkrét értékeként lesznek használva.
+             Miután az irányítás átkerült a hívottnak addig amíg ki el nem éri utolsó sorát vagy egy <literal>return</literal>-t végrehajtódik.
+             Ha végrehajtódásának végére ér, az irányítás visszaadódik a hívónak, és ha volt visszatérési érték, azt
+             hívó látni fogja.
+             Nem szükséges hogy a <literal>return</literal> után kifejezés álljon, ez esetben a hívó nem kap vissza semmit. 
+             A vezérlés visszatér (visszatérési érték nélkül) azon esetben is, ha 
+             a blokk végét úgy érjük el, hogy nem futottunk bele <literal>return</literal>-be.
+             Mikor a visszatérési érték nem adódik meg a hívott által a hívó által látott visszatérési érték nem NULL vagy egyéb,
+             hanem nem definiált, azaz ne alapozzuk erre a program későbbi működését, logikáját.
+             Az ilyen hibákat <literal>lint</literal> helyességvizsgálóval analizálhatjuk.
+            </para>
+          </section>
+          <section>
+            <title>Nem int visszatérési értékű függvények</title>
+            <para>
+              A függvények implicit módon deklaráltak azáltal,  hogy megjelennek valamely utasításban vagy kifejezésben.
+              Ha valamely kifejezésben korábban még nem deklarált név fordul elô,
+              amelyet bal oldali kerek zárójel követ, akkor ezt a gép a szövegkörnyezet alapján függvénynévként deklarálja. 
+              Default ezen függvény visszatérési értékének int-et veszi.
+              Ha a fenti default működéstő eltérő értelmezést akarunk, akkor explicit deklarálnunk kell a függvényt.
+              Ilyen esetben deklarálnunk a függvény visszatérési rték típusát a függvény neve előtt:
+            </para>
+<literallayout>
+double foo(int a);
+</literallayout>
+          </section>
+          <section>
+            <title>Külső változók</title>
+            <para>
+                A C program külsô változókból és függvényekből áll.
+                Külsővel szemben belső az amit függvényen belül deklaráltunk vagy automatikusan deklarálódtak.
+                A külsô változókat függvényeken kívül definiáljuk, 
+                így sok függvény számára elérhetôk. 
+                Maguk a függvények mindig külsôk, hiszen függvényt függvényen belül nem szabad definiálni. 
+                Megállapodás szerint a külsô változók egyben globális változók is tehát minden, 
+                az ilyen változóra ugyanazzal a névvel történô hivatkozás 
+                (még a teljesen külön fordított függvényekbôl is) ugyanarra a programozási objektumra t
+                örténô hivatkozást  jelent.
+                Bármelyik  függvény hozzáférhet külsô változóhoz az illetô változó nevére történô hivatkozással, 
+                ha a nevet korábban deklarálták.
+            </para>
+          </section>
+          <section>
+            <title>Érvényességi Tartomány</title>
+            <para>
+              Nem szükséges egyszerre lefordítani a C programot alkotó összes függvényt és külsô változót: a program forrásszövege több állományban tárolható, és könyvtárakból már elôzôleg lefordított rutinok is betölthetôk.
+            </para>
+            <para>
+              Egy név érvényességi tartománya a programnak az a része, 
+              amelyre vonatkozóan a nevet definiáltuk. 
+              A függvény elején definiált automatikus változó érvényességi  
+              tartománya  az  a függvény, amelyben  a nevet deklaráltuk, 
+              és a más függvényekben ugyanilyen néven létezô változókat ez nem érinti. 
+              Ugyanez igaz a függvény argumentumaira.
+              A külsô változó érvényességi tartománya ott kezdôdik, 
+              ahol a forrásállományban a változót deklaráltuk és az illetô állomány végéig tart. 
+            </para>
+            <para>
+              Ha viszont egy külsô változóra még annak definiálása elôtt kell hivatkozni, vagy ha egy külsô változót más forrásállományban definiálunk, mint ahol használunk, akkor kötelezôen extern deklarációt kell alkalmazni.
+            </para>
+            <para>
+                A forrásprogramot alkotó állományok között csupán egyben kell a külsô változó definíciójának szerepelnie; a többi állományban extern deklarációval biztosítjuk a változó elérését. (A definíciót tartalmazó állományban is lehet extern deklaráció.) Külsô változót csak definiáláskor lehet inicializálni. A tömbméreteket a definícióban kell megadni, de opcionálisan extern deklarációban is szerepelhetnek.
+            </para>
+          </section>
+          <section>
+            <title>Statikus változók</title>
+            <para>
+              A már korábban megismert extern és automatikus változók mellett 
+              a statikus (static) változók jelentik a harmadik tárolási osztályt. 
+              A static változók akár belsôk, akár külsôk lehetnek.
+              Belső esetben ugyanúgy csak a függvényen belülről elérhetőek, de az automatikusokatól eltérően,
+              nem inicializálódik újra értékük hívásonként és az egész program élettartama alatt megmaradnak.
+              A belsô static változók a függvényen belül állandó tárban tárolódnak le. 
+              A függvényeken belül megjelenô karakterláncok, mint pl. a printf argumentumai, belsô static változók.
+            </para>
+            <para>
+              A külsô static változó azon forrásállományban ahol deklaráltuk látható lesz,
+              és a program egész élettartama alatt létezni fog.
+              Miel csak az adott forrásállományban használhatjuk azután hogy deklarálva lett, ezért ennek két következménye lesz:
+              Egy forrásállományban deklarációja után több függvénnyel is használhatjuk, módosíthatjuk ezt.
+              Más forrásállományból nem látjuk, nem használhatjuk, módosíthatjuk.
+            </para>
+            <para>
+              A statikus tárolást úgy jelöljük hogy static szót írjuk a típus elé.
+              A változó külsô, ha nem függvényen belül deklaráltuk, belső ha függvényen belül.
+            </para>
+<literallayout>
+static int a;
+foo(int b)
+{
+static int c;
+}
+</literallayout>
+          </section>
+          <section>
+            <title>Regiszter változók</title>
+            <para>
+              Amennyiben lehetséges, a register típusú változók a gép regisztereibe kerülnek, miáltal rövidebb és gyorsabb
+              programok jönnek létre. A register deklaráció alakja:
+            </para>
+<literallayout>
+register int c, n;
+f(register unsigned int a, register long b)
+</literallayout>
+            <para>
+              Gyakorlatban persze elég gép függő kényszerek között dolgozunk.
+              Hisz már ha csak a használható regiszterek száméra gondolunk, akkor is láthatjuk hogy ez elég
+              gép függő lehet.
+            </para>
+          </section>
+          <section>
+            <title>Blokk struktúra</title>
+            <para>
+              C-ben nem deklaráhatóak függvények függvények testében, 
+              viszont bizonyos részek elküönítésére alkalmasak a blokkok.
+              Az adott blokk kezdete után deklarált változók a blokk végéig érvényben maradnak.
+              Ha a blokkon kívül egy adott névvel már létezik változó de mi a blokkban deklaráaláunk ezen a néven újból egyet, akkor ezen blokkon belül,
+              ez az új felülfogja bírálni a régit, tehát ezen blokkban mindig a blokkra lokálisra fogunk hivatkozni.
+            </para>
+          </section>
+          <section>
+            <title>Inicializáció</title>
+            <para>
+              Az explcicit inicializálatlan külső és statikus változók értéke mindig garantáltan null lesz,
+              míg az auto és regiszter változók értéke ilyen setben definiálatlan.
+            </para>
+            <para>
+              Külsô és statikus változók esetében az inicializálás egyszer fordítási idôben történik meg.
+              Az auto és regiszter változók minden függvénybe vagy blokkba lépéskor inicializálódnak, 
+              ha oda ért a vezérlés.
+              Automatikus és regiszterváltozók esetében az inicializálás jobb oldalán állhat állandó, 
+              előzőleg definiált érték, függvény hívás stb.
+            </para>
+            <para>
+              Tömbök inicializálása során kapcsoszárjelek között az elemeket vesszővel elválasztva kell felsorolnunk.
+            </para>
+<literallayout>
+int arr [10] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, } ;
+</literallayout>
+            <para>
+              Karakter tömbök esetén literállal is megadhatjuk.
+            </para>
+<literallayout>
+char ar0 [] = "abc";
+char ar1 [] = {'a','b','c','\0'};
+</literallayout>
+          </section>
+          <section>
+            <title>Rekurzió</title>
+            <para>
+              C megengedi hogy a függvények önnömagukat hívják.
+              Ilyenkor az automatikus változól az új hívás esetén újra inicializálódnak.
+              Mivel a hívó és a hívott adatait el kell szeparálni, ezért ez plusz terhelés a veremnek.
+              Emiatt általában a rekurzivitás lassabb és nagyobb tárigányű kódhoz vezet.
+            </para>
+          </section>
+      </section>
+      <section>
+        <title>Bevitel és kivitel</title>
+        <para>
+          A bevitel és kivitel nem részei a C nyelvnek.
+          Azonban a C nyelv mellé használatos szabványos könyvtár orvosolja ezt a problémát.
+          Ez a könyvtár függvények olyan készletét tartalmazza, melyek a szabványos be- és kivitelről gondoskodnak.
+          A könyvtárbeli rutinok gépfüggetlenek azaz kompatibilis módon működnek minde olyan rendszeren melyen a C létezik.
+          A fenti könyvtárat <literal>stdio.h</literal> fájl includejával be kell emelnünk az előfordító segítségével használat előtt.
+        </para>
+          <section>
+            <title>Szabványos kimenet és bemenet</title>
+            <para>
+              A legegyszerűbb beviteli mód a getchar
+            </para>
+<literallayout>
+int getchar(void);
+</literallayout>
+            <para>
+              Minden híváskor a soronkövetkező karaktert vagy EOF konstanst ad vissza.
+              EOF jelentése end of file, azaz az input végére ért.
+              Ezt az <literal>stdio.h</literal> definiálja.
+            </para>
+            <para>
+              Sok rendszeren lehetőségünk van szabványos bemenetre billentyűzet helyett fájl állományt irányítani.
+            </para>
+<literallayout>
+foo &lt; file.txt
+</literallayout>
+            <para>
+              Emellett lehetőségünk van egyik program kimenetét átirányítani egy másik program bementére:
+            </para>
+<literallayout>
+foo | bar
+</literallayout>
+            <para>
+              A kimenetre legegyszerűbb lehetőségünk a putchar:
+            </para>
+<literallayout>
+int putchar(int);
+</literallayout>
+             <para>
+              Ez egyszerűen a megadott értéket megpróbálja a szabványos kimenetre írni.
+              Visszatérési értéke a kiírt érték, vagy hiba esetén EOF.
+            </para>
+          </section>
+          <section>
+            <title>Formátumozott kimenet- printf</title>
+            <para>
+              A formátumozott kimenetet megavlósító printf
+            </para>
+<literallayout>
+int printf(char* format, arg1, arg2);
+</literallayout>
+            <para>
+              A függvény láthatóan vár egy format string-et, és ez illetve a megadott változó számú argumentumok alapján elvégzi a kiírást az stdout-ra.
+            </para>
+            <para>
+              A format string két fajta objektumot tartalmazhat: közönséges karaktereket, 
+              amelyeket egyszerűen a kimeneti folyamra másol és konverzió-specifikációkat, 
+              amelyek mindegyike a printf soron következô argumentumának konvertálását és ki-nyomtatását írja elô.
+            </para>
+            <para>
+              A format stringben % után szerepelnie kell a következő felsorolásbeli szimbólumoknak, majd egy konverziós karakterrel kell ezt a karakter felsorolást zárni.
+              <itemizedlist>
+                <listitem>
+                    <para>minusz - balra igazítás</para>
+                </listitem>
+                <listitem>
+                    <para>szám - mely megadja a minimális hosszat megjelenített karakterszámban</para>
+                </listitem>
+                <listitem>
+                    <para>pont - ami szeparálja a precíziót</para>
+                </listitem>
+                <listitem>
+                    <para>szám - megadja a precízió pontosságát</para>
+                </listitem>
+                <listitem>
+                    <para>h, vagy l - h ha short, l ha longként kell a számot kezelni</para>
+                </listitem>
+              </itemizedlist>
+              A konverziós karakterek:
+              <itemizedlist>
+                <listitem>
+                    <para>d,i - int decimális</para>
+                </listitem>
+                <listitem>
+                    <para>o - int unsigned oktális</para>
+                </listitem>
+                <listitem>
+                    <para>x,X - int unsigned hexadecimális</para>
+                </listitem>
+                <listitem>
+                    <para>u - int unsigned decimális</para>
+                </listitem>
+                <listitem>
+                    <para>c - egy karkter</para>
+                </listitem>
+                <listitem>
+                    <para>s - char* mely null terminátorig a char array-t kiírja</para>
+                </listitem>
+                <listitem>
+                    <para>f - double lebegőpontos szám [-]m.dddddd alakban</para>
+                </listitem>
+                <listitem>
+                    <para>e,E - double lebegőpontos szám [-]m.dddddde[+/-]xx alakban</para>
+                </listitem>
+                <listitem>
+                    <para>g,G - ha a kitevő kisebb mint -4, vagy nagyobb mint a precízió akkor úgy viselkedik mint e, egyébként f</para>
+                </listitem>
+                <listitem>
+                    <para>p - pointer</para>
+                </listitem>
+                <listitem>
+                    <para>% - nincs konverzió, %-t nyomtat</para>
+                </listitem>
+              </itemizedlist>
+            </para>
+          </section>
+          <section>
+            <title>Formattált bemenet - Scanf</title>
+            <para>
+              A formátumozott bemenetet megavlósító scanf
+            </para>
+<literallayout>
+int scanf(char* format, arg1, arg2);
+</literallayout>
+            <para>
+              scanf akkor áll meg, ha a format string-ben megadott össze olvasási kérést elvégezte, 
+              vagy az egyik input format alapján történő beolvasása és értelmezése közben hiba lép fel.
+              A scanf számára meg kell adni hogy beolvasás esetén hova tárolja a értékeket.
+              Példa:
+            </para>
 <literallayout>
 int a,b,c;
-a = b = c = 5;
+double v;
+char arr[20];
+scanf("%lf",&amp;v);
+scanf("%s",arr);
+scanf("%d/%d/%d",&amp;a,&amp;b,&amp;c);
 </literallayout>
-        </section>
-        
-        
-        <section>
-          <title>Cast</title>
           <para>
-            Explicit tudunk castolni. Például osztást akarunk végezni két nem nulla term. számon. és lebegőpontosat akarunk visszakapni. Ekkor érdemes (lehet) az operandusokat explicit castolni float-ba.
-            Érdekesebb példa c library-kben gyakran a callbackek void ptr-t fogadnak be hogy a felhasználó testreszabhassa:
+            Fenti példán látszik hogy az érték szerinti átadás maitt
+            nem egyenesen a változókat adtuk át hanem azok címét.
+            Ettől csak a char array esetén tértünk el, hoszen az array, és eredendően a a karaktertömbnek foglalt hely kezdő memória címét adja.
+          </para>
+          <para>
+            Scanf átugorja a whitespace karaktereket.
+          </para>
+          </section>
+          <section>
+            <title>Változó hosszú argumentum listák</title>
+            <para>
+              Az edigiekben látott <literal>printf</literal> függvény esetében láthattuk, hogy nem volt megszabott az argumentumok száma.
+              Hogyan lehet jelölni, hogy n darab előre nem meghatározott argumentumot akarunk elfogadni?
+            </para>
+<literallayout>
+int myprintf(char*fmt, ...);
+</literallayout>
+          <para>
+            Ahhoz hogy végigtudjuk járni az argumentumokat használnunk kell az <literal>stdarg.h</literal>-t.
           </para>
 <literallayout>
-int MyCallback(void* userData)
+int myprintf(char*fmt, ...)
 {
-  int* le_a = (int*) userData;
-}
-
-int main()
-{
-  int a = 0;
-  do_library(MyCallback,&amp;a);
+  va_list ap;char *p, *sval;
+  int ival;
+  double dval;
+  
+  va_start(ap,fmt);
+  for(p=fmt; *p; p++){
+    if(*p!='%'){
+      putchar(*p);
+      continue;
+    }
+    switch(*++p){
+      case 'd':
+        ival = va_arg(ap,int);
+        printf("%d",ival);
+        break;
+      case 'f':
+        dval = va_arg(ap,double);
+        printf("%f",dval);
+        break;
+      case 's':
+        for(sval=va_arg(ap,char*);*sval;sval+){
+          putchar(*sval);
+        }
+        break;
+      default:
+        putchar(*p);
+        break;
+    }
+    va_end(ap);
+  }
 }
 </literallayout>
-        </section>
-        
-        
-        <section>
-          <title>Ternary</title>
+          </section>
+          <section>
+            <title>Fájl hozzáférés</title>
+            <para>
+              Az eddigiekben szabványos bemenettel, kimenettel foglalkoztunk.
+              Azonban olykor szükség lehet például egyéb állományok használatára.
+              Gyakran fájlok tartalmával kell foglalkoznunk.
+              Ezek fizikailag egy adott módon vannak leképezve, viszont a C szempontjából logikailag kezelésük egységes.
+              Azaz a logikai állomány egy absztrakció a perifária, fájlrendszer és OS által megvalósított fizikai szint felett.
+              Minden alapja a <literal>FILE</literal> ami az <literal>stdio.h</literal>-ban deklarált struktúra.
+            </para>
+            <para>
+              Az állományt bármilyen más művelet előtt meg kell nyitni. Ez az a pont amikor 
+              összerendelődik a fizikai és logikai állomány és emellett a hozzáférés módja is tisztázódik.
+              Másrészről ez jelzi az OS számára hogy a folyamat igényt tart az adott állományra.
+            </para>
+<literallayout>
+FILE* fp;
+fp = fopen(name,mode);
+</literallayout>
+            <para>
+              Az első arg az állomány neve (az OS kezeli egyébként, hiszen a valóságban nem név alapján azonosítja egyedileg a fájlokat.)
+              A mode egy karakterlánc ami specifikálja hogy milyen módon akarjuk megnyitni.
+              <literal>r</literal> olvasás, <literal>w</literal> írás, <literal>a</literal> hozzáfűzés.
+              <literal>b</literal> bináris, azaz nem történi karakter konverzió, hanem a nyers bájtokat kapjuk meg.
+              Ha egy nem létező fájlt nyitunk meg írási célból akkor az ilyenkor létrejön.
+              Ha létező fájlt nyitunk írásra, akkor az összes előzetes eddigi tartalmat felülírjuk.
+              Ha nem létező fájlt akarunk olvasni akkor az hiba.
+              Másik hiba lehetőség, ha nincs megfelelő jogosultságunk, de ezt az OS kezeli vagy DOS esetén nem kezeli.
+              Hiba esetén fopen garantáltan NULL értékkel tér vissza.
+            </para>
+            <para>
+              Bemenet kimenet legegyszerűbb tevékenységei a:
+            </para>
+<literallayout>
+int getc(FILE* fp);
+int putc(int c, FILE* fp);
+</literallayout>
+            <para>
+              Format vezérelt bemenet kimenet legegyszerűbb tevékenységei a:
+            </para>
+<literallayout>
+int fscanf(FILE* fp, char* fmt, ...);
+int fprintf(FILE* fp, char* fmt, ...);
+</literallayout>
+            <para>
+              Ha végeztünk a tevékenységekkel, akkor be kell zárni a fájlt.
+              Ez valóságban azt jelenti,hogy bontani kell a megfeleltetési kapcsolatot 
+              a logikai és a fizikai állomány között.
+              Másrészről ez jelzi az OS számára hogy a folyamat továbbá nem tart igényt az adott állományra.
+            </para>
+<literallayout>
+int fcloe(FILE* fp);
+</literallayout>
+          </section>
+          <section>
+            <title>Hibakezelés és Exit</title>
+            <para>
+              A stdout mellett létezik még egy szabványos kimenet.
+              Ez az stderr. Ez általában akkor is megjelenik a képernyőn ha stdout át lett irányítva.
+              (De külön ezt is lehet átirányítani.)
+              Példa:
+            </para>
+<literallayout>
+if(is_error){
+  fprintf(stderr,"%s: error\n", msg);
+  exit(2);
+}
+</literallayout>
           <para>
-            Ha Kondícionális expression igaz akkor :-tól balra, különben jobbra. a= (b&gt;c) ? b : c;
-          </para>  
-        </section>
-    </section> 
+            A másik dolog amit a fenti kód használ az az <literal>exit</literal>.
+            Ennek egyetlen argumentuma egy int.
+            A program ennek hatására elkezdi terminálni a futását.
+            Visszatérési értéke pedig az ezen függvény argumentumában adott int lesz.
+          </para>
+          </section>
+          <section>
+            <title>Soronkénti bemenet és kimenet</title>
+            <para>
+              Lehetőségünk van stdlib-el sorok beolvasására.
+            </para>
+<literallayout>
+char* fgets(char*line, int maxline, FILE* fp);
+</literallayout>
+           <para>
+              <literal>fgets</literal> beolvassa a következő karakterláncot fp által mutatott állományból.
+              Maximum maxline-1 karaktert olvas.
+              Az olvasás eredményéből egy karakter tömböt hoz létre mely null terminált.
+              Ha fájl végére ért, vagy egyéb hiba jelentkezett akkor NULL ptr-t ad vissza.
+            </para>
+            <para>
+               Lehetőségünk van stdlib-el sorok kiírására.
+            </para>
+<literallayout>
+int fputs(char*line, FILE* fp);
+</literallayout>
+            <para>
+              <literal>fputs</literal> kiírja egy sorban a kimentre a megadott karakterláncot az fp által mutatott állományból.
+              Alapvetően 0 visszatérési értéket ad vissza.
+              Hiba esetén EOF-t.
+            </para>
+          </section>
+      </section>
+    </section>
 
     <section>
         <title>Programozás</title>
@@ -1994,7 +3039,314 @@ void safe() const{b = 7;}
         </section>
         <section>
           <title>C++ IO alapjai</title>
-          <para></para>
+          <para>Ezen alfejezetben a C++ IO-val fogunk foglalkozni, kicsit a C-ből indulva.</para>
+          <section>
+            <title>Szabványos adatfolyamok</title>
+            <para>
+              C nyelvben három előre megnyitott szabványos állomány leíró áll rendelkezésre. stdin, stdout és stderr.
+              A C++ adatfolyamokban gondolkodik, ami felfogható byte-ok sorának.
+              Egy folyam lehet bemeneti (istream), kimeneti (ostream), vagy ezek kombinációja.
+              A könyv azt írja, hogy a kimenetnek alapértelmezetten a képernyő a kimenete.
+              Ez szerintem nem teljesen van így (mármint ha jól értem akkor arra gondolhatott a szerző,
+              hogy ha terminál ablakból nyitottuk, akkor annak az OS által kialakított OS dependens terminálnak valamilyen módon ír egy bufferére,
+              ami a végén azt eredményezi hogy megjelenik a szöveg a terminál ablakban. De nem direkt a képernyőn jelenik meg még ekkor sem...).
+            </para>
+            <para>
+              std namespace cout, cin és cerr megfeleltethető a C-s szabvány állományoknak céljuk és rendeltetésük szerint.
+              A left shift &lt;&lt; alkalmazható cout-on (ostream) a kiírásra, míg a &gt;&gt; right shift operátorral cin-ből végezhetünk beolvasást.
+              cin esetén fontos tudni, hogy whitespace jellegű karaktereket elhagyja.
+              Alább egy példa a folyam állapotáról:
+            </para>
+<literallayout>
+#include &lt;iostream&gt;
+int main()
+{
+  std::cout&lt;&lt;"Enter an int: "&lt;&lt;std::endl;
+  int i;
+  std::cin >> i;
+  std::cout&lt;&lt;"Enter a dbl: "&lt;&lt;std::endl;
+  double d;
+  std::cin >> d;
+  if(cin)
+    std::cout&lt;&lt;"The number was "&lt;&lt;i&lt;&lt;", "&lt;&lt;d&lt;&lt;std::endl;
+  else
+    std::cout&lt;&lt;"It was not a number"&lt;&lt;std::endl;
+}
+</literallayout>
+          <para>
+            A fent megadott kód a következő user input-ra <literal>12.3</literal> 
+            várakozásunk ellenére <literal>12, 0.3</literal>-at fog kiírni anélkül hogy bekérné a double-t,
+            vagy hibát dobna 12.3-nál.
+            C-ben <literal>fflush(stdin);</literal>-el értük el az eddigi adatok ejtését (azaz a flush-t).
+            C++-ban más módon ugyan de azt megtudjuk adni, hogy a sorvége karakterig hagyja figyelmen kívü a karaktereket.
+          </para>
+<literallayout>
+#include &lt;limits&gt;
+std::cin.ignore(std::numeric_limits&lt;std::streamsize&gt;::max(),'\n');
+</literallayout>
+          <para>
+            A <literal>numeric_limits</literal> első paramétere megadja hány karaktert ignoráljunk legfeljebb, míg a másik argumentummal
+            azt adjuk meg melyik karakterig.
+          </para>
+          <para>
+            flush-ra egyébként van lehetőség a bufferelt adatfolyamokon:
+          </para>
+<literallayout>
+std::cout&lt;&lt;std::flush;
+
+std::cout.flush();
+</literallayout>
+          <para>
+            A cerr nem bufferelt, ami segítség, ha pl. memória szűkében állunk és pont ezt akarjuk kiírni, hiszen
+            ha bufferelni kéne, nem lenne elég memóriánk, hisz pontosan amiatt kezdtük el a hiba írást.
+          </para>
+          <para>
+            A clog, hasonló rendeltetésű mint a cerr, azonban ez bufferelt.
+          </para>
+          <para>
+            Az adatfolyam állapotát egy iostate nevű tagváltozó reprezentálja.
+            Ez a következő értékeket veheti fel:
+            <itemizedlist>
+              <listitem>
+                  <para>eofbit: adatfolyam elérte végét</para>
+              </listitem>
+              <listitem>
+                  <para>failbit: pl. formátummal hiba</para>
+              </listitem>
+              <listitem>
+                  <para>badbit: fatáis hiba, pl. adatvesztés</para>
+              </listitem>
+              <listitem>
+                  <para>goodbit: egyik másik állapot sem áll fenn</para>
+              </listitem>
+            </itemizedlist>
+            Ezek együtt maszkokként használandóak, alább példa:
+          </para>
+<literallayout>
+std::cout.clear(std::ios::eofbit | std::ios::failbit);
+</literallayout>
+          <para>
+            A bit-ek lekérdezése tagfüggvényekkel történik, pl.:
+          </para>
+<literallayout>
+bool g = std::cout.good();
+</literallayout>
+  <para>
+    Ha az adatfolyam bármely hibabitje beállítódik, akkor az össze további írási és olvasási tevékenység
+    hatástalan marad.
+  </para>
+  <para>
+    Az adatfolyam igaz-hamis értékké történő kiértékelése hamisat ad, ha bármely hiba bit be van állítva.
+    Ennek logikusan tagadás is működik
+  </para>
+<literallayout>
+while(std::cin>>v)
+{siker(v);}
+
+if(!cin)
+{std::cout&lt;&lt;"Err"&lt;&lt;std::endl);}
+</literallayout>
+      <para>
+        Az istream osztálynak egyéb hasznos tagfüggvényei is vannak.
+      </para>
+      <para>
+        get() utolsó karakter vagy eof visszaadása.
+      </para>
+      <para>
+        getline() egy sor olvasása a sorvégig vagy más hatroló karkterig
+      </para>
+      <para>
+        fread() bináris adat olvasása.
+      </para>
+          </section>
+          <section>
+            <title>Manipulátorok és formázás</title>
+            <para>Az előre deiniált manipulátorokat az iomanip header-ben találjuk</para>
+            <para>
+              Például a <literal>noskipws</literal> segítségével beállíthatjuk hogy a sztenderd input
+              ne ignorálja a whitespace karaktereket.
+              <literal>skipws</literal>-el pedig visszatudjuk ezt állítani.
+            </para>
+<literallayout>
+std::cin>>std::noskipws;
+std::cin>>std::skipws;
+</literallayout>
+            <para>
+              A <literal>setprecision</literal>-el a megjelenített tizedestört kiírási pontosságát állíthatjuk be
+              például <literal>setprecision(4)</literal>.
+              A formázásra különböző jelző bitek szolgálnak.
+              Alább példa lebegőpontos szám tizedestört alakban történő kiírására:
+            </para>
+<literallayout>
+cout&lt;&lt;setiosflags(ios::fixed)&lt;&lt;3.14&lt;&lt;endl;
+cout&lt;&lt;resetiosflags(ios::fixed);
+</literallayout>
+
+          </section>
+          <section>
+            <title>Állománykezelés</title>
+            <para>
+              C-ben az állomány kezelés FILE* típusú leíróval kapcsolatos függvényekkel történik.
+              C++-ban ez is adatfolyamokkal történik. Ezek <literal>ifstream</literal> <literal>ofstream</literal> az ezekhez kapcsolódó
+              header <literal>fstream</literal> fájlban taláhatóak.
+              Az állományok megnyitását ezen objektumok konstruktorai, míg lezárást ezek destruktorai végzik.
+            </para>
+            <para>
+              Egyes OS-k eltérően ábrázolhatják és kezelhetik egyes speciális karakterek csoportját.
+              Legegyszerűbb a WIN-re jellemző carriage return + new line.
+              Emiatt olykor érdemes lehet binárisban nyitni a fájlt(begyük észre a flag-ek össze vagy-olását):
+            </para>
+<literallayout>
+ofstream ofs("sample.txt", ios::out | ios::binary)
+</literallayout>
+            <para>
+              Ha valami miatt nem ctor-ban akarjuk nyitni a fájlt, vagy nem dtor-ban zárni, akkor
+              <literal>open()</literal>, <literal>close()</literal> és <literal>is_open()</literal>
+              állnak rendelkezésünkre.
+            </para>
+            <para>
+              Bizonyos állományok esetén pozícionálásra is van szükség. 
+            </para>
+            <para>
+              <literal>tellg()</literal> visszaadja a jelenlegi pozíciót.
+            </para>
+            <para>
+              <literal>seekg(position)</literal> a megadott pozíciót állítja be.
+            </para>
+            <para>
+              <literal>seekg(offset,position)</literal> Relatíve a pozícióhoz képest állítja be az offset által megadott pozíciót.
+              position lehet:
+              <literal>ios::beg</literal> állomány kezdet,
+              <literal>ios::end</literal> állomány vég,
+              <literal>ios::cur</literal> jelen pozíció.
+            </para>
+            <para>
+              Az ezekkel beállított pozíciók validitását a hívónak (szóval a programozónak) a felelőssége garantálni.
+            </para>
+            <para>
+              Átirányításra alább egy példa
+            </para>
+<literallayout>
+// Állományt nyitjuk
+ofstream log_file("log.txt");
+// clog formázási beállításainak másolás
+log_file.copyfmt(clog);
+// clog eredeti bufferének eltárolása
+streambuf* clog_buf=clog.rdbuf();
+// clog buffere az állomány buffere lesz
+clog.rdbuf(log_file.rdbuf());
+// Ezen a ponton clog már át van irányítva
+clog&lt;&lt;"Redirect happend "&lt;&lt;endl;
+// Régi buffer vissza
+clog.rdbuf(clog_buf); 
+</literallayout>
+          </section>
+        </section>
+        <section>
+          <title>Operátorok és túlterhelésük</title>
+          <para>
+            Az operátorok argumentumaikon végzett műveletekkel
+            visszatérési értéket álíltanak elő.
+            Általában emiatt használjuk őket, de egyes operátorok
+            ezenkívül argumentumaikon végzett változtatásuk miatt (mellékhatás)
+            is hasznosak.
+          </para>
+          <para>
+            Operátorok kiértékelési sorrendjét a nyelv által lefeketetett minden
+            implementáció által betartandó precedencia táblázat rögzíti.
+          </para>
+          <section>
+            <title>Függvényszintaxis és túlterhelés</title>
+            <para>
+              C nyelv esetében a függvényeknek nem lehet mellékhatásuk a pass by value miatt.
+              Az egyetlen mód a kikényszerítésére ha ptr-t adunk át.
+              C++ esetében azonban referenciák használatával ez már nem így van.
+            </para>
+            <para>
+              Példának vegyünk egy postfix operátort
+            </para>
+<literallayout>
+int postfix_incr(int&amp; arg)
+{
+  int a = arg;
+  arg = arg +1;
+  return a;
+}
+
+int main()
+{
+  int i = 1;
+  int j;
+  j= i++;
+  j = postfix_incr(i);
+}
+</literallayout>
+            <para>
+              A fenti példa is mutatja, hogy az operátorok és a függvények között csak nagyon kis különbség van.
+              A különbség csak a kiértékelés szabályaiban van.
+              Sőt, szószerint függvény hívási szintaxissal is hívhatjuk!
+            </para>
+<literallayout>
+++i;
+operator++ (i);
+</literallayout>
+            <para>
+              Mintahogy a függvények, úgy az operátorok is túlterhelhetőek.
+              Alapvetően a global namespace-ben kell dolgozni:
+            </para>
+<literallayout>
+Foo operator(double d, Foo z);
+</literallayout>
+            <para>
+              Ha azonban az első paraméter olyan user defined type (class) amit mi írtunk, 
+              akkor azon adott osztály tagfüggvényeként fogalmazzuk meg!
+            </para>
+<literallayout>
+Foo Foo::operator(Foo a, Foo b);
+</literallayout>
+            <para>
+            </para>
+          </section>
+          <section>
+            <title>Speciális operátorok túlterhelése</title>
+            <para>
+              Az életciklus szempontjából nem triviális az assignment, értékadás operátor túlterhelése. 
+              Dinamikus adattagokat tartalmazó osztályban ezt érdemes végig gondolni.
+              A ctor-okat is behozva a témába a következő életciklust befolyásoló esetek vannak:
+              <itemizedlist>
+              <listitem>
+                  <para>deafult ctor</para>
+              </listitem>
+              <listitem>
+                  <para>other ctors</para>
+              </listitem>
+              <listitem>
+                  <para>copy ctor</para>
+              </listitem>
+              <listitem>
+                  <para>copy assignment</para>
+              </listitem>
+              <listitem>
+                  <para>move ctor</para>
+              </listitem>
+              <listitem>
+                  <para>move assignment</para>
+              </listitem>
+            </itemizedlist>
+              Ezeket érdemes mindig elkészíteni. Ha egy ctor-t definiáltunk, akkor a hozzátartozó assignment-et is definiálni kell szabály szerint.
+              Ha mondjuk valamit nagyon nem akarunk (pl.: non-copyable) akkor érdemes azokat direkt töröltetni, megakadályozva a compiler generálta shallow copy implementációt.
+            </para>
+            <para>
+              Deafult ctor-ról már volt szó. Hiánya esetén az inicializálást kezelnünk kell majd ha beépítjük más osztályba.
+            </para>
+            <para>
+              Más ctor-ok, ezeknél talán az egy paraméterűek speciálisak, ugyanis ezek konverzióknál használhatóak. (És a compiler is megpróbálja őket használni, ha csak nem tiltjuk meg)
+            </para>
+            <para>
+              Copy ctor és assignment esetén egy létező példány alapján egy teljesen újat akarunk kialakítani.
+              Mindezt úgy, hogy a másolandó állapotát nem változtathatjuk (azaz max mutable változókhoz nyúlhatunk hozzá)
+            </para>
+          </section>
         </section>
     </section>  
     <!-- TODO BMECPP -->  
