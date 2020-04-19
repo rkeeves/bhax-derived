@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<diagram program="umlet" version="14.3.0">
+  <zoom_level>10</zoom_level>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>140</x>
+      <y>50</y>
+      <w>210</w>
+      <h>70</h>
+    </coordinates>
+    <panel_attributes>QT::QMainWindow
+{Some Properties}
+--
+...</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>230</x>
+      <y>110</y>
+      <w>30</w>
+      <h>70</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;-</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;50.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>140</x>
+      <y>160</y>
+      <w>210</w>
+      <h>330</h>
+    </coordinates>
+    <panel_attributes>AntWin
+--
+-width : int
+-height : int
+-antThread : AntThread*
+-ants : Ants*
+-grids : int***
+-gridIdx : int
+-cellHeight : int
+-cellWidth : int
+-max : int
+-min : int
+--
++Antwin(width : int, height : int, delay : int, numAnts : int, pheromone : int, nbhPheromon : int, evaporation : int,   cellDef : int, min: int, max : int, cellAntMax : int,  parent : QWidget*)
++~AntWin()
++closeEvent(event : QCloseEvent*) : void
++keyPressEvent(event : QKeyEvent*) : void
++paintEvent(event : QPaintEvent*) : void
+--
+slots:
+step(const int &amp;) : void</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>620</x>
+      <y>160</y>
+      <w>210</w>
+      <h>500</h>
+    </coordinates>
+    <panel_attributes>AntThread
+--
+-running : bool
+-paused : bool
+-ants : Ants*
+-numAntsinCells : int** ;
+-min : int
+-max : int 
+-cellAntMax : int ;
+-pheromone : int;
+-evaporation : int;
+-nbrPheromone : int;
+-grids : int***;
+-width : int;
+-height : int;
+-gridIdx : int;
+-delay : int;
+--
++AntThread( ants : Ants*, grids : int***, width : int, height : int,delay : int,  numAnts : int,  pheromone : int,  nbrPheromone : int,  evaporation : int,  min : int,  max : int,  cellAntMax : int)
++~AntThread()
++run() : void
++finish() : void
++pause() : void
++isRunnung() : bool
+-timeDevel() : void
+-newDir(sor : int, oszlop : int, vsor : int, voszlop : int) : int
+-detDirs( irany : int, ifrom : int&amp;, ito : int&amp;, jfrom : int&amp;, jto : int&amp;) : void
+-moveAnts(grid : int**, row : int, col : int, retrow : int&amp;, retcol : int&amp;, dir : int) : int
+-sumNbhs(grid : int**, row : int, col : int, dir : int) : double
+-setPheromone(grid : int**, row : int , col : int) : void
+--
+slots:
+step(const int &amp;) : void
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>620</x>
+      <y>50</y>
+      <w>210</w>
+      <h>70</h>
+    </coordinates>
+    <panel_attributes>QT::QThread
+--
+...</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>710</x>
+      <y>110</y>
+      <w>30</w>
+      <h>70</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;-</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;50.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>450</x>
+      <y>270</y>
+      <w>90</w>
+      <h>80</h>
+    </coordinates>
+    <panel_attributes>Ant
+--
++x : int
++y : int
++dir : int</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>450</x>
+      <y>380</y>
+      <w>90</w>
+      <h>50</h>
+    </coordinates>
+    <panel_attributes>&lt;&lt;typedef&gt;&gt;
+Ants
+--
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>480</x>
+      <y>340</y>
+      <w>30</w>
+      <h>60</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;.</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;40.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>530</x>
+      <y>220</y>
+      <w>110</w>
+      <h>200</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+m2=ants</panel_attributes>
+    <additional_attributes>10.0;180.0;40.0;180.0;40.0;10.0;90.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>340</x>
+      <y>230</y>
+      <w>130</w>
+      <h>190</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+m2=ants</panel_attributes>
+    <additional_attributes>110.0;170.0;80.0;170.0;80.0;10.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>340</x>
+      <y>160</y>
+      <w>300</w>
+      <h>90</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+m2=antThread</panel_attributes>
+    <additional_attributes>280.0;10.0;190.0;10.0;190.0;60.0;10.0;60.0</additional_attributes>
+  </element>
+</diagram>

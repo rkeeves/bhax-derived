@@ -15,7 +15,7 @@
            Az nbatfais alap project fájlt pl módosítani kell. Project file-hoz például <literal>QMAKE_CXXFLAGS += -std=c++11</literal> lehet definiálni milyen flag-eket adunk hozzá.
            Mivel a project file alapján generálja a makefile-t, ezért érdemes nem kihagyni a flag-eket különben compilertől függő mértékben lesz sírás.
         </para>
-        <para>Miután meg van a makefile compile. Az applikációról alább két kép.</para>
+        <para>Miután meg van a makefile compile. Az applikációt tesztből arg nélkül indítottam először hogy fut-e, QT libekkel minden rendben van-e. Alább két kép.</para>
         <figure>
             <title>qt alap hangya 0</title>
             <mediaobject>
@@ -39,74 +39,152 @@
             </mediaobject>
         </figure>
         <para>
-            Megoldás videó: <link xlink:href="https://bhaxor.blog.hu/2018/10/10/myrmecologist">https://bhaxor.blog.hu/2018/10/10/myrmecologist</link>
+          A szimulációban hangyák mozgását számoljuk.
+          A hangyák irány választásánál az a cél hogy részben random legyen, azonban ha megérzik a feromont akkor próbálják követni.
+          Ha jól értem akkor Tanár Úr egy játékos példát akart adni egyensúly beállásra.
+          Mármint ha jól értem az a cél, hogy egy kvázi stabil egyensúly jöjjön létre és ugyanazt a mintát ismételgessék.
         </para>
         <para>
-            Megoldás forrása: <link xlink:href="https://gitlab.com/nbatfai/bhax/-/tree/master/attention_raising%2FMyrmecologist">https://gitlab.com/nbatfai/bhax/-/tree/master/attention_raising%2FMyrmecologist</link>               
+          Az első futtatás után megpróbálkozunk már argokkal elindítani.
+          <literal>myrmecologist -w 50 -m 50 -n 100 -t 200 -p 5 -f 80 -d 0 -a 10 -i 3 -s 3 -c 2</literal>
+          Azaz kicsit kisebbre raktam, durván megnöveltem a tick-enkénti időt, lecsökkentettem a hangyák, és az egyidejűleg egy mezőre férő hangyák számát.
+          Plusz emellett a max feromon mennyiséget is.
+        </para>
+        <figure>
+            <title>ants different args</title>
+            <mediaobject>
+                <imageobject>
+                    <imagedata fileref="img/antsdifferentargs.png" scale="50" />
+                </imageobject>
+                <textobject>
+                    <phrase>ants different args</phrase>
+                </textobject>
+            </mediaobject>
+        </figure>
+         <figure>
+            <title>ants different args2</title>
+            <mediaobject>
+                <imageobject>
+                    <imagedata fileref="img/antsdifferentargs2.png" scale="50" />
+                </imageobject>
+                <textobject>
+                    <phrase>ants different args</phrase>
+                </textobject>
+            </mediaobject>
+        </figure>
+        <para>
+          A hangya programhoz tartozó osztályok UML diagramja:
+        </para>
+        <figure>
+          <title>ants uml</title>
+          <mediaobject>
+              <imageobject>
+                  <imagedata fileref="img/antsuml.jpg" scale="100" />
+              </imageobject>
+              <textobject>
+                  <phrase>ants uml</phrase>
+              </textobject>
+          </mediaobject>
+      </figure>
+        <para>
+            Eredeti megoldás videó: <link xlink:href="https://bhaxor.blog.hu/2018/10/10/myrmecologist">https://bhaxor.blog.hu/2018/10/10/myrmecologist</link>
         </para>
         <para>
-            Tanulságok, tapasztalatok, magyarázat... ezt kell az olvasónak kidolgoznia, mint labor- vagy otthoni mérési feladatot!
-            Ha mi már megtettük, akkor használd azt, dolgozd fel, javítsd, adj hozzá értéket!
-        </para>            
-    </section>        
+            Eredeti megoldás forrása: <link xlink:href="https://gitlab.com/nbatfai/bhax/-/tree/master/attention_raising%2FMyrmecologist">https://gitlab.com/nbatfai/bhax/-/tree/master/attention_raising%2FMyrmecologist</link>               
+        </para>        
+    </section>               
     <section>
-        <title>Java életjáték</title>
+        <title>C++ életjáték</title>
         <para>
-            Írd meg Java-ban a John Horton Conway-féle életjátékot, 
-            valósítsa meg a sikló-kilövőt!
+          Qt helyett sdl2, why not.
+          Játékszabálya hogy egy élő sejtnek ha NEM 2 vagy 3 szomszédja van akkor meghal. 
+          Halott sejt ha 3 szomszédja van feltámad.
+          Feladat volt a glider gun megvalósítása.
+          Cél fps-t lehetne módosítani játék közben keyevent-re de nem bajlódtam vele mert kalkulus.
         </para>
+        <figure>
+            <title>glider gun</title>
+            <mediaobject>
+                <imageobject>
+                    <imagedata fileref="img/golgun.png" scale="100" />
+                </imageobject>
+                <textobject>
+                    <phrase>glider gun</phrase>
+                </textobject>
+            </mediaobject>
+        </figure>
         <para>
-            Megoldás forrása: <link xlink:href="https://regi.tankonyvtar.hu/hu/tartalom/tkt/javat-tanitok-javat/apb.html#conway">https://regi.tankonyvtar.hu/hu/tartalom/tkt/javat-tanitok-javat/apb.html#conway</link>               
+          Forráskód alább látható:
         </para>
+        <programlisting language="c++" linenumbering="numbered">
+          <textobject><textdata fileref="Conway/life/life.cpp"/></textobject>
+        </programlisting>  
         <para>
-            Tanulságok, tapasztalatok, magyarázat... ezt kell az olvasónak kidolgoznia, mint labor- vagy otthoni mérési feladatot!
-            Ha mi már megtettük, akkor használd azt, dolgozd fel, javítsd, adj hozzá értéket!
-        </para>            
-    </section>        
-    <section>
-        <title>Qt C++ életjáték</title>
-        <para>
-            Most Qt C++-ban!
+          A glider gun lényege, hogy glider alakzatokat generál. Alábbi pillanatfelvételeken működésközben.
         </para>
+        <figure>
+            <title>gol gun 0</title>
+            <mediaobject>
+                <imageobject>
+                    <imagedata fileref="img/gol0.png" scale="50" />
+                </imageobject>
+                <textobject>
+                    <phrase>gol gun 0</phrase>
+                </textobject>
+            </mediaobject>
+        </figure>
+        <figure>
+            <title>gol gun 1</title>
+            <mediaobject>
+                <imageobject>
+                    <imagedata fileref="img/gol1.png" scale="50" />
+                </imageobject>
+                <textobject>
+                    <phrase>gol gun 1</phrase>
+                </textobject>
+            </mediaobject>
+        </figure>
         <para>
             Megoldás forrása: <link xlink:href="https://bhaxor.blog.hu/2018/09/09/ismerkedes_az_eletjatekkal">https://bhaxor.blog.hu/2018/09/09/ismerkedes_az_eletjatekkal</link>               
         </para>
         <para>
             Megoldás videó: a hivatkozott blogba ágyazva. 
-        </para>
-        <para>
-            Tanulságok, tapasztalatok, magyarázat... ezt kell az olvasónak kidolgoznia, mint labor- vagy otthoni mérési feladatot!
-            Ha mi már megtettük, akkor használd azt, dolgozd fel, javítsd, adj hozzá értéket!
         </para>            
     </section>        
     <section>
         <title>BrainB Benchmark</title>
         <para>
+          Opencv csak MS VC compilerre volt, szóval lekellett buildelni a full library-t.
+          Sajnos mivel a gépemet krumpli sütésre tervezték ezért az opencv build 2 óra volt (pontosabban 2 óráig számoltam, utána elmentem AVL fát számítani papíron).
+          Ahhoz hogy win-en menjen a projekt, a konfigurációba kicsit bele kellett nyúlni.
+        </para>
+        <figure>
+            <title>BrainB működésközben</title>
+            <mediaobject>
+                <imageobject>
+                    <imagedata fileref="img/Test-6000-screenimage.png" scale="50" />
+                </imageobject>
+                <textobject>
+                    <phrase>BrainB működésközben</phrase>
+                </textobject>
+            </mediaobject>
+        </figure>
+        <figure>
+            <title>BrainB működésközben 2</title>
+            <mediaobject>
+                <imageobject>
+                    <imagedata fileref="img/Test-6001-screenimage.png" scale="50" />
+                </imageobject>
+                <textobject>
+                    <phrase>BrainB működésközben 2</phrase>
+                </textobject>
+            </mediaobject>
+        </figure>
+        <para>
+            Eredeti megoldás videó: initial hack: <link xlink:href="https://www.twitch.tv/videos/139186614">https://www.twitch.tv/videos/139186614</link>
         </para>
         <para>
-            Megoldás videó: initial hack: <link xlink:href="https://www.twitch.tv/videos/139186614">https://www.twitch.tv/videos/139186614</link>
-        </para>
-        <para>
-            Megoldás forrása: <link xlink:href="https://github.com/nbatfai/esport-talent-search">https://github.com/nbatfai/esport-talent-search</link>               
-        </para>
-        <para>
-            Tanulságok, tapasztalatok, magyarázat... ezt kell az olvasónak kidolgoznia, mint labor- vagy otthoni mérési feladatot!
-            Ha mi már megtettük, akkor használd azt, dolgozd fel, javítsd, adj hozzá értéket!
-        </para>            
-    </section>        
-    <section>
-        <title>Vörös Pipacs Pokol/19 RF</title>
-        <para>
-            Megoldás videó: <link xlink:href="https://youtu.be/VP0kfvRYD1Y">https://youtu.be/VP0kfvRYD1Y</link>      
-        </para>
-        <para>
-            Megoldás forrása: <link xlink:href="https://github.com/nbatfai/RedFlowerHell">https://github.com/nbatfai/RedFlowerHell</link>               
-        </para>
-        <para>
-            Tanulságok, tapasztalatok, magyarázat... ezt kell az olvasónak kidolgoznia, mint labor- vagy otthoni mérési feladatot!
-            Ha mi már megtettük, akkor használd azt, dolgozd fel, javítsd, adj hozzá értéket!
-        </para>            
-    </section>     
-       
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        
+            Eredeti megoldás forrása: <link xlink:href="https://github.com/nbatfai/esport-talent-search">https://github.com/nbatfai/esport-talent-search</link>               
+        </para>          
+    </section>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    
 </chapter>                
