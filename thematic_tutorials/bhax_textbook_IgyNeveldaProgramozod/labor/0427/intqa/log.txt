@@ -1,0 +1,17 @@
+ENTER Int ctor 9 42 0x3b6af0 0x22fe30
+EXIT Int ctor 0 42 0x3b6af0 0x22fe30
+ENTER Int copy assign 0 42 0x3b6af0 0x22fe30
+ENTER Int copy ctor 0 42 0x3b6b10 0x22fdd0
+EXIT Int copy ctor 1 42 0x3b6b10 0x22fdd0
+ENTER Int move ctor 42 3894960 0x7fefed02ab0 0x22fd80
+ENTER Int move assign 42 -1 0 0x22fd80
+EXIT Int move assign 42 42 0x3b6af0 0x22fd80
+EXIT Int move ctor 2 42 0x3b6af0 0x22fd80
+ENTER Int move assign 0 -1 0 0x22fe30
+EXIT Int move assign 0 42 0x3b6b10 0x22fe30
+ENTER Int move assign 1 -1 0 0x22fdd0
+EXIT Int move assign 1 42 0x3b6af0 0x22fdd0
+Int dtor 2  0 0x22fd80
+EXIT Int copy assign 0 42 0x3b6b10 0x22fe30
+Int dtor 1  0x3b6af0 0x22fdd0
+Int dtor 0  0x3b6b10 0x22fe30

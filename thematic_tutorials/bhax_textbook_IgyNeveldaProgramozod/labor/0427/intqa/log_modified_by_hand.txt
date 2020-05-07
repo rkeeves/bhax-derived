@@ -1,0 +1,35 @@
+// Int a{42}
+ENTER Int ctor 9 42 0x3b6af0 0x22fe30
+EXIT Int ctor 0 42 0x3b6af0 0x22fe30
+// a = a;
+  ENTER Int copy assign 0 42 0x3b6af0 0x22fe30
+  // Int tmp(old);
+    ENTER Int copy ctor 0 42 0x3b6b10 0x22fdd0
+    EXIT Int copy ctor 1 42 0x3b6b10 0x22fdd0
+  // std::swap(*this,tmp);
+  
+  // _Tp __tmp = GLIBCXX_MOVE(*this);
+  // *this = GLIBCXX_MOVE(tmp);
+  // tmp = GLIBCXX_MOVE(__tmp);
+  
+    // _Tp __tmp = GLIBCXX_MOVE(*this);
+    ENTER Int move ctor 42 3894960 0x7fefed02ab0 0x22fd80
+      ENTER Int move assign 42 -1 0 0x22fd80
+      EXIT Int move assign 42 42 0x3b6af0 0x22fd80
+    EXIT Int move ctor 2 42 0x3b6af0 0x22fd80
+    // *this = GLIBCXX_MOVE(tmp);
+    ENTER Int move assign 0 -1 0 0x22fe30
+    EXIT Int move assign 0 42 0x3b6b10 0x22fe30
+    // tmp = GLIBCXX_MOVE(__tmp);
+    ENTER Int move assign 1 -1 0 0x22fdd0
+    EXIT Int move assign 1 42 0x3b6af0 0x22fdd0
+    // End of scope of std::swap
+    // killed __tmp
+    Int dtor 2  0 0x22fd80
+  EXIT Int copy assign 0 42 0x3b6b10 0x22fe30
+  // End of scope of Int& operator=(const Int& old)
+  // killed tmp
+  Int dtor 1  0x3b6af0 0x22fdd0
+// End of scope of main
+// killed a
+Int dtor 0  0x3b6b10 0x22fe30

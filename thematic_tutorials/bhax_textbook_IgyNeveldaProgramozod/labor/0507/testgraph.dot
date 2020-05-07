@@ -1,0 +1,16 @@
+digraph G {
+0[label="genomes_bin/LR757998_1.out"];
+1[label="genomes_bin/MT019529_1.out"];
+2[label="genomes_bin/MT186683_1.out"];
+3[label="genomes_bin/MT412243_1.out"];
+0->1 ;
+0->2 ;
+0->3 ;
+1->0 ;
+1->3 ;
+2->0 ;
+2->3 ;
+3->0 ;
+3->1 ;
+3->2 ;
+}

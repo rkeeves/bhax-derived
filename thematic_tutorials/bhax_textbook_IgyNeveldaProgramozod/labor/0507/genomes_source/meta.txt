@@ -1,0 +1,5 @@
+https://www.ncbi.nlm.nih.gov/genbank/sars-cov-2-seqs/
+LR757998_1 2019-12-26 China: Hubei, Wuhan
+MT019529_1 2019-12-23 China: Hubei, Wuhan
+MT412243_1 2020-01-01 USA
+MT186683_1 2020-01-01 Hong Kong
