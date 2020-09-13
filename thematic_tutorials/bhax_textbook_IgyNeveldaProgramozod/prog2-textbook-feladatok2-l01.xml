@@ -1,0 +1,196 @@
+<chapter xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xi="http://www.w3.org/2001/XInclude" version="5.0" xml:lang="hu">
+    <info>
+        <title>Helló, Arroway!</title>
+        <keywordset>
+            <keyword/>
+        </keywordset>
+    </info>
+
+    <section>
+        <title>OO szemlélet</title>
+        <para>
+        	A módosított polártranszformációs normális generátor beprogramozása Java nyelven. Mutassunk rá, hogy a mi természetes saját megoldásunk (az algoritmus egyszerre két normálist állít elő, kell egy példánytag, amely a nem visszaadottat tárolja és egy logikai tag, hogy van-e tárolt vagy futtatni kell az algot.) és az OpenJDK, Oracle JDK-ban a Sun által adott OO szervezés ua.!Lásd még fóliák!Ismétlés: <link xlink:href="https://arato.inf.unideb.hu/batfai.norbert/UDPROG/deprecated/Prog1_5.pdf">(16-22 fólia)</link> Ugyanezt írjuk meg C++ nyelven is! (lásd még UDPROG repó: source/labor/polargen)
+        </para>
+        <para>
+        	A Java implementáció a következő:
+        </para>
+        <programlisting language="java" linenumbering="numbered">
+					<textobject><textdata fileref="l01/polargen/java/PolarGen.java"/></textobject>
+				</programlisting> 
+				<para>
+					Látható hogy egy fordítási egységen belül definiáltunk egy PolarGen osztályt és implementáltuk is.
+				</para>
+				<para>
+					Ezen pici fájl miatt nem érdemes elindítani az IDE-t.
+					Alább egy fordítás és futtatás OpenJDK 11.0-val, mivel az Oracle volt olyan kedves hogy ... na ebbe most ne menjünk bele-
+				</para>
+				<figure>
+              <title>Java Manual Build</title>
+              <mediaobject>
+                  <imageobject>
+                      <imagedata fileref="l01/polargen/java/build0.png" scale="50" />
+                  </imageobject>
+                  <textobject>
+                      <phrase>Java Manual Build</phrase>
+                  </textobject>
+              </mediaobject>
+        </figure>
+				<para>
+        	A Cpp esetén egy header-ben definiáltuk az osztályt.
+        </para>
+        <programlisting language="c++" linenumbering="numbered">
+					<textobject><textdata fileref="l01/polargen/cpp/polargen.h"/></textobject>
+				</programlisting> 
+				<para>
+        	Include guard-ra azért van szükségünk, mert több helyen is fogjuk használni a header-t és nem akarjuk hogy újradefiniálási hibába ütközzünk. Ezt a preprocessornak kiadott utasításokkal érjük el. Ez röviden annyit tesz, hogyha még nem létezik a POLARGEN_H def akkor bejutunk az ifdef-be és kiértékelésre kerül a header tartalma (plusz definiáljuk POLARGEN_H, azaz effektíve egy "beolvastuk-e már egyszer?" flag-ként működik). Ha a POLARGEN_H már definiálva volt, akkor kiesünk ifdefből és végeztünk.
+        </para>
+        <para>
+        	Eltértem Tanár Úr példájától, hisz nem láttam értelmét a header-be includeolni a rand-hoz szükséges dolgokat. Ezek elegendőek ha bekerülnek a cpp-be. Ehhez csak annyit kell módosítanunk hogy ctor implementációt a cpp-ben végezzük el.
+        </para>
+				<programlisting language="c++" linenumbering="numbered">
+					<textobject><textdata fileref="l01/polargen/cpp/polargen.cpp"/></textobject>
+				</programlisting> 
+				<para>
+        	Egyébként jó szokás saját namespace-ben dolgozni, emiatt vezettem be ezen fájlokba a prog2 namespace-t.
+        </para>
+        <para>
+        	Ha mindez meg volt akkor már csak a "main" van hátra.
+        </para>
+        <programlisting language="c++" linenumbering="numbered">
+					<textobject><textdata fileref="l01/polargen/cpp/polargenmain.cpp"/></textobject>
+				</programlisting> 
+				<para>
+         A fordítás során ugye nem fordíthatjuk először a main-t. Előtte szükségünk van arra az objektumra, mely a polargen fordításából jön. Alább látható ez a folyamat.
+        </para>
+        <figure>
+              <title>Manual Build</title>
+              <mediaobject>
+                  <imageobject>
+                      <imagedata fileref="l01/polargen/cpp/build0.png" scale="50" />
+                  </imageobject>
+                  <textobject>
+                      <phrase>Manual Build</phrase>
+                  </textobject>
+              </mediaobject>
+        </figure>
+        <para>
+        	Persze egy olyan projektnél ahol 50+ file-unk van, ott érdemes lehet ezt automatizálni. Erre szolgálnak a makefile-ok. Alább egy primitív egyszerűségű példa.
+        </para>
+         
+        <programlisting language="c" linenumbering="numbered">
+					<textobject><textdata fileref="l01/polargen/cpp/Makefile"/></textobject>
+				</programlisting> 
+				<para>
+					Alább egy példa a build-re make-el.
+				</para>
+				 <figure>
+              <title>Make Build</title>
+              <mediaobject>
+                  <imageobject>
+                      <imagedata fileref="l01/polargen/cpp/build1.png" scale="50" />
+                  </imageobject>
+                  <textobject>
+                      <phrase>Make Build</phrase>
+                  </textobject>
+              </mediaobject>
+        </figure>
+       <para>
+       	A make feletti szintet a CMake képviseli, ezt nagyon széles körben használják és pont olyan borzalmas is mint minden amit sok ember szeret. Másik megoldás a premake ami nagyon jó annak aki szereti az átlátható dolgokat, a Lua-t. Apró hátulütője, hogy jó esetben kinevetik miatta az embert rossz esetben pedig ki is közösítik.
+       </para>
+    </section>     
+
+    <section>
+        <title>Homokozó</title>
+        <para>
+        	Írjuk át az első védési programot (LZW binfa) C++ nyelvről Java nyelvre, ugyanúgy működjön!Mutassunk rá, hogy gyakorlatilag a pointereket és referenciákat kell kiirtani és minden máris működik
+        	(erre  utal  a  feladat  neve,  hogy  Java-ban  minden  referencia,  nincs  választás,  hogy  mondjuk  egy attribútum pointer, referencia vagy tagként tartalmazott legyen).Miután már áttettük Java nyelvre, tegyük be egy Java Servletbe és a böngészőből GET-es kéréssel (például a böngésző címsorából) kapja meg azt a mintát, amelynek kiszámolja az LZW binfáját!
+        </para>
+        <para>
+         Long story short, itt a Java verzió. Egyszerűen átemeltük c++-ból emiatt nagyon csúnya.
+         A Java és a C++ nagyon komolyan eltér egymástól ennek hatásai meg is látszódnak.
+        </para>
+        <para>
+         C++ esetben ha olyan típust használunk mely esetén nem értelmezett a less than, és az equality operátorok akkor fordítási hiba lesz.
+         Java esetében ezt például a Comparable interface öröklésével kényszeríthetjük ki, mint pl.
+        </para>
+        <para>
+         Igazi nagy különbség hogy míg C++ esetében a rule of five miatt copy, move ctor/assignment-re szükség volt, addig Java esetén elég egy deep copy.
+         </para>
+         <para>
+         Ami számomra problémát okozott, az az, hogy a T paraméternek Cloneable-nek kellene lennie. Eddig ok is, de nem hívhatjuk a java.lang.Object.clone-t, mert az alapvetően protected visibility-vel rendelkezik. So good luck using that out of the box :D (I'd personally consider accepting a functor which is responsible for the copying of any instance of T, but that might be wrong.)
+         </para>
+        <programlisting language="c" linenumbering="numbered">
+					<textobject><textdata fileref="l01/lzw/BaseTree.java"/></textobject>
+				</programlisting> 
+        <para>
+         Compile + execution példa alább.
+        </para>
+        <figure>
+              <title>Lzw Java</title>
+              <mediaobject>
+                  <imageobject>
+                      <imagedata fileref="l01/lzw/build0.png" scale="50" />
+                  </imageobject>
+                  <textobject>
+                      <phrase>Lzw Java</phrase>
+                  </textobject>
+              </mediaobject>
+        </figure>
+    </section>
+       
+		<section>
+			<title>Gagyi</title>
+			<para>
+			Az  ismert  formális „while  (x  &lt;&#x3d;  t  &amp;&amp;  x  >=  t  &amp;&amp; t  !=  x);” tesztkérdéstípusra  adj  a  szokásosnál (miszerint  x,  t  az  egyik  esetben  az  objektum  által  hordozott  érték,  a  másikban  meg  az  objektum referenciája) „mélyebb” választ,  írj  Java  példaprogramot  mely  egyszer  végtelen  ciklus,  más  x,  t értékekkel meg nem! Apéldát építsd a JDK Integer.java forrására4, hogy a 128-nál inkluzív objektum példányokat poolozza!
+			</para>
+			<para>
+			Tanulságok, tapasztalatok, magyarázat...
+			</para>
+    </section>   
+    <section>
+			<title>Yoda</title>
+			<para>
+			Írjunk  olyan  Java  programot,  ami  java.lang.NullPointerEx-el  leáll,  ha  nem  követjük  a <link xlink:href="https://en.wikipedia.org/wiki/Yoda_conditions">Yoda conditions</link>-t! 
+			</para>
+			<para>
+			Tanulságok, tapasztalatok, magyarázat...
+			</para>
+    </section> 
+    <section>
+			<title>Kódolás from scratch</title>
+			<para>
+			Induljunk ki <link xlink:href="http://crd-legacy.lbl.gov/~dhbailey/dhbpapers/bbp-alg.pdf">ebből</link> a tudományos közleményből: és csak ezt tanulmányozva írjuk meg Java nyelven a BBP algoritmus megvalósítását! <link xlink:href="https://www.tankonyvtar.hu/hu/tartalom/tkt/javat-tanitok-javat/apbs02.html#pi_jegyei">Ha  megakadsz,  de  csak  végső  esetben</link>: (mert ha csak lemásolod, akkor pont az a fejlesztői élmény marad ki, melyet szeretném, ha átélnél).
+			</para>
+			<para>
+			Tanulságok, tapasztalatok, magyarázat...
+			</para>
+    </section> 
+    <section>
+			<title>EPAM: Java Object metódusok</title>
+			<para>
+			Mutasd be a Java Object metódusait és mutass rá mely metódusokat érdemes egy saját osztályunkban felüldefiniálni és miért. (Lásd még Object class forráskódja)
+			</para>
+			<para>
+			Tanulságok, tapasztalatok, magyarázat...
+			</para>
+    </section> 
+    <section>
+			<title>EPAM: Eljárásorientál vs Objektumorientált</title>
+			<para>
+			Írj egy 1 oldalas értekező esszé szöveget, amiben összehasonlítod az eljárásorientált és az objektumorientált paradigmát, igyekezve kiemelni az objektumorientált paradigma előnyeit!
+			</para>
+			<para>
+			Tanulságok, tapasztalatok, magyarázat...
+			</para>
+    </section> 
+    <section>
+    <title>EPAM: Objektum példányosítás programozási mintákkal</title>
+			<para>
+			Hozz példát mindegyik “creational design pattern”-re és mutasd be mikor érdemes használni őket!
+			</para>
+			<para>
+			Tanulságok, tapasztalatok, magyarázat...
+			</para>
+        </section>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           
+</chapter>                

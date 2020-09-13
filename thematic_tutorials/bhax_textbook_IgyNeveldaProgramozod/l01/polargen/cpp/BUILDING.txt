@@ -1,0 +1,16 @@
+# Ubuntu
+
+Just use make's rebuild target.
+
+```
+make rebuild
+```
+
+
+# Windows
+
+If you are on win... well, I  can feel your pain.
+Mingw lacks c++14 and upper support when I last checked.
+
+Cygwin is okay, but you have to use XWindow etc.
+VS Compiler on the other hand is extremely good, but you should use it with Visual Studio IDE. :)

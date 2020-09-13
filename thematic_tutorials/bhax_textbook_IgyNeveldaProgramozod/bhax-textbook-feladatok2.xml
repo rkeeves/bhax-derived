@@ -15,14 +15,20 @@
         
     </partintro>
     
-    <xi:include href="bhax-textbook-feladatok2-arroway.xml">
+    <xi:include href="prog2-textbook-feladatok2-l00.xml">
         <xi:fallback>
             <para>
-                <emphasis>XInclude: bhax-textbook-motto.xml file not found</emphasis>
+                <emphasis>XInclude: prog2-textbook-feladatok2-l00.xml file not found</emphasis>
             </para>
         </xi:fallback>
     </xi:include>     
     
     
-            
+           <xi:include href="prog2-textbook-feladatok2-l01.xml">
+        <xi:fallback>
+            <para>
+                <emphasis>XInclude: prog2-textbook-feladatok2-l01.xml file not found</emphasis>
+            </para>
+        </xi:fallback>
+    </xi:include>   
 </part>  

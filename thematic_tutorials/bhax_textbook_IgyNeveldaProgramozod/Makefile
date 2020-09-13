@@ -1,25 +1,18 @@
+# ...
+RELAXNG_LOCAL = /home/rkeeves/dev/relaxng/docbookxi.rng
 
-RM = rm -f
-RELAXNG = C:/Users/UBMCGU/home/relaxng/docbookxi.rng
-PDF_TARGET = bhax-textbook_fdl.pdf
-VALIDATE_OUTFILE = validate_output.xml
-PY_ROOT = C:/Python27
-PY = $(PY_ROOT)/python.exe
-DBLATEX = $(PY_ROOT)/Scripts/dblatex
-
-all:	clean validate fdl
-
-build: $(PDF_TARGET)
+all:	clean validate build
 	
-$(PDF_TARGET): bhax-textbook-fdl.xml bhax-textbook.xsl
-	$(PY) $(DBLATEX) bhax-textbook-fdl.xml -p bhax-textbook.xsl
-	
+build: prog2-textbook.xml prog2-textbook.xsl
+	dblatex prog2-textbook.xml -p prog2-textbook.xsl
+
 .PHONY: validate
 validate:
-	xmllint --xinclude bhax-textbook-fdl.xml --output $(VALIDATE_OUTFILE)
-	xmllint --relaxng $(RELAXNG) $(VALIDATE_OUTFILE) --noout
-	$(RM) $(VALIDATE_OUTFILE)
+	xmllint --xinclude prog2-textbook.xml --output output.xml
+	xmllint --relaxng $(RELAXNG_LOCAL) output.xml --noout
+	rm -f output.xml	
 	
 .PHONY: clean
 clean:
-	$(RM) $(PDF_TARGET)
+	rm -f prog2-textbook.pdf output.xml
+

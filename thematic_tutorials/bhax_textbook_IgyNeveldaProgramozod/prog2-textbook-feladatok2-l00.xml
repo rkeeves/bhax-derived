@@ -1,41 +1,29 @@
 <chapter xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xi="http://www.w3.org/2001/XInclude" version="5.0" xml:lang="hu">
     <info>
-        <title>Helló, Arroway!</title>
+        <title>Helló, Berners-Lee!</title>
         <keywordset>
             <keyword/>
         </keywordset>
     </info>
 
     <section>
-        <title>A BPP algoritmus Java megvalósítása</title>
+        <title>C++ Java összehasonlítás</title>
         <para>
-        </para>
-        <para>
-            Megoldás videó:
-        </para>
-        <para>
-            Megoldás forrása:                
+        	Ebből a két könyvből pár oldalas esszé jellegű kidolgozást kérek, Java  és  C++ összehasonlítás mentén, pl. kb.: kifejezés fogalom ua., Javában minden objektum referencia, mindig dinamikus a kötés, minden függvény virtuális, klónozásstb.
         </para>
         <para>
             Tanulságok, tapasztalatok, magyarázat...
         </para>
-    </section>        
-
+    </section>     
+    
     <section>
-        <title>Java osztályok a Pi-ben</title>
+        <title>Python Java Mobil</title>
         <para>
-            Az előző feladat kódját fejleszd tovább: vizsgáld, hogy Vannak-e Java osztályok a Pi hexadecimális kifejtésében!
-        </para>
-        <para>
-            Megoldás videó:
-        </para>
-        <para>
-            Megoldás forrása:                
+        	Itt a kijelölt oldalakból (35-51) egy 1 oldalas élmény-olvasónaplóra gondoltam.
         </para>
         <para>
             Tanulságok, tapasztalatok, magyarázat...
         </para>
-    </section>        
-        
+    </section>     
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         
 </chapter>                
