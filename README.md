@@ -1,5 +1,10 @@
 # BHAX
 
+## GYAKORLAT VEZETONEK
+
+[LINK TO PDF](https://github.com/rkeeves/bhax-derived/blob/master/thematic_tutorials/bhax_textbook_IgyNeveldaProgramozod/bhax-textbook-fdl.pdf)
+
+
 ## History
 
 This repo is part of de-pti curriculum and was forked from [nbatfai](https://gitlab.com/nbatfai/bhax.git)
