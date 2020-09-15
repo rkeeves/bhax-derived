@@ -193,7 +193,7 @@ synchronized public double nextGaussian() {
             </para>
             <programlisting language="java" linenumbering="numbered">
                 <textobject>
-                    <textdata fileref="l01\lzw\prog2\example\Outer.java"/>
+                    <textdata fileref="l01/lzw/prog2/example/Outer.java"/>
                 </textobject>
             </programlisting>
             <para>
@@ -230,7 +230,7 @@ synchronized public double nextGaussian() {
 		return newNode;
 	}
 ...
-                <literallayout>
+                </literallayout>
                     <para>
             Sajnos nem szép, hogy a treep átállítása egy mélyen eldugott mellékhatása a method-nak, de ezt örökültük a kiindulási C++-ból. (ezen feladat kidolgozása végén van egy olyan megoldás
              mely a fát immutable-é teszi és a treep-t egy új builder class kezeli és az építés is a builder felelőssége.)
@@ -240,7 +240,7 @@ synchronized public double nextGaussian() {
                     </para>
                     <programlisting language="java" linenumbering="numbered">
                         <textobject>
-                            <textdata fileref="l01\lzw\prog2\lzw\BaseTree.java"/>
+                            <textdata fileref="l01/lzw/prog2/lzw/BaseTree.java"/>
                         </textobject>
                     </programlisting>
                     <para>
@@ -322,43 +322,43 @@ synchronized public double nextGaussian() {
                         Alább látható, hogy a Node-ot kiemeltem saját fájlba. 
                         Ez a változtatás egyébként abszolút nem szükséges, sőt olykor az inner class különösen hasznos.
                     </para>
-                    <programlisting language="c" linenumbering="numbered">
+                    <programlisting language="java" linenumbering="numbered">
                         <textobject>
-                            <textdata fileref="l01\lzw\prog2\lzw2\Node.java"/>
+                            <textdata fileref="l01/lzw/prog2/lzw2/Node.java"/>
                         </textobject>
                     </programlisting>
                     <para>
                         Alább látható, hogy a Tree nem felelős a felépülésért csak a bejárásért.
                     </para>
-                    <programlisting language="c" linenumbering="numbered">
+                    <programlisting language="java" linenumbering="numbered">
                         <textobject>
-                            <textdata fileref="l01\lzw\prog2\lzw2\Tree.java"/>
+                            <textdata fileref="l01/lzw/prog2/lzw2/Tree.java"/>
                         </textobject>
                     </programlisting>
                     <para>
                         Alább látható, hogy az építés át lett hárítva egy absztrakt class-ra.
                         Az ezt subclass-oló osztályok feladata a konkrét építés implementálása.
                     </para>
-                    <programlisting language="c" linenumbering="numbered">
+                    <programlisting language="java" linenumbering="numbered">
                         <textobject>
-                            <textdata fileref="l01\lzw\prog2\lzw2\TreeBuilder.java"/>
+                            <textdata fileref="l01/lzw/prog2/lzw2/TreeBuilder.java"/>
                         </textobject>
                     </programlisting>
                     <para>
                         Alább látható, hogy az építő határozza meg milyen fa is fog létrejönni.
                         Próbáltam a viszonylag hosszú, sok elágazást tartalmazó eredeti metódust kicsit rövidebbé és talán olvashatóbbá tenni.
                     </para>
-                    <programlisting language="c" linenumbering="numbered">
+                    <programlisting language="java" linenumbering="numbered">
                         <textobject>
-                            <textdata fileref="l01\lzw\prog2\lzw2\BinTreeBuilder.java"/>
+                            <textdata fileref="l01/lzw/prog2/lzw2/BinTreeBuilder.java"/>
                         </textobject>
                     </programlisting>
                     <para>
                         Végül pedig egy példa a használatra.
                     </para>
-                    <programlisting language="c" linenumbering="numbered">
+                    <programlisting language="java" linenumbering="numbered">
                         <textobject>
-                            <textdata fileref="l01\lzw\prog2\lzw2\Main.java"/>
+                            <textdata fileref="l01/lzw/prog2/lzw2/Main.java"/>
                         </textobject>
                     </programlisting>
                     <para>
@@ -384,8 +384,20 @@ synchronized public double nextGaussian() {
 			Az  ismert  formális „while  (x  &lt;&#x3d;  t  &amp;&amp;  x  >=  t  &amp;&amp; t !=  x);” tesztkérdéstípusra  adj  a  szokásosnál (miszerint  x,  t  az  egyik  esetben  az  objektum  által  hordozott  érték,  a  másikban  meg  az  objektum referenciája) „mélyebb” választ,  írj  Java  példaprogramot  mely  egyszer  végtelen  ciklus,  más  x,  t értékekkel meg nem! Apéldát építsd a JDK Integer.java forrására4, hogy a 128-nál inkluzív objektum példányokat poolozza!
                 </para>
                 <para>
-			Tanulságok, tapasztalatok, magyarázat...
+									A shallow comparison <literal>t !=  x</literal>simán referenciákat összehasonlítja, hogy ugyanoda mutatnak-e.
+									Ez amiatt problémás mert az OpenJDK implementáció [-128, 127] tartományon mielőtt átad egy instance-t a kliensnek becacheli és későbbi hívásoknál ezt adja vissza.
                 </para>
+                <para>
+                	A dolgot mi is kipróbálhatjuk. Létrehoztam egy primitív egyszerűségű pool-t nested class-ként. Itt simán annyit teszünk, hogy értéktől függetlenül eltárolunk minden instance-t mielőtt átadjuk a kliensnek.
+                </para>
+                <para>
+                	A programban több esetet is végigvizsgálunk. Az elsődleges dolog amit szem előtt kell tartani minden esetben, hogy melyik konkrét instance-ről is lehet szó. Ez a feladat abból a szempontból érdekes, hogy egy egyszerű példán keresztül mutatja be, hogy milyen szépen elválasztható az életciklus kezelés a kliens kódtól (Na jó, valójában itt pont problémát okoz, de ez egy mesterséges példa...).
+                </para>
+                <programlisting language="java" linenumbering="numbered">
+                    <textobject>
+                        <textdata fileref="l01/jdkint/src/jdkint/Main.java"/>
+                    </textobject>
+                </programlisting>
             </section>
             <section>
                 <title>Yoda</title>
@@ -412,9 +424,9 @@ synchronized public double nextGaussian() {
                     <para>
                         Egyébként a megoldásban van egy másik is ami Optional-t használ, utána pedig erre mappelünk (plusz egy default értéket adunk vissza null ref esetén).
                     </para>
-                    <programlisting language="c" linenumbering="numbered">
+                    <programlisting language="java" linenumbering="numbered">
                         <textobject>
-                            <textdata fileref="l01\yoda\src\prog2\yoda\Yoda.java"/>
+                            <textdata fileref="l01/yoda/src/prog2/yoda/Yoda.java"/>
                         </textobject>
                     </programlisting>
                 </section>
@@ -427,6 +439,11 @@ synchronized public double nextGaussian() {
                 <para>
 			Tanulságok, tapasztalatok, magyarázat...
                 </para>
+                 <programlisting language="java" linenumbering="numbered">
+                        <textobject>
+                            <textdata fileref="l01/bbp/src/bbp/BBP.java"/>
+                        </textobject>
+                    </programlisting>
             </section>
             <section>
                 <title>EPAM: Java Object metódusok</title>
@@ -434,8 +451,57 @@ synchronized public double nextGaussian() {
 			Mutasd be a Java Object metódusait és mutass rá mely metódusokat érdemes egy saját osztályunkban felüldefiniálni és miért. (Lásd még Object class forráskódja)
                 </para>
                 <para>
-			Tanulságok, tapasztalatok, magyarázat...
+			Az equals method felülírása ajánlatos.
+			Ezt mi is és sok JDK beli osztály is használhatja objektumunkon.
+			Ha nem írjuk felül akkor a default shallow equality fog futni (Az Object class method-ja amit mi felülírhatunk). Ez pedig azt jelenti, hogy ha csak nem ugyanarra a helyre mutató referenciáról van szó két instance-t mindig eltérőnek fog ítélni. Ez nagyon sok esetben nem előnyös.
                 </para>
+                <para>
+                Az equals method override-al nem igazán okozhatunk hibát (de de erről később), szóval mindig megéri.
+                </para>
+                <para>
+                	A hashCode is az Objektum-tól örökölt viselkedést. Ez a java.util-os és egyéb más collection jellegű osztályok használják (pl.: HashTable). Ez is viszonylag fontos. Ami az igazi trükk az egészben, hogy vagy mindkettőt implementáljuk vagy egyiket se (bár ezt a másodikat nem bátorítanám). Alább jó pár pédát hozok az override-ra.
+                </para>
+                <para>
+                	Az Object <literal>finalize</literal> method-ját nem érdemes implementálni, és deprecated is.
+                </para>
+                <para>
+                	A <literal>toString</literal> method-ot opcionálisan átírhatjuk. A célja az hogyha például PrintStream-re jut, akkor a PrintStream a példány ezen method-ját meghívja és a kapott String-et próbálja kiírni.
+                </para>
+                <para>
+                	A <literal>clone</literal> method-ot ha használni akarjuk akkor felül KELL írnunk. Másrészről ha láthatóvá akarjuk tenni öröklési hierarchián kívül akkor emelnünk kell a láthatóságát <literal>protected</literal>-ről <literal>public</literal>-ra.
+                </para>
+                <para>
+                	A <literal>hashCode</literal>, <literal>equals</literal>, <literal>toString</literal> egyébként generálható IDE-vel, vagy még jobb esetben Lombok-kal.
+                </para>
+                <para>
+                	Annak aki unja a feladatot alább egy Reflectionnel történő ctor használat és var arg továbbítás. Nem szeretek könyveket írni vagy magyar szövegeket, de egyébként is bot egyszerű: csak példányosít random beadott class-t boohoo. A komment arra utal hogy elég vadul semmi előzetes check nélkül beleindexelünk az array-be stb. Védelememre szóljon hogy a célom csak az API próbálgatása volt és valószínűleg rajtam kívül soha senki nem fogja látni se a kódot se ezen mondatot, and this is how you break down a 4th wall.
+                </para>
+                <programlisting language="java" linenumbering="numbered">
+										<textobject>
+												<textdata fileref="l01/object-overrides/src/prog2/objovrride/Main.java"/>
+										</textobject>
+								</programlisting>
+								<programlisting language="java" linenumbering="numbered">
+										<textobject>
+												<textdata fileref="l01/object-overrides/src/prog2/objovrride/NotOverridedObject.java"/>
+										</textobject>
+								</programlisting>
+								<programlisting language="java" linenumbering="numbered">
+										<textobject>
+												<textdata fileref="l01/object-overrides/src/prog2/objovrride/OverriddenObject.java"/>
+										</textobject>
+								</programlisting>
+								<programlisting language="java" linenumbering="numbered">
+										<textobject>
+												<textdata fileref="l01/object-overrides/src/prog2/objovrride/EqOverriddenObject.java"/>
+										</textobject>
+								</programlisting>
+								<programlisting language="java" linenumbering="numbered">
+										<textobject>
+												<textdata fileref="l01/object-overrides/src/prog2/objovrride/HashOverriddenObject.java"/>
+										</textobject>
+								</programlisting>
+								
             </section>
             <section>
                 <title>EPAM: Eljárásorientál vs Objektumorientált</title>
@@ -471,12 +537,11 @@ synchronized public double nextGaussian() {
     Negyedrészt, az alábbi látható ábrán (UMLetben csináltam olyan is) egy interface-el el is választhatjuk a konkrét implementációt a hívótól.
     Mármint arra célzok, hogy ilyen esetben a hívó csak a Behavior interface-től fog függni, és az implementációt pedig szabadon változtathatjuk.
                     </para>
-                </section>
                 <figure>
                     <title>Factory</title>
                     <mediaobject>
                         <imageobject>
-                            <imagedata fileref="l01/patterns/factory.jpg" scale="100" />
+                            <imagedata fileref="l01/patterns/factory.jpg" scale="50" />
                         </imageobject>
                         <textobject>
                             <phrase>Factory</phrase>
@@ -505,7 +570,7 @@ synchronized public double nextGaussian() {
                     <title>Abstract Factory</title>
                     <mediaobject>
                         <imageobject>
-                            <imagedata fileref="l01/patterns/abstractfactory.jpg" scale="100" />
+                            <imagedata fileref="l01/patterns/abstractfactory.jpg" scale="50" />
                         </imageobject>
                         <textobject>
                             <phrase>Abstract Factory</phrase>
