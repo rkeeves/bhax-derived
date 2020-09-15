@@ -1,4 +1,6 @@
-<chapter xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xi="http://www.w3.org/2001/XInclude" version="5.0" xml:lang="hu">
+<chapter xmlns="http://docbook.org/ns/docbook"
+    xmlns:xlink="http://www.w3.org/1999/xlink"
+    xmlns:xi="http://www.w3.org/2001/XInclude" version="5.0" xml:lang="hu">
     <info>
         <title>Helló, Arroway!</title>
         <keywordset>
@@ -8,189 +10,521 @@
 
     <section>
         <title>OO szemlélet</title>
-        <para>
-        	A módosított polártranszformációs normális generátor beprogramozása Java nyelven. Mutassunk rá, hogy a mi természetes saját megoldásunk (az algoritmus egyszerre két normálist állít elő, kell egy példánytag, amely a nem visszaadottat tárolja és egy logikai tag, hogy van-e tárolt vagy futtatni kell az algot.) és az OpenJDK, Oracle JDK-ban a Sun által adott OO szervezés ua.!Lásd még fóliák!Ismétlés: <link xlink:href="https://arato.inf.unideb.hu/batfai.norbert/UDPROG/deprecated/Prog1_5.pdf">(16-22 fólia)</link> Ugyanezt írjuk meg C++ nyelven is! (lásd még UDPROG repó: source/labor/polargen)
-        </para>
-        <para>
-        	A Java implementáció a következő:
-        </para>
-        <programlisting language="java" linenumbering="numbered">
-					<textobject><textdata fileref="l01/polargen/java/PolarGen.java"/></textobject>
-				</programlisting> 
-				<para>
-					Látható hogy egy fordítási egységen belül definiáltunk egy PolarGen osztályt és implementáltuk is.
-				</para>
-				<para>
-					Ezen pici fájl miatt nem érdemes elindítani az IDE-t.
-					Alább egy fordítás és futtatás OpenJDK 11.0-val, mivel az Oracle volt olyan kedves hogy ... na ebbe most ne menjünk bele-
-				</para>
-				<figure>
-              <title>Java Manual Build</title>
-              <mediaobject>
-                  <imageobject>
-                      <imagedata fileref="l01/polargen/java/build0.png" scale="50" />
-                  </imageobject>
-                  <textobject>
-                      <phrase>Java Manual Build</phrase>
-                  </textobject>
-              </mediaobject>
-        </figure>
-				<para>
-        	A Cpp esetén egy header-ben definiáltuk az osztályt.
-        </para>
-        <programlisting language="c++" linenumbering="numbered">
-					<textobject><textdata fileref="l01/polargen/cpp/polargen.h"/></textobject>
-				</programlisting> 
-				<para>
+        <section>
+            <title>Feladat</title>
+            <para>A módosított polártranszformációs normális generátor beprogramozása Java nyelven. 
+            Mutassunk rá, hogy a mi természetes saját megoldásunk 
+            (az algoritmus egyszerre két normálist állít elő, kell egy példánytag, 
+            amely a nem visszaadottat tárolja és egy logikai tag, hogy van-e tárolt vagy futtatni kell az algot.) 
+            és az OpenJDK, Oracle JDK-ban a Sun által adott OO szervezés ua.!Lásd még fóliák!Ismétlés: 
+                <link xlink:href="https://arato.inf.unideb.hu/batfai.norbert/UDPROG/deprecated/Prog1_5.pdf">(16-22 fólia)</link> 
+            Ugyanezt írjuk meg C++ nyelven is! (lásd még UDPROG repó: source/labor/polargen)</para>
+        </section>
+        <section>
+            <title>Áttekintés</title>
+            <para>
+			A feladat a következő probléma miatt érdekes: Az algoritmus nem egy <literal>double</literal>-t hanem egy <literal>double</literal> rendezett párt ad eredményül.
+            Magyarán minden egyes számítással két új számot fogunk kapni. Ennek áthidalása a valódi feladat.
+            </para>
+            <para>
+            A következő a célunk: Minden számítás futtatáskor adjuk vissza a pár első elemét, míg második elemét tároljuk el.
+            Az osztályban létrehozunk egy <literal>public method</literal>-ot, melyet az end user hívhat és megkaphat egy <literal>double</literal>-t.
+            Az end user tudta nélkül azonban ezen <literal>method</literal> csak akkor fog valójában számítást futtatni ha nincs tárolt értékünk.
+            </para>
+            <para>
+            Implementációhoz két <literal>field</literal>-et fogunk használni: <literal>double stored</literal> (az érték tárolója) és <literal>boolean store_is_empty</literal> ami effektíve egy flag és azt a célt szolgálja, hogy jelezzük vele, hogy a tároló állapotát (üres vagy teli).
+            </para>
+        </section>
+        <section>
+            <title>Java implementáció</title>
+            <para>
+            Alább egy konkrét implementációt láthatunk. Figyeljük meg, hogy az egész cache-elésről nem tud a felhasználó. 
+            A felhasználónak nem engedjük, hogy a tárolási logikáért felelős field-ekre rálásson (<literal>private visibility</literal>).
+            Egy példány életének kezdetén a <literal>ctor</literal>-ban <literal>true</literal> azaz igaz-ra inicializáljuk a flag jellegű field-et 
+            (az értéket tároló tagot nem inicializájuk explicit, ugyanis nem fogjuk olvasni anélkül hogy legalább egyszer ne adjunk neki értéket).
+            Az implementációt alább láthatjuk:
+            </para>
+            <programlisting language="java" linenumbering="numbered">
+                <textobject>
+                    <textdata fileref="l01/polargen/java/PolarGen.java"/>
+                </textobject>
+            </programlisting>
+            <para>
+            Ezen pici fájl miatt nem érdemes elindítani az IDE-t.
+            Alább egy fordítás és futtatás OpenJDK 11.0-val, mivel az Oracle volt olyan kedves hogy ... na ebbe most ne menjünk bele-
+            </para>
+            <figure>
+                <title>Java Manual Build</title>
+                <mediaobject>
+                    <imageobject>
+                        <imagedata fileref="l01/polargen/java/build0.png" scale="50" />
+                    </imageobject>
+                    <textobject>
+                        <phrase>Java Manual Build</phrase>
+                    </textobject>
+                </mediaobject>
+            </figure>
+        </section>
+        <section>
+            <title>Összehasonlítás OpenJDK-val</title>
+            <para>
+                Az OpenJDK implementációban a sajátunkhoz hasonlóan két field használatával érték el a cache szerű viselkedést:
+            </para>
+            <literallayout language="java">
+private double nextNextGaussian;
+private boolean haveNextNextGaussian = false;
+            </literallayout>
+            <para>
+                Látható, hogy az OpenJDK implementációban is elágazás van és a cache-ből szolgáltatnak értéket ha lehetséges (kikerülve az újraszámítást).
+            </para>
+            <literallayout language="java">
+synchronized public double nextGaussian() {
+    // See Knuth, ACP, Section 3.4.1 Algorithm C.
+    if (haveNextNextGaussian) {
+        haveNextNextGaussian = false;
+        return nextNextGaussian;
+    } else {
+        ...
+    }
+            </literallayout>
+        </section>
+        <section>
+            <title>C++</title>
+            <para>
+        	A Cpp esetén egy header és cpp fájlban fogjuk definiálni majd implementálni az osztályt.
+            </para>
+            <programlisting language="c++" linenumbering="numbered">
+                <textobject>
+                    <textdata fileref="l01/polargen/cpp/polargen.h"/>
+                </textobject>
+            </programlisting>
+            <para>
         	Include guard-ra azért van szükségünk, mert több helyen is fogjuk használni a header-t és nem akarjuk hogy újradefiniálási hibába ütközzünk. Ezt a preprocessornak kiadott utasításokkal érjük el. Ez röviden annyit tesz, hogyha még nem létezik a POLARGEN_H def akkor bejutunk az ifdef-be és kiértékelésre kerül a header tartalma (plusz definiáljuk POLARGEN_H, azaz effektíve egy "beolvastuk-e már egyszer?" flag-ként működik). Ha a POLARGEN_H már definiálva volt, akkor kiesünk ifdefből és végeztünk.
-        </para>
-        <para>
+            </para>
+            <para>
         	Eltértem Tanár Úr példájától, hisz nem láttam értelmét a header-be includeolni a rand-hoz szükséges dolgokat. Ezek elegendőek ha bekerülnek a cpp-be. Ehhez csak annyit kell módosítanunk hogy ctor implementációt a cpp-ben végezzük el.
-        </para>
-				<programlisting language="c++" linenumbering="numbered">
-					<textobject><textdata fileref="l01/polargen/cpp/polargen.cpp"/></textobject>
-				</programlisting> 
-				<para>
+            </para>
+            <programlisting language="c++" linenumbering="numbered">
+                <textobject>
+                    <textdata fileref="l01/polargen/cpp/polargen.cpp"/>
+                </textobject>
+            </programlisting>
+            <para>
         	Egyébként jó szokás saját namespace-ben dolgozni, emiatt vezettem be ezen fájlokba a prog2 namespace-t.
-        </para>
-        <para>
+            </para>
+            <para>
         	Ha mindez meg volt akkor már csak a "main" van hátra.
-        </para>
-        <programlisting language="c++" linenumbering="numbered">
-					<textobject><textdata fileref="l01/polargen/cpp/polargenmain.cpp"/></textobject>
-				</programlisting> 
-				<para>
+            </para>
+            <programlisting language="c++" linenumbering="numbered">
+                <textobject>
+                    <textdata fileref="l01/polargen/cpp/polargenmain.cpp"/>
+                </textobject>
+            </programlisting>
+            <para>
          A fordítás során ugye nem fordíthatjuk először a main-t. Előtte szükségünk van arra az objektumra, mely a polargen fordításából jön. Alább látható ez a folyamat.
-        </para>
-        <figure>
-              <title>Manual Build</title>
-              <mediaobject>
-                  <imageobject>
-                      <imagedata fileref="l01/polargen/cpp/build0.png" scale="50" />
-                  </imageobject>
-                  <textobject>
-                      <phrase>Manual Build</phrase>
-                  </textobject>
-              </mediaobject>
-        </figure>
-        <para>
+            </para>
+            <figure>
+                <title>Manual Build</title>
+                <mediaobject>
+                    <imageobject>
+                        <imagedata fileref="l01/polargen/cpp/build0.png" scale="50" />
+                    </imageobject>
+                    <textobject>
+                        <phrase>Manual Build</phrase>
+                    </textobject>
+                </mediaobject>
+            </figure>
+            <para>
         	Persze egy olyan projektnél ahol 50+ file-unk van, ott érdemes lehet ezt automatizálni. Erre szolgálnak a makefile-ok. Alább egy primitív egyszerűségű példa.
-        </para>
-         
-        <programlisting language="c" linenumbering="numbered">
-					<textobject><textdata fileref="l01/polargen/cpp/Makefile"/></textobject>
-				</programlisting> 
-				<para>
+            </para>
+
+            <programlisting language="c" linenumbering="numbered">
+                <textobject>
+                    <textdata fileref="l01/polargen/cpp/Makefile"/>
+                </textobject>
+            </programlisting>
+            <para>
 					Alább egy példa a build-re make-el.
-				</para>
-				 <figure>
-              <title>Make Build</title>
-              <mediaobject>
-                  <imageobject>
-                      <imagedata fileref="l01/polargen/cpp/build1.png" scale="50" />
-                  </imageobject>
-                  <textobject>
-                      <phrase>Make Build</phrase>
-                  </textobject>
-              </mediaobject>
-        </figure>
-       <para>
+            </para>
+            <figure>
+                <title>Make Build</title>
+                <mediaobject>
+                    <imageobject>
+                        <imagedata fileref="l01/polargen/cpp/build1.png" scale="50" />
+                    </imageobject>
+                    <textobject>
+                        <phrase>Make Build</phrase>
+                    </textobject>
+                </mediaobject>
+            </figure>
+            <para>
        	A make feletti szintet a CMake képviseli, ezt nagyon széles körben használják és pont olyan borzalmas is mint minden amit sok ember szeret. Másik megoldás a premake ami nagyon jó annak aki szereti az átlátható dolgokat, a Lua-t. Apró hátulütője, hogy jó esetben kinevetik miatta az embert rossz esetben pedig ki is közösítik.
-       </para>
-    </section>     
+            </para>
+        </section>
+    </section>
 
     <section>
         <title>Homokozó</title>
-        <para>
-        	Írjuk át az első védési programot (LZW binfa) C++ nyelvről Java nyelvre, ugyanúgy működjön!Mutassunk rá, hogy gyakorlatilag a pointereket és referenciákat kell kiirtani és minden máris működik
-        	(erre  utal  a  feladat  neve,  hogy  Java-ban  minden  referencia,  nincs  választás,  hogy  mondjuk  egy attribútum pointer, referencia vagy tagként tartalmazott legyen).Miután már áttettük Java nyelvre, tegyük be egy Java Servletbe és a böngészőből GET-es kéréssel (például a böngésző címsorából) kapja meg azt a mintát, amelynek kiszámolja az LZW binfáját!
-        </para>
-        <para>
-         Long story short, itt a Java verzió. Egyszerűen átemeltük c++-ból emiatt nagyon csúnya.
-         A Java és a C++ nagyon komolyan eltér egymástól ennek hatásai meg is látszódnak.
-        </para>
-        <para>
-         C++ esetben ha olyan típust használunk mely esetén nem értelmezett a less than, és az equality operátorok akkor fordítási hiba lesz.
-         Java esetében ezt például a Comparable interface öröklésével kényszeríthetjük ki, mint pl.
-        </para>
-        <para>
-         Igazi nagy különbség hogy míg C++ esetében a rule of five miatt copy, move ctor/assignment-re szükség volt, addig Java esetén elég egy deep copy.
-         </para>
-         <para>
-         Ami számomra problémát okozott, az az, hogy a T paraméternek Cloneable-nek kellene lennie. Eddig ok is, de nem hívhatjuk a java.lang.Object.clone-t, mert az alapvetően protected visibility-vel rendelkezik. So good luck using that out of the box :D (I'd personally consider accepting a functor which is responsible for the copying of any instance of T, but that might be wrong.)
-         </para>
-        <programlisting language="c" linenumbering="numbered">
-					<textobject><textdata fileref="l01/lzw/BaseTree.java"/></textobject>
-				</programlisting> 
-        <para>
-         Compile + execution példa alább.
-        </para>
-        <figure>
-              <title>Lzw Java</title>
-              <mediaobject>
-                  <imageobject>
-                      <imagedata fileref="l01/lzw/build0.png" scale="50" />
-                  </imageobject>
-                  <textobject>
-                      <phrase>Lzw Java</phrase>
-                  </textobject>
-              </mediaobject>
-        </figure>
-    </section>
-       
-		<section>
-			<title>Gagyi</title>
-			<para>
-			Az  ismert  formális „while  (x  &lt;&#x3d;  t  &amp;&amp;  x  >=  t  &amp;&amp; t  !=  x);” tesztkérdéstípusra  adj  a  szokásosnál (miszerint  x,  t  az  egyik  esetben  az  objektum  által  hordozott  érték,  a  másikban  meg  az  objektum referenciája) „mélyebb” választ,  írj  Java  példaprogramot  mely  egyszer  végtelen  ciklus,  más  x,  t értékekkel meg nem! Apéldát építsd a JDK Integer.java forrására4, hogy a 128-nál inkluzív objektum példányokat poolozza!
-			</para>
-			<para>
-			Tanulságok, tapasztalatok, magyarázat...
-			</para>
-    </section>   
-    <section>
-			<title>Yoda</title>
-			<para>
-			Írjunk  olyan  Java  programot,  ami  java.lang.NullPointerEx-el  leáll,  ha  nem  követjük  a <link xlink:href="https://en.wikipedia.org/wiki/Yoda_conditions">Yoda conditions</link>-t! 
-			</para>
-			<para>
-			Tanulságok, tapasztalatok, magyarázat...
-			</para>
-    </section> 
-    <section>
-			<title>Kódolás from scratch</title>
-			<para>
-			Induljunk ki <link xlink:href="http://crd-legacy.lbl.gov/~dhbailey/dhbpapers/bbp-alg.pdf">ebből</link> a tudományos közleményből: és csak ezt tanulmányozva írjuk meg Java nyelven a BBP algoritmus megvalósítását! <link xlink:href="https://www.tankonyvtar.hu/hu/tartalom/tkt/javat-tanitok-javat/apbs02.html#pi_jegyei">Ha  megakadsz,  de  csak  végső  esetben</link>: (mert ha csak lemásolod, akkor pont az a fejlesztői élmény marad ki, melyet szeretném, ha átélnél).
-			</para>
-			<para>
-			Tanulságok, tapasztalatok, magyarázat...
-			</para>
-    </section> 
-    <section>
-			<title>EPAM: Java Object metódusok</title>
-			<para>
-			Mutasd be a Java Object metódusait és mutass rá mely metódusokat érdemes egy saját osztályunkban felüldefiniálni és miért. (Lásd még Object class forráskódja)
-			</para>
-			<para>
-			Tanulságok, tapasztalatok, magyarázat...
-			</para>
-    </section> 
-    <section>
-			<title>EPAM: Eljárásorientál vs Objektumorientált</title>
-			<para>
-			Írj egy 1 oldalas értekező esszé szöveget, amiben összehasonlítod az eljárásorientált és az objektumorientált paradigmát, igyekezve kiemelni az objektumorientált paradigma előnyeit!
-			</para>
-			<para>
-			Tanulságok, tapasztalatok, magyarázat...
-			</para>
-    </section> 
-    <section>
-    <title>EPAM: Objektum példányosítás programozási mintákkal</title>
-			<para>
-			Hozz példát mindegyik “creational design pattern”-re és mutasd be mikor érdemes használni őket!
-			</para>
-			<para>
-			Tanulságok, tapasztalatok, magyarázat...
-			</para>
+        <section>
+            <title>Feladat</title>
+            <para>
+                Írjuk át az első védési programot (LZW binfa) C++ nyelvről Java nyelvre, ugyanúgy működjön!Mutassunk rá, hogy gyakorlatilag a pointereket és referenciákat kell kiirtani és minden máris működik
+                (erre  utal  a  feladat  neve,  hogy  Java-ban  minden  referencia,  nincs  választás,  hogy  mondjuk  egy attribútum pointer, referencia vagy tagként tartalmazott legyen).Miután már áttettük Java nyelvre, tegyük be egy Java Servletbe és a böngészőből GET-es kéréssel (például a böngésző címsorából) kapja meg azt a mintát, amelynek kiszámolja az LZW binfáját!
+            </para>
         </section>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           
-</chapter>                
+        <section>
+            <title>Áttekintés</title>
+            <para>
+                Jelen feladat három probléma miatt érdekes. Először is át kell írnunk a C++ kódot Javára. 
+                Mivel semmilyen C++ specifikus dolgot nem használunk (pl. static variable declaration in function bodies) ezért viszonylag könnyen megoldható.
+                Ezekután a másolás problémájával fogok foglalkozni.
+                Végül egy overengineered módon próbálom szétrobbantani a kötöttségeket, illetve a fa felelősségi körét csökkenteni azáltal, hogy builder-ek bízzuk a fa felépítését.
+                Ezekután természetesen a fa immutable lesz.
+            </para>
+        </section>
+        <section>
+            <title>Java</title>
+            <para>
+                A raw pointer-ek helyett a Java-ban használatos objektum (strong) referenciákat fogjuk használni.
+                Természetesen ezen esetben is szükségesek a null check-ek, viszont nem kell a pointereknél megszokott <literal>arrow operator</literal>-t használni.
+                Másrészről a dtor is változik, hiszen a VM gondoskodik a garbage collection által a dinamikus memória menedzsmentről.
+                A Java-ban is van lehetőségünk osztályokon belül új osztályokat definiálni, illetve a outer class generic paramétereit használni az inner class-ban.
+                Tekintsük az alábbi egyszerű példát:
+            </para>
+            <programlisting language="java" linenumbering="numbered">
+                <textobject>
+                    <textdata fileref="l01\lzw\prog2\example\Outer.java"/>
+                </textobject>
+            </programlisting>
+            <para>
+                Láthatjuk hogy Outer generic class T paraméterét az InnerNonStatic class-ban használhatjuk.
+                Természetesen ez már static class esetén nem működne, hiszen a static innner class esetén a type erasure-nél nem lehet eldönteni, hogy milyen értékű a T.
+            </para>
+            <para>
+                Annak ellenére, hogy a GC levette a vállunkról a terhet egy probléma még továbbra is van.
+                Mi történjen másolásnál?
+            </para>
+            <para>
+                A probléma az, hogy alapvetően referenciákat használunk, azaz ha kinevezünk egy új változót és értékül a régit változót adjuk neki, akkor továbbra is ugyanazon instance-en fogunk operálni.
+                A másik probléma, hogy nem elegendő egy egyszerű shallow copy.
+                Itt arra a tényre célzok, hogy a fának két változója van: root és treep. Egyik sem primitív típus, azaz referenciák.
+                Ha csak átmásolnánk ezen referenciákat mondjuk ctor-ban, akkor ugyan egy új fa instance-t kapnánk, de a ugyanazon node instance-ekre mutatnának referenciái.
+            </para>
+            <para>
+                A megoldás itt is a deep copym melyet a C++ megoldás utánzása miatt hasonlóan magában a fában implementáltunk.
+            </para>
+            <literallayout language="java">
+...
+	protected Node cp(Node node, Node treep) {
+		Node newNode = null;
+
+		if (node != null) {
+			newNode = new Node(node.val);
+			newNode.left = cp(node.left, treep);
+			newNode.right = cp(node.right, treep);
+			newNode.count = node.count;
+			if (node == treep)
+				this.treep = newNode;
+		}
+
+		return newNode;
+	}
+...
+                <literallayout>
+                    <para>
+            Sajnos nem szép, hogy a treep átállítása egy mélyen eldugott mellékhatása a method-nak, de ezt örökültük a kiindulási C++-ból. (ezen feladat kidolgozása végén van egy olyan megoldás
+             mely a fát immutable-é teszi és a treep-t egy új builder class kezeli és az építés is a builder felelőssége.)
+                    </para>
+                    <para>
+            Alább látható a kód, de utána bemutatom a program kimenetén a deep copy-t.
+                    </para>
+                    <programlisting language="java" linenumbering="numbered">
+                        <textobject>
+                            <textdata fileref="l01\lzw\prog2\lzw\BaseTree.java"/>
+                        </textobject>
+                    </programlisting>
+                    <para>
+            A copy és move ctor hiánya miatt láthatjuk, hogy a main method végén létrehozunk egy új változót, mely egy már létező instance-re mutat.
+            Az új változón alkalmazunk egy olyan metódust mely módosítja az instance állapotát, és látható az utána történő kiíratásban
+                    </para>
+                    <para>
+                        Először is kezdjük a deep copy-val.
+                        Alább látható a program kimenet releváns része.
+                        Készítünk egy deep copy-t, majd az így létrehozott új példányt módosítjuk, utána pedig kiíratjuk az eredetit és a másolatot.
+                        Csak másolat változott (A sorok végén a zárójelben 0 szerepel az eredeti 1 helyett, ez egyébként egy counter nevű field értéke egy adott node-ban.). 
+                    </para>
+                    <literallayout language="c" linenumbering="numbered">
+[Mutate ZLWTree-copy]
+[ZLWTree-orig]
+4 ------------1 (1) 
+3 ---------1 (1) 
+2 ------1 (1) 
+3 ---------0 (1) 
+4 ------------0 (1) 
+5 ---------------0 (1) 
+1 ---/ (1) 
+3 ---------1 (1) 
+2 ------0 (1) 
+3 ---------0 (1) 
+[ZLWTree-copy]
+4 ------------1 (0) 
+3 ---------1 (0) 
+2 ------1 (0) 
+3 ---------0 (0) 
+4 ------------0 (0) 
+5 ---------------0 (0) 
+1 ---/ (0) 
+3 ---------1 (0) 
+2 ------0 (0) 
+3 ---------0 (0) 
+                    </literallayout>
+                    <para>
+                    A második alkalommal csak létrehozunk egy új változót, értékül adjuk az első változóban tárolt eredeti példány referenciáját.
+                    Módosítjuk az összes node-ot majd kiíratjuk a fát mindkát változóban tárolt referenciáról.
+                    Látható alább, hogy mindkettő változott (a sorok végén a zárójelekben mostmár 0 van)
+                    </para>
+                    <literallayout language="c" linenumbering="numbered">
+[Mutate just_ref]
+[ZLWTree-just_ref]
+4 ------------1 (0) 
+3 ---------1 (0) 
+2 ------1 (0) 
+3 ---------0 (0) 
+4 ------------0 (0) 
+5 ---------------0 (0) 
+1 ---/ (0) 
+3 ---------1 (0) 
+2 ------0 (0) 
+3 ---------0 (0) 
+[ZLWTree-orig]
+4 ------------1 (0) 
+3 ---------1 (0) 
+2 ------1 (0) 
+3 ---------0 (0) 
+4 ------------0 (0) 
+5 ---------------0 (0) 
+1 ---/ (0) 
+3 ---------1 (0) 
+2 ------0 (0) 
+3 ---------0 (0) 
+                    </literallayout>
+                    <para>
+                    Tanulság, hogy mivel nincs kifejezett mozgató/másoló szemantika Java-ban ezért C++ átírásánál érdemes picit figyelemmel lenni.
+                    </para>
+                </section>
+                <section>
+                    <title>Overengineered</title>
+                    <para>
+                        Létrehoztam egy teljesen másik változatot, ami nem 1:1 átírás C++-ról, hanem próbáltam csökkenteni a fa felelősségeit, és egy builder class-ba delegálni az építési viselkedést és az ehhez szükséges állapotváltozót (Node&lt;T&gt; treep).
+                        Továbbá próbáltam kisebb részekre bontani a 10+ soros methodokat olvashatóság miatt, bár a megoldással továbbra sem vagyok megelégeve (ugyanis nincs konkrét előírás arra, hogy mit kell betartania a fának, azaz nem kaptunk egy letisztult tervet vagy interface-t az elvárt működésről).
+                    </para>
+                    <para>
+                        Alább látható, hogy a Node-ot kiemeltem saját fájlba. 
+                        Ez a változtatás egyébként abszolút nem szükséges, sőt olykor az inner class különösen hasznos.
+                    </para>
+                    <programlisting language="c" linenumbering="numbered">
+                        <textobject>
+                            <textdata fileref="l01\lzw\prog2\lzw2\Node.java"/>
+                        </textobject>
+                    </programlisting>
+                    <para>
+                        Alább látható, hogy a Tree nem felelős a felépülésért csak a bejárásért.
+                    </para>
+                    <programlisting language="c" linenumbering="numbered">
+                        <textobject>
+                            <textdata fileref="l01\lzw\prog2\lzw2\Tree.java"/>
+                        </textobject>
+                    </programlisting>
+                    <para>
+                        Alább látható, hogy az építés át lett hárítva egy absztrakt class-ra.
+                        Az ezt subclass-oló osztályok feladata a konkrét építés implementálása.
+                    </para>
+                    <programlisting language="c" linenumbering="numbered">
+                        <textobject>
+                            <textdata fileref="l01\lzw\prog2\lzw2\TreeBuilder.java"/>
+                        </textobject>
+                    </programlisting>
+                    <para>
+                        Alább látható, hogy az építő határozza meg milyen fa is fog létrejönni.
+                        Próbáltam a viszonylag hosszú, sok elágazást tartalmazó eredeti metódust kicsit rövidebbé és talán olvashatóbbá tenni.
+                    </para>
+                    <programlisting language="c" linenumbering="numbered">
+                        <textobject>
+                            <textdata fileref="l01\lzw\prog2\lzw2\BinTreeBuilder.java"/>
+                        </textobject>
+                    </programlisting>
+                    <para>
+                        Végül pedig egy példa a használatra.
+                    </para>
+                    <programlisting language="c" linenumbering="numbered">
+                        <textobject>
+                            <textdata fileref="l01\lzw\prog2\lzw2\Main.java"/>
+                        </textobject>
+                    </programlisting>
+                    <para>
+                        A fenti feladatokban a 01111001001001000111 sorozatot  <link xlink:href="https://progpater.blog.hu/2011/03/05/labormeres_otthon_avagy_hogyan_dolgozok_fel_egy_pedat">Bátafai Tanár Úrtól vettem át</link>.
+                    </para>
+                    <figure>
+                        <title>Lzw Java</title>
+                        <mediaobject>
+                            <imageobject>
+                                <imagedata fileref="l01/lzw/build0.png" scale="50" />
+                            </imageobject>
+                            <textobject>
+                                <phrase>Lzw Java</phrase>
+                            </textobject>
+                        </mediaobject>
+                    </figure>
+                </section>
+            </section>
+
+            <section>
+                <title>Gagyi</title>
+                <para>
+			Az  ismert  formális „while  (x  &lt;&#x3d;  t  &amp;&amp;  x  >=  t  &amp;&amp; t !=  x);” tesztkérdéstípusra  adj  a  szokásosnál (miszerint  x,  t  az  egyik  esetben  az  objektum  által  hordozott  érték,  a  másikban  meg  az  objektum referenciája) „mélyebb” választ,  írj  Java  példaprogramot  mely  egyszer  végtelen  ciklus,  más  x,  t értékekkel meg nem! Apéldát építsd a JDK Integer.java forrására4, hogy a 128-nál inkluzív objektum példányokat poolozza!
+                </para>
+                <para>
+			Tanulságok, tapasztalatok, magyarázat...
+                </para>
+            </section>
+            <section>
+                <title>Yoda</title>
+                <section>
+                    <title>Feladat</title>
+                    <para>
+			Írjunk  olyan  Java  programot,  ami  java.lang.NullPointerEx-el  leáll,  ha  nem  követjük  a <link xlink:href="https://en.wikipedia.org/wiki/Yoda_conditions">Yoda conditions</link>-t! 
+                    </para>
+                </section>
+                <section>
+                    <title>Java</title>
+                    <para>
+                        A feladat csak annyiról szól, hogy ha nem primitív típusokról van szó, akkor sohasem szabad elfelejteni, hogy bármi lehet null.
+                        Emiatt általában, ha arra vagyunk kénszerülve hogy valamilyen nem static methodot kell hívnunk akkor ott a lehetősége a NullPointerException-nek.
+                    </para>
+                    <para>
+                    Ezen problémának egy megoldása a Disney Cashgrab conditions.
+                    A lényege annyi, hogy például equals használata esetén, ha van lehetőség, akkor lehetőleg a nagyob bizonyossággal nem null objektum résézéről kell hívni a metódust (és a null-t majd ezen létező instance methodja majd lekezeli.)
+                    </para>
+                    <para>
+                        A null nem egy osztály és nem egy osztály példánya, hanem egy kulcsszó.
+                        Egyébként attól hogy maga az object ref null, még a statikus típust lehet használni, alább példa a static method hívhatóságára.
+                    </para>
+                    <para>
+                        Egyébként a megoldásban van egy másik is ami Optional-t használ, utána pedig erre mappelünk (plusz egy default értéket adunk vissza null ref esetén).
+                    </para>
+                    <programlisting language="c" linenumbering="numbered">
+                        <textobject>
+                            <textdata fileref="l01\yoda\src\prog2\yoda\Yoda.java"/>
+                        </textobject>
+                    </programlisting>
+                </section>
+            </section>
+            <section>
+                <title>Kódolás from scratch</title>
+                <para>
+			Induljunk ki <link xlink:href="http://crd-legacy.lbl.gov/~dhbailey/dhbpapers/bbp-alg.pdf">ebből</link> a tudományos közleményből: és csak ezt tanulmányozva írjuk meg Java nyelven a BBP algoritmus megvalósítását! <link xlink:href="https://www.tankonyvtar.hu/hu/tartalom/tkt/javat-tanitok-javat/apbs02.html#pi_jegyei">Ha  megakadsz,  de  csak  végső  esetben</link>: (mert ha csak lemásolod, akkor pont az a fejlesztői élmény marad ki, melyet szeretném, ha átélnél).
+                </para>
+                <para>
+			Tanulságok, tapasztalatok, magyarázat...
+                </para>
+            </section>
+            <section>
+                <title>EPAM: Java Object metódusok</title>
+                <para>
+			Mutasd be a Java Object metódusait és mutass rá mely metódusokat érdemes egy saját osztályunkban felüldefiniálni és miért. (Lásd még Object class forráskódja)
+                </para>
+                <para>
+			Tanulságok, tapasztalatok, magyarázat...
+                </para>
+            </section>
+            <section>
+                <title>EPAM: Eljárásorientál vs Objektumorientált</title>
+                <para>
+			Írj egy 1 oldalas értekező esszé szöveget, amiben összehasonlítod az eljárásorientált és az objektumorientált paradigmát, igyekezve kiemelni az objektumorientált paradigma előnyeit!
+                </para>
+                <para>
+			Tanulságok, tapasztalatok, magyarázat...
+                </para>
+            </section>
+            <section>
+                <title>EPAM: Objektum példányosítás programozási mintákkal</title>
+                <para>
+			Hozz példát mindegyik “creational design pattern”-re és mutasd be mikor érdemes használni őket!
+                </para>
+                <para>
+			Tanulságok, tapasztalatok, magyarázat...
+                </para>
+
+                <section>
+                    <title>Factory</title>
+                    <para>
+    Factory esetén a példányosítás felelősségét átruházza a hívó a Factory-ra.
+    Gyakorlatban már önmagában hasznos tud lenni, ha például sok argumentum van, nem akarunk több egymásra épülő ctor-t stb.
+                    </para>
+                    <para>
+    Másik alkalmazás ha a ctor hívás előtt valami tevékenységet kell végezni és ennek felelősségét leakarjuk venni a hívó válláról.
+                    </para>
+                    <para>
+    Harmadrészt olykor már csak amiatt is megéri, mert így egy helyen történik a példányosítás, egyszerűbb a debug.
+                    </para>
+                    <para>
+    Negyedrészt, az alábbi látható ábrán (UMLetben csináltam olyan is) egy interface-el el is választhatjuk a konkrét implementációt a hívótól.
+    Mármint arra célzok, hogy ilyen esetben a hívó csak a Behavior interface-től fog függni, és az implementációt pedig szabadon változtathatjuk.
+                    </para>
+                </section>
+                <figure>
+                    <title>Factory</title>
+                    <mediaobject>
+                        <imageobject>
+                            <imagedata fileref="l01/patterns/factory.jpg" scale="100" />
+                        </imageobject>
+                        <textobject>
+                            <phrase>Factory</phrase>
+                        </textobject>
+                    </mediaobject>
+                </figure>
+            </section>
+
+            <section>
+                <title>Abstract Factory</title>
+                <para>
+    AbstractFactory esetén eggyel tovább növeljük a szeparációt.
+    Mostmár a hívó nem egy konkrét factory implementációhoz van kötve.
+                </para>
+                <para>
+    Gyakran arra használjuk, hogy a hívó válláról annak felelősségét vegyük le, hogy neki kelljen összeválogatni különböző implementációkat.
+    Például OS függő esetekben lehet használni.
+                </para>
+                <para>
+                    A Factory-hoz képest az a legnagyobb eltérés (és az ok ami életre hívja), hogy az AbstractFactory valamilyen, a típus rendszerrel nehezen kifejezehető üzleti logika miatt összetartozó osztályok példányosítását kezeli.
+                </para>
+                <para>
+                    Apró negatívuma, hogy az absztrakció növelése miatt már nem egy helyen kezeljük a problémát, hanem több factory implementáció van.
+                </para>
+                <figure>
+                    <title>Abstract Factory</title>
+                    <mediaobject>
+                        <imageobject>
+                            <imagedata fileref="l01/patterns/abstractfactory.jpg" scale="100" />
+                        </imageobject>
+                        <textobject>
+                            <phrase>Abstract Factory</phrase>
+                        </textobject>
+                    </mediaobject>
+                </figure>
+            </section>
+            <section>
+                <title>Builder</title>
+                <para>Én akkor szoktam használni, mikor unmutable dolgot kell összerakni több lépésben.</para>
+                <para>Nagy negatívuma, hogy... nos személy szerint én a ctor injection-t preferálom mert mockolni is egyszerűbb.</para>
+            </section>
+            <section>
+                <title>Singleton</title>
+                <para>Anti-pattern. Ugyanolyan deathtrap mint a service locator, plusz win-en dll határon nem működik.</para>
+            </section>
+            <section>
+                <title>Prototype</title>
+                <para>...more to come...</para>
+            </section>
+        </section>
+    </chapter>                

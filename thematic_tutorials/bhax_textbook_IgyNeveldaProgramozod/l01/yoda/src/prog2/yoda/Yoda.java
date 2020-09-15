@@ -4,29 +4,33 @@ import java.util.Optional;
 
 public class Yoda {
 	
-	private final static String EXPECTED = "a";
+	private final static String YouMust = "a";
+	
+	public static void foo() {
+		System.out.println("bar");
+	}
 	
 	public static void main(String[] args) {
-		String user_name = null;
+		String something = null;
 		try {
-			System.out.println("unsafe_compare: " + unsafe_compare(user_name));
+			unsafe_compare(something);
 		} catch (Exception e) {
-			System.out.println("unsafe_compare FAILED!");
+			System.out.println(something.format("Go %s, go!", "Yoda"));
 		}
-		System.out.println("safe_compare: " + safe_compare(user_name));
-		System.out.println("safe_compare_opt: " + safe_compare_opt(Optional.ofNullable(user_name)));
+		System.out.println("safe_compare: " + safe_compare(something));
+		System.out.println("safe_compare_opt: " + safe_compare_opt(Optional.ofNullable(something)));
 	}
 
 	
-	private static boolean unsafe_compare(String userString) {
-		return (userString.equalsIgnoreCase(EXPECTED));
+	private static boolean unsafe_compare(String toThisString) {
+		return (toThisString.equals(YouMust));
 	}
 	
 	private static boolean safe_compare(String userString) {
-		return (EXPECTED.equalsIgnoreCase(userString));
+		return (YouMust.equalsIgnoreCase(userString));
 	}
 	
 	private static Boolean safe_compare_opt(Optional<String> userString) {
-		return (userString.map((s)->s.equalsIgnoreCase(EXPECTED))).orElse(false);
+		return (userString.map((s)->s.equalsIgnoreCase(YouMust))).orElse(false);
 	}
 }
