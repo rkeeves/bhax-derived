@@ -1,0 +1,68 @@
+Compiled from "HelloPrimitives.java"
+public class HelloPrimitives {
+  public HelloPrimitives();
+    Code:
+       0: aload_0
+       1: invokespecial #1                  // Method java/lang/Object."<init>":()V
+       4: return
+    LineNumberTable:
+      line 2: 0
+    LocalVariableTable:
+      Start  Length  Slot  Name   Signature
+          0       5     0  this   LHelloPrimitives;
+
+  public static void main(java.lang.String[]);
+    Code:
+       0: iconst_1
+       1: istore_1
+       2: bipush        97
+       4: istore_2
+       5: iconst_1
+       6: istore_3
+       7: iconst_2
+       8: istore        4
+      10: iconst_2
+      11: istore_3
+      12: iconst_1
+      13: istore        4
+      15: iconst_1
+      16: istore        5
+      18: ldc2_w        #2                  // long 2l
+      21: lstore        6
+      23: fconst_2
+      24: fstore        8
+      26: ldc2_w        #4                  // double 2.0d
+      29: dstore        9
+      31: iload_2
+      32: iload_2
+      33: iadd
+      34: i2c
+      35: istore        11
+      37: return
+    LineNumberTable:
+      line 5: 0
+      line 6: 2
+      line 7: 5
+      line 9: 7
+      line 10: 10
+      line 12: 12
+      line 13: 15
+      line 14: 18
+      line 15: 23
+      line 16: 26
+      line 17: 31
+      line 18: 37
+    LocalVariableTable:
+      Start  Length  Slot  Name   Signature
+         10       2     4 v_byte2   B
+          0      38     0  args   [Ljava/lang/String;
+          2      36     1 v_bool   Z
+          5      33     2 v_char   C
+          7      31     3 v_byte   B
+         15      23     4 v_short   S
+         18      20     5 v_int   I
+         23      15     6 v_long   J
+         26      12     8 v_float   F
+         31       7     9 v_double   D
+         37       1    11     c   C
+}

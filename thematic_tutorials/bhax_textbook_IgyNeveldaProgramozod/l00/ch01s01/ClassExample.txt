@@ -1,0 +1,126 @@
+Classfile /C:/Users/vikto/dev/bhax-derived/thematic_tutorials/bhax_textbook_IgyNeveldaProgramozod/l00/ch01s01/ClassExample.class
+  Last modified 2020.09.18.; size 701 bytes
+  MD5 checksum 805807363ef3926422395ad0e8c62479
+  Compiled from "ClassExample.java"
+public class ClassExample
+  minor version: 0
+  major version: 52
+  flags: ACC_PUBLIC, ACC_SUPER
+Constant pool:
+   #1 = Methodref          #10.#26        // java/lang/Object."<init>":()V
+   #2 = Fieldref           #27.#28        // java/lang/System.out:Ljava/io/PrintStream;
+   #3 = String             #29            // CTOR
+   #4 = Methodref          #30.#31        // java/io/PrintStream.println:(Ljava/lang/String;)V
+   #5 = Fieldref           #9.#32         // ClassExample.field:I
+   #6 = Fieldref           #9.#33         // ClassExample.static_var:I
+   #7 = Methodref          #30.#34        // java/io/PrintStream.println:(I)V
+   #8 = String             #35            // STATIC INIT
+   #9 = Class              #36            // ClassExample
+  #10 = Class              #37            // java/lang/Object
+  #11 = Utf8               static_var
+  #12 = Utf8               I
+  #13 = Utf8               field
+  #14 = Utf8               <init>
+  #15 = Utf8               (I)V
+  #16 = Utf8               Code
+  #17 = Utf8               LineNumberTable
+  #18 = Utf8               LocalVariableTable
+  #19 = Utf8               this
+  #20 = Utf8               LClassExample;
+  #21 = Utf8               method
+  #22 = Utf8               ()V
+  #23 = Utf8               <clinit>
+  #24 = Utf8               SourceFile
+  #25 = Utf8               ClassExample.java
+  #26 = NameAndType        #14:#22        // "<init>":()V
+  #27 = Class              #38            // java/lang/System
+  #28 = NameAndType        #39:#40        // out:Ljava/io/PrintStream;
+  #29 = Utf8               CTOR
+  #30 = Class              #41            // java/io/PrintStream
+  #31 = NameAndType        #42:#43        // println:(Ljava/lang/String;)V
+  #32 = NameAndType        #13:#12        // field:I
+  #33 = NameAndType        #11:#12        // static_var:I
+  #34 = NameAndType        #42:#15        // println:(I)V
+  #35 = Utf8               STATIC INIT
+  #36 = Utf8               ClassExample
+  #37 = Utf8               java/lang/Object
+  #38 = Utf8               java/lang/System
+  #39 = Utf8               out
+  #40 = Utf8               Ljava/io/PrintStream;
+  #41 = Utf8               java/io/PrintStream
+  #42 = Utf8               println
+  #43 = Utf8               (Ljava/lang/String;)V
+{
+  public static int static_var;
+    descriptor: I
+    flags: ACC_PUBLIC, ACC_STATIC
+
+  int field;
+    descriptor: I
+    flags:
+
+  public ClassExample(int);
+    descriptor: (I)V
+    flags: ACC_PUBLIC
+    Code:
+      stack=2, locals=2, args_size=2
+         0: aload_0
+         1: invokespecial #1                  // Method java/lang/Object."<init>":()V
+         4: getstatic     #2                  // Field java/lang/System.out:Ljava/io/PrintStream;
+         7: ldc           #3                  // String CTOR
+         9: invokevirtual #4                  // Method java/io/PrintStream.println:(Ljava/lang/String;)V
+        12: aload_0
+        13: iload_1
+        14: putfield      #5                  // Field field:I
+        17: getstatic     #6                  // Field static_var:I
+        20: iconst_1
+        21: iadd
+        22: putstatic     #6                  // Field static_var:I
+        25: return
+      LineNumberTable:
+        line 12: 0
+        line 13: 4
+        line 14: 12
+        line 15: 17
+        line 16: 25
+      LocalVariableTable:
+        Start  Length  Slot  Name   Signature
+            0      26     0  this   LClassExample;
+            0      26     1 field   I
+
+  public void method();
+    descriptor: ()V
+    flags: ACC_PUBLIC
+    Code:
+      stack=2, locals=1, args_size=1
+         0: getstatic     #2                  // Field java/lang/System.out:Ljava/io/PrintStream;
+         3: getstatic     #6                  // Field static_var:I
+         6: invokevirtual #7                  // Method java/io/PrintStream.println:(I)V
+         9: return
+      LineNumberTable:
+        line 21: 0
+        line 22: 9
+      LocalVariableTable:
+        Start  Length  Slot  Name   Signature
+            0      10     0  this   LClassExample;
+
+  static {};
+    descriptor: ()V
+    flags: ACC_STATIC
+    Code:
+      stack=2, locals=0, args_size=0
+         0: iconst_0
+         1: putstatic     #6                  // Field static_var:I
+         4: getstatic     #2                  // Field java/lang/System.out:Ljava/io/PrintStream;
+         7: ldc           #8                  // String STATIC INIT
+         9: invokevirtual #4                  // Method java/io/PrintStream.println:(Ljava/lang/String;)V
+        12: iconst_1
+        13: putstatic     #6                  // Field static_var:I
+        16: return
+      LineNumberTable:
+        line 4: 0
+        line 7: 4
+        line 8: 12
+        line 9: 16
+}
+SourceFile: "ClassExample.java"

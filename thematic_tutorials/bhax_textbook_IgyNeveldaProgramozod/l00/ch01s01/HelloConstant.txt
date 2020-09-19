@@ -1,0 +1,98 @@
+Classfile /C:/Users/vikto/dev/bhax-derived/thematic_tutorials/bhax_textbook_IgyNeveldaProgramozod/l00/ch01s01/HelloConstant.class
+  Last modified 2020.09.18.; size 660 bytes
+  MD5 checksum ebef8f1f04643aac41326e4abc171c89
+  Compiled from "HelloConstant.java"
+public class HelloConstant
+  minor version: 0
+  major version: 52
+  flags: ACC_PUBLIC, ACC_SUPER
+Constant pool:
+   #1 = Methodref          #7.#27         // java/lang/Object."<init>":()V
+   #2 = Fieldref           #28.#29        // java/lang/System.out:Ljava/io/PrintStream;
+   #3 = Class              #30            // HelloConstant
+   #4 = Integer            10000000
+   #5 = Methodref          #31.#32        // java/io/PrintStream.println:(I)V
+   #6 = Integer            10000001
+   #7 = Class              #33            // java/lang/Object
+   #8 = Utf8               REAL_DEAL
+   #9 = Utf8               I
+  #10 = Utf8               ConstantValue
+  #11 = Utf8               PRIVATE_RYAN
+  #12 = Utf8               optimize_me_away
+  #13 = Integer            0
+  #14 = Utf8               <init>
+  #15 = Utf8               ()V
+  #16 = Utf8               Code
+  #17 = Utf8               LineNumberTable
+  #18 = Utf8               LocalVariableTable
+  #19 = Utf8               this
+  #20 = Utf8               LHelloConstant;
+  #21 = Utf8               main
+  #22 = Utf8               ([Ljava/lang/String;)V
+  #23 = Utf8               args
+  #24 = Utf8               [Ljava/lang/String;
+  #25 = Utf8               SourceFile
+  #26 = Utf8               HelloConstant.java
+  #27 = NameAndType        #14:#15        // "<init>":()V
+  #28 = Class              #34            // java/lang/System
+  #29 = NameAndType        #35:#36        // out:Ljava/io/PrintStream;
+  #30 = Utf8               HelloConstant
+  #31 = Class              #37            // java/io/PrintStream
+  #32 = NameAndType        #38:#39        // println:(I)V
+  #33 = Utf8               java/lang/Object
+  #34 = Utf8               java/lang/System
+  #35 = Utf8               out
+  #36 = Utf8               Ljava/io/PrintStream;
+  #37 = Utf8               java/io/PrintStream
+  #38 = Utf8               println
+  #39 = Utf8               (I)V
+{
+  public static final int REAL_DEAL;
+    descriptor: I
+    flags: ACC_PUBLIC, ACC_STATIC, ACC_FINAL
+    ConstantValue: int 10000000
+
+  public static final int optimize_me_away;
+    descriptor: I
+    flags: ACC_PUBLIC, ACC_STATIC, ACC_FINAL
+    ConstantValue: int 0
+
+  public HelloConstant();
+    descriptor: ()V
+    flags: ACC_PUBLIC
+    Code:
+      stack=1, locals=1, args_size=1
+         0: aload_0
+         1: invokespecial #1                  // Method java/lang/Object."<init>":()V
+         4: return
+      LineNumberTable:
+        line 2: 0
+      LocalVariableTable:
+        Start  Length  Slot  Name   Signature
+            0       5     0  this   LHelloConstant;
+
+  public static void main(java.lang.String[]);
+    descriptor: ([Ljava/lang/String;)V
+    flags: ACC_PUBLIC, ACC_STATIC
+    Code:
+      stack=2, locals=1, args_size=1
+         0: getstatic     #2                  // Field java/lang/System.out:Ljava/io/PrintStream;
+         3: ldc           #4                  // int 10000000
+         5: invokevirtual #5                  // Method java/io/PrintStream.println:(I)V
+         8: getstatic     #2                  // Field java/lang/System.out:Ljava/io/PrintStream;
+        11: iconst_0
+        12: invokevirtual #5                  // Method java/io/PrintStream.println:(I)V
+        15: getstatic     #2                  // Field java/lang/System.out:Ljava/io/PrintStream;
+        18: ldc           #6                  // int 10000001
+        20: invokevirtual #5                  // Method java/io/PrintStream.println:(I)V
+        23: return
+      LineNumberTable:
+        line 11: 0
+        line 12: 8
+        line 13: 15
+        line 14: 23
+      LocalVariableTable:
+        Start  Length  Slot  Name   Signature
+            0      24     0  args   [Ljava/lang/String;
+}
+SourceFile: "HelloConstant.java"

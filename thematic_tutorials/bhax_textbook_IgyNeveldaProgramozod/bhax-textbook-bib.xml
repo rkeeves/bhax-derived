@@ -62,7 +62,23 @@
                 <publishername>Bp., Műszaki</publishername>
             </publisher>
             <pubdate>1993</pubdate>
-        </biblioentry>            
+        </biblioentry>      
+        <biblioentry>
+            <abbrev>JAVAGUIDE</abbrev>
+            <authorgroup>
+                <author>
+                    <personname>
+                        <firstname>Judit</firstname>
+                        <surname>Nyékyné Gaizler</surname>
+                    </personname>
+                </author>
+            </authorgroup>
+            <title>Java 2 útikalauz programozóknak</title>
+            <publisher>
+                <publishername>ELTE TTK Hallgatói Alapítvány</publishername>
+            </publisher>
+            <pubdate>2008</pubdate>
+        </biblioentry>       
     </bibliodiv>
     <bibliodiv>
         <title>C++</title>

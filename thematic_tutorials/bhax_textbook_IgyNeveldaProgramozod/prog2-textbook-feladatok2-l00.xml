@@ -1,4 +1,6 @@
-<chapter xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xi="http://www.w3.org/2001/XInclude" version="5.0" xml:lang="hu">
+<chapter xmlns="http://docbook.org/ns/docbook"
+    xmlns:xlink="http://www.w3.org/1999/xlink"
+    xmlns:xi="http://www.w3.org/2001/XInclude" version="5.0" xml:lang="hu">
     <info>
         <title>Helló, Berners-Lee!</title>
         <keywordset>
@@ -7,23 +9,1268 @@
     </info>
 
     <section>
-        <title>C++ Java összehasonlítás</title>
+        <title>Java összehasonlítás</title>
         <para>
-        	Ebből a két könyvből pár oldalas esszé jellegű kidolgozást kérek, Java  és  C++ összehasonlítás mentén, pl. kb.: kifejezés fogalom ua., Javában minden objektum referencia, mindig dinamikus a kötés, minden függvény virtuális, klónozásstb.
+        	A feladat a <citation>JAVAGUIDE</citation> feldolgozása.
+            A fejezeteket külön alszekciókban fogom tárgyalni.
         </para>
-        <para>
-            Tanulságok, tapasztalatok, magyarázat...
-        </para>
-    </section>     
-    
-    <section>
-        <title>Python Java Mobil</title>
-        <para>
-        	Itt a kijelölt oldalakból (35-51) egy 1 oldalas élmény-olvasónaplóra gondoltam.
-        </para>
-        <para>
-            Tanulságok, tapasztalatok, magyarázat...
-        </para>
-    </section>     
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        
-</chapter>                
+
+        <section>
+            <title>Első fejezet</title>
+            <para>
+      				Nagyjábóli áttekintés.
+            </para>
+      
+            <section>
+                <title>Első két alkalmazás</title>
+                <para>
+                A könyv állítása szerint a Java nyelv objektumok és ezek mintáinak összessége.
+                Ez inkább egy informális állítás, ugyanis így nem igaz, de szerintem jól átadja a nyelv eredeti vízióját.
+                Egy osztály field-ek és methodok-ok halmaza.
+                Álljunk meg egyből! Miért is kell ez? Nos igazság szerint junior programozó szempontból a lényeg: kód szervezés.
+                A C-ben ugye már találkozhattunk azzal a problémával, hogy sok funkció ugyan egy adott struct-on végzett műveleteket,
+                de ezek a funkciók bárhol lehettek definiálva attól függetlenül, hogy mennyire nagyon erősen is kötődtek ahhoz a struct-hoz. 
+                Vagy gondoljunk bele: Adatszerkezetek esetén mi volt az absztrakt megfogalmazása bármely szerkezetnek? 
+                Nos, semmi más, mint egy jól definiált lista a szerkezeten végezhető műveletekről.
+                A konrkét adatszerkezet pedig emellett egy implementációt is adott (mennyi adatot, hol és milyen módon tárol).
+                Tovább folytatnám az adatszerkezetek példát hogy megvilágítsak egy másik okot arra, hogy miért lehet jó ötlet valahogy összecsomagolni funkciókat és struct-okat (ezt sajnos nem tehetjük meg, mármint C-ben).
+                Tegyük fel red-black tree-t építünk. Attól függően hogy a fában vannak-e sentinel node-ok az összes funkció működése más KELL hogy legyen.
+                Emellett vannak más okok is, de szerintem ez volt a legmainstream-ebb oka az OOP-nek és ez volt az a feature amivel meglehetett győzni a vállalati döntéshozókat, 
+                hogy érdemes átképezni munkaerejüket erre a paradigmára.
+                Nem szeretnék most belemenni a tovább részleteibe, de természetesen OOP nem csak ennyi van pl.: lifecycle management, dynamic dispatch és a többi.
+                </para>
+                    <para>
+                De mi is az a Java? Elég a beszédből, írjunk egy új fájlt HelloJava.java néven!
+                    </para>
+                    <programlisting language="java" linenumbering="numbered">
+                        <textobject>
+                            <textdata fileref="l00/ch01s01/HelloJava.java"/>
+                        </textobject>
+                    </programlisting>
+                    <para>
+                Ha ez meg volt, gépeljük be terminálba a következő két parancsot ( a második egy szöveges kimenetet ad, szóval stdout-ját befolyathatjuk egy új fájlba is, egyébként csak kiköpi terminálra )!
+                    </para>
+                    <literallayout>
+javac -g HelloJava.java 
+javap -l -c HelloJava
+                    </literallayout>
+                    <para>
+                    Valami ilyesmit kell kapnunk:
+                    </para>
+                    <programlisting language="c" linenumbering="numbered">
+                        <textobject>
+                            <textdata fileref="l00/ch01s01/HelloJava.txt"/>
+                        </textobject>
+                    </programlisting>
+                    <para>
+                    Már a szövegből is láthatjuk hogy bármi is a VM, kell hogy legyen benne stack.
+                    Abszolút nem cpu instrukciókat látunk, egyszerű stack műveleteket.
+                    Mi ez az egész?
+                    </para>
+                    <para>
+                    Később fogunk róla beszélni, de a mi kis OO forrásfájljainkat a compiler egy egyszerű gép szintjére fordítja és ezt bytecode-nak nevezzük.
+                    Ezen bytecode-ok összessége jelentheti a programunkat, library-nket stb.
+                    (A VM nem csak egy stack. Ez egy teljes hazugság, a stack csak egy a sok fontos részlet közül. Maga a frame, native callok, constant pools, dynamic dispatch stb. 
+                    de úgy gondoltam inkább indítsunk egyszerűen és apránként adogassuk hozzá a dolgokat, hátha akkor nem égünk ki.
+                    Mármint lesz szó jó pár dologról ahol javap-vel decompile-olva a bytecode-ot nézünk stb.
+                    Most még elégedjünk meg azzal hogy egy method bodyban kiszámítjuk mennyi 1+1 és gondolkodunk azon hogy milyen zenekar lehet az a LIFO :) 
+                    Ha valakit mégis a top-down szemlélet érdekel itt egy hasznos link: <link xlink:href="https://blog.jamesdbloom.com/JVMInternals.html#memory_management">JVM Internals</link>).
+                    </para>
+                    <para>
+                    Láthatjuk (42.sor), hogy annak ellenére hogy semmi ctor-t nem írtunk, a compiler mégis begenerált egy default-ot. 
+                    Sőt, szemfülesebbek észrevehetik azt is, hogy miután aload_0-val(42.sor) a LocalVariableTable 0 indexén lévő elemét (this) benyomta stack-re. 
+                    Ezután invokespecial-el(43.sor) meghívja a super class ctor-át majd visszatér.
+                    </para>
+                    <para>
+                    Ami kicsit furcsa lehet az a dup (57. sor). Miért duplikálja a stack top-ot?
+                    Nos, utána egyértelműen hívja a ctor-t. Nézzük meg a ctor mivel végződik: return-el. 
+                    Azaz a ctor leveszi a stack-ről a példány referenciáját használgatja, majd befejeződik.
+                    Szóval ha nem dup-olnánk, akkor ugyan lefutna a ctor, de nem tudnánk megcsinálni az astore_1(59.sor) utasítást, hiszen üres lenne a stack, mert azt az 1 példány referenciát a ctor előbb lekapta a stackről (LIFO stack).
+                    </para>
+                    <para>
+                    Ha megnézzük akkor látható, hogy a LocalVariableTable-ben láthatjuk is a, b, c változóink adatait!
+                    Ebbe az egészbe csak amiatt mentem bele, hogy értsük, hogy az egész Java nyelv csak egy absztrakciós layer egy stackmachine felett.
+                    Jön a kérdés, hogy akkor bármi ami valid bytecode-ot generál elfut-e?
+                    Igen, teljesen random nyelveket is lehet csinálni. Sőt csinálnak is, IntelliJ-t készítő cég is azt hiszem főként talán Android célra.
+                    Mi ebben a könyvben csak és kizárólag a Java nyelvről fogunk tanulni.
+                    </para>
+                    <para>
+                    A könyv említi, hogy optimalizálás miatt futáskor a fizikális gépi kódra is fordíthatja, hogy gyorsabban fusson, de JIT compiler-ek esetén például lehetséges automata inline-ing.
+                    Ebből az egészből annyi a lényeg, hogy csak hobbiból szórakozzunk bytecode-al.
+                    </para>
+                    <para>
+                    A továbbiakban egyébként én Eclipse-et fogok használni, mert E betűvel kezdődik ami a buddhizmusban .
+                    Csináljunk egy új class-t!
+                    </para>
+                    <programlisting language="java" linenumbering="numbered">
+                        <textobject>
+                            <textdata fileref="l00/ch01s01/HelloWorld.java"/>
+                        </textobject>
+                    </programlisting>
+                    <para>
+                    A System Class Loader(A Bootstrap tölti a jdk-t, az Ext a külső libeket) betölti a class-t, inicializálja
+                    ezek után hívja a main method-ot. Azért tudja hívni, mert ez egy static method és külsőleg bárki által hívható azaz public.
+                    A main method-nak nem célja értelmes érték visszaadása ezért void kulcsszóval megadott a return type.
+                    Ez azért szükséges, mert Java-ban minden method-nak van return type-ja(EGY SPECIFIKUS return type-ja).
+                    Ahogy body-ba lépünk totojázás nélkül kiírjuk a terminálra a konstans string-et.
+                    Ez ugye a System class-al történik, mely egy wrapper class az os körül illetve sok method-ja convenience jellegű simán egy ugyanolyan nevű methodot hív a Runtime osztályból.
+                    A mi esetünkben fontosabb, hogy van egy public static PrintStream fieldje, és mi ennek az objektumnak hívjuk a println methodját.
+                    Ezek után visszatérünk a main body-ból, és mivel vége a programnak, a VM végrehajtja a shutdownhook-jainkat (Runtime osztály megfelelő methodját használjuk hook regisztrálásra), majd pedig elkezdi a cleanup-ot.
+                    </para>
+            </section>
+   
+            <section>
+                <title>Applet</title>
+                <para>
+                    Gépeljünk be egy egyszerű applet-et!
+                </para>
+                <programlisting language="java" linenumbering="numbered">
+                    <textobject>
+                        <textdata fileref="l00/ch01s01/HelloApplet.java"/>
+                    </textobject>
+                </programlisting>
+                <para>
+                    Egyszerűen kékkel ki fogunk tölteni egy téglalapot.
+                    Az applet-et meghivatkozva egy html fájlban az appletviewer segítségével egy előnézetet kaphatunk alkotásunkról.
+                </para>
+                <figure>
+                    <title>Applet build</title>
+                    <mediaobject>
+                        <imageobject>
+                            <imagedata fileref="l00/ch01s01/helloappletbuild.png" scale="100" />
+                        </imageobject>
+                        <textobject>
+                            <phrase>Applet build</phrase>
+                        </textobject>
+                    </mediaobject>
+                </figure>
+                <para>
+                    Mit gondolsz, ez a forradalmi technológia teljesen felforgatta vajon a piacot és megoldotta az gyermek éhezést?
+                    <link xlink:href="https://www.java.com/en/download/faq/chrome.xml">SPOILER</link>. 
+                    Ezzel az alfejezettel nem akarok foglalkozni, mert ilyen célra inkább használok vanilla js-t, vagy PIXI.js-t.
+                </para>
+            </section>
+            <section>
+                <title>Változók</title>
+                <para>
+                    Gépeljünk be egy egyszerű kódot!
+                </para>
+                <programlisting language="java" linenumbering="numbered">
+                    <textobject>
+                        <textdata fileref="l00/ch01s01/HelloPrimitives.java"/>
+                    </textobject>
+                </programlisting>
+                <para> Futtassuk a köv parancsokat! </para>
+                <literallayout>
+javac -g HelloPrimitives.java 
+javap -l -c HelloPrimitives
+                </literallayout>
+                <para>
+                    Nézzük meg a kimenetet!
+                </para>
+                <programlisting language="c" linenumbering="numbered">
+                    <textobject>
+                        <textdata fileref="l00/ch01s01/HelloPrimitives.txt"/>
+                    </textobject>
+                </programlisting>
+                <para>
+                    Azért fogunk lemenni bytecode szintre, hogy természetessé és logikussá tegyük, hogy mi is megy a háttérben.
+                </para>
+                <para>
+                    Mi a start és length? Ez a tárolt hossz? NEM.
+                    A start és length oszlopok az adott változó láthatóságát jelölik semmi közük a méretéhez.
+                    Add össze a start és length-et és mindegyik 38-ra jön ki, kivéve egyet a v_byte2-t mert ő csak egy block scope-ban él.
+                </para>
+                <para>
+                    A konkrét tárolási méret implementáció függő, viszont azt mi is láthatjuk, hogy a különböző változók mellett fel van tüntetve típusuk.
+                    A szemfülesebbek most kérdezhetik: Erm, ha a byte nem foglal annyi helyet mint az int akkor miért istore (aka store integer)-t használ?
+                    Nos, nem teljesen istore-t használt, hanem <link xlink:href="https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-6.html#jvms-6.5.istore_n">istore_1</link>-et.
+                    (Másik alak az istore 5, azaz istore &lt;index&gt;)
+                    A lényeg, hogy a stack teljes szavakkal operál.
+                    Annyira, hogy pl. két a stack tetején lévő double swap-eléséhez nincs beépített lehetőség míg két int swap-jére van.
+                </para>
+                <para>
+                    A fejezetben szó van arról, hogy kezdeti értékadás nélkül ne igazán használjunk változókat, ha csak nem ez kimondottan az explicit célunk.
+                    Adattagoknál előre definiált kiindulási értéket kapnak ha csak ezt nem írjuk felül saját kezdeti értékadásunkkal.
+                    Ennek oka érthető, ha arra gondolunk hogy method-ba belépéskor ugyan a LocalVariableTable-ben már benne van minden változó, de implementáció függő hogy milyen értéket tárolnak ezek a helyek a memóriában.
+                </para>
+            </section>
+            <section>
+                <title>Konstansok</title>
+                <para>
+                    Gépeljük a kövi programot:
+                </para>
+                <programlisting language="java" linenumbering="numbered">
+                    <textobject>
+                        <textdata fileref="l00/ch01s01/HelloConstant.java"/>
+                    </textobject>
+                </programlisting>
+                <para>  
+                    Compile + decompile
+                </para>
+                <literallayout>
+javac -g HelloConstant.java 
+javap -verbose -l -c HelloConstant
+                </literallayout>
+                <programlisting language="c" linenumbering="numbered">
+                    <textobject>
+                        <textdata fileref="l00/ch01s01/HelloConstant.txt"/>
+                    </textobject>
+                </programlisting>
+                <para>
+                    Látható, hogy teljesen másképp tárolódnak, egy úgy nevezett constant pool-ba. 
+                    Ide kerül az összes konstans, még a string literal-ok is, minden.
+                    A szemfülesebbek észrevehetik, hogy az első konstans értékét úgy nyomtuk stack-re, hogy ldc-t kértünk 4-es indexű const pool elemre.
+                    A második konstans kiíratásakor azonban a compiler úgy döntött nem járja be ezt a kacskaringós utat, és a konstans helyett iconst0-val egy 0-t nyomott le a stack-be.
+                </para>
+                <para>
+                    A még szemfülesebbeknek feltűnhet, hogy ha egyenesen lehet a constant pool-hoz érni, akkor mi lesz a visibility-vel?
+                    Nos, a megoldás trükkös. 
+                    Minden osztálynak van constant pool-ja, viszont az hogy linkeléskor mi történik egy kicsit más történet.
+                </para>
+                <para>
+                    Gépeljük a kövi programot:
+                </para>
+                <programlisting language="java" linenumbering="numbered">
+                    <textobject>
+                        <textdata fileref="l00/ch01s01/HelloConstant2.java"/>
+                    </textobject>
+                </programlisting>
+                <para>  
+                    Compile + decompile
+                </para>
+                <literallayout>
+javac -g HelloConstant2.java 
+javap -verbose -l -c HelloConstant2
+                </literallayout>
+                <programlisting language="c" linenumbering="numbered">
+                    <textobject>
+                        <textdata fileref="l00/ch01s01/HelloConstant2.txt"/>
+                    </textobject>
+                </programlisting>
+                <para>
+                    Ahogy láthatjuk, az int konstans értéke simán átkerült, azonban a HelloConstant THING-re tett referenciánk egy field referencia lett.
+                </para>
+            </section>
+            <section>
+                <title>Osztály</title>
+                <para>
+                    Egy példán keresztül fogom bemutatni a dolgokat.
+                    Csinálunk egy osztályt, illetve egy másikat, ami csak egy main-t fog tartalmazni és példányosítja az előző osztályt.
+                </para>
+                <programlisting language="java" linenumbering="numbered">
+                    <textobject>
+                        <textdata fileref="l00/ch01s01/ClassExample.java"/>
+                    </textobject>
+                </programlisting>
+                <programlisting language="java" linenumbering="numbered">
+                    <textobject>
+                        <textdata fileref="l00/ch01s01/ClassExampleMain.java"/>
+                    </textobject>
+                </programlisting>
+                <para>
+                    A class-nak önmagának lehet viselkedése és állapota.
+                    Viselkedése static method-ok formájában megadható. 
+                    Állapota static változók formájában megadható. 
+                    Egy static block-al pedig megadható hogy mi történjen amikor az adott class inicializálásra kerül.
+                    SEMMI köze nincs a példányosításhoz ez előbb elmondottaknak.
+                    A static block akkor fut le amikor a CLASS inicializálódik.
+                    Jelen esetben már az előtt, hogy hozzáakarnánk férni egy static field-jéhez.
+                </para>
+
+                <para>
+                    Egy adott osztály arra szolgál hogy csoportosítsuk a megegyező példányokat.
+                    Azaz ClassExample egy osztály, míg a memóriában lévő objektum amire egy referenciát tartalmaz ce változónk, 
+                    az pedig példánya a ClassExample osztálynak. 
+                </para>
+                <para>
+                    A könyv most belemegy hogy a static dolgoknak logikusan nem kell újra helyet foglalni new op után stb.
+                    Mi nézzünk inkább egy érdekesebb dolgot!
+                </para>
+                <literallayout>
+javac -g ClassExample.java 
+javap -verbose -l -c ClassExample
+                </literallayout>
+                <programlisting language="c" linenumbering="numbered">
+                    <textobject>
+                        <textdata fileref="l00/ch01s01/ClassExample.txt"/>
+                    </textobject>
+                </programlisting>
+                <para>
+                    Nézzük csak meg, hogy a static field értékadása a bytecode-ban a static{} része!
+                    Azaz amikor mi írunk egy ilyen block-ot az nem a teljes block lesz, hanem csak a compiler az eddig auto-generált végére illeszti.
+                    Magyarul először a static field init fog lemenni és csak utána a plusz user defined code!
+                </para>
+                <para>
+                    A GC-ről itt nem írnék bővebben, mert nem annyira egyszerű. (több generáció stb.)
+                    A lényeg, hogy a gc-re explicit kontrollunk nincs, helyette a Runtime.gc()-vel kérhetjük (btw, System.gc() csak meghívja a Runtime singleton gc methodját, szóval csak egy shortcut), de nem nagyon ajánlatos, hisz automatán végzi a rendszer.               
+                </para>
+            </section>
+            <section>
+                <title>Megbízhatóság</title>
+                <para>
+                A Java-ban a megbízhatóság nagyon fontos elem.
+                Ennek a megvalósításának az egyik eszköze try catch block.
+                A try utáni block-ban futó kódban ha bárhol egy Throwable dobódik (throw keyword-el dobhatunk, és továbbítódik a caller felé ha nem kapjuk el),
+                akkor ezt egy catch block tudja kezelni. Erre egy egész egy fejezetet fogunk szánni.
+                </para>
+            </section>
+            <section>
+                <title>Multi Threading</title>
+                <para>
+                    A több szálon történő futáshoz a Java a Thread-et használja. Ez reprezentál egy párhuzamosan futó szálat.
+                    Ilyen szálat létrehozhatunk úgy hogy subclassoljuk a Thread osztályt. 
+                    A másik megoldás, hogy a Runnable interface-t implementáló class-t hozunk létre. Ebben az esetben úgy tudjuk egy párhuzamos szálon elindítani, hogy létrehozunk egy Thread példányt a megfelelő ctor használatával.
+                    Több ctor egyik argumentuma lehet egy Runnable interface-t megvalósító objektum.
+                </para>
+                <programlisting language="java" linenumbering="numbered">
+                    <textobject>
+                        <textdata fileref="l00/ch01s01/ThreadExample.java"/>
+                    </textobject>
+                </programlisting>
+                <para>
+                    A fenti példát ha többször lefuttatjuk, akkor különbség adódhat az először futó thread pár és az utánuk futók outputja között.
+                    Az első páros olykor nem jó, "összekeveredett", outputot generál.
+                    Ez amiatt van, mert egy PrintWriter (System.out) használatáért versengenek és mivel nincs kontroll afelett hogy ki használhatja, ezért az dönt hogy melyik thread mikor kap lehetőséget futásra. 
+                </para>
+                <para>
+                    A második esetben az System.out-ot egy szinkronizált blokkban használjuk.
+                    Azaz a block-ba történő sikeres belépéskor a használó kizárólagos jogosultságot kap a használathoz.
+                </para>
+            </section>
+
+        </section>
+        <section>
+            <title>Alapok</title>
+            <para>
+            </para>
+            <section>
+                <title>Primitive types</title>
+                <para>
+                    A Java-ban a következő primitív típusok állnak rendelkezésünkre.
+                </para>
+                <itemizedlist mark='opencircle'>
+                    <listitem>
+                        <para>boolean</para>
+                    </listitem>
+                    <listitem>
+                        <para>char - 16 bit Unicode</para>
+                    </listitem>
+                    <listitem>
+                        <para>byte - 8 bit signed egész</para>
+                    </listitem>
+                    <listitem>
+                        <para>short - 16 bit signed egész</para>
+                    </listitem>
+                    <listitem>
+                        <para>int - 32 bit signed egész</para>
+                    </listitem>
+                    <listitem>
+                        <para>long - 64 bit signed egész</para>
+                    </listitem>
+                    <listitem>
+                        <para>float - 32 bit lebegőpontos racionális</para>
+                    </listitem>
+                    <listitem>
+                        <para>double - 64 bit lebegőpontos racionális</para>
+                    </listitem>
+                </itemizedlist>
+                <para>
+                    A primitív típusok abban térnek a többi típustól, hogy ezek nem objektum típusokat reprezentálnak.
+                    Primitív típusú változók a konkrét ÉRTÉKET tárolják, nem egy referenciát.
+                    Minden más típusú változó valójában egy objektum referenciát jelent. 
+                </para>
+                <para>
+                    Itt fontos megjegyezni, hogy egy primitív változónak csak az értékét tudjuk átadni a hívott methodnak (azaz teljesen pass by value).
+                    Nem primitív esetben amit továbbadunk a hívott methodnak az a típus információ arról az objektumról amire a ref mutat, illetve maga a ref értéke.
+                    Azaz nem "másoljuk" le a példányt, míg primitívnél az értéket átmásoljuk (de persze ez elég gyors, hisz legnagyobb esetben is 64 bit-ről van szó).
+                </para>
+                <para>
+                    Az összes primitív típusnak van wrapper-e. Ez amiatt szükséges, mert például a collection-ök implementálását úgy találták ki, hogy az elemeknek önmaguknak rendelkezniük kell equals és hashCode. methodokkal.
+                </para>
+                <para>
+                    A wrapper kicsomagolása és becsomagolása automatikusan történik.
+                </para>
+                <literallayout>
+Integer i = 5;
+int a = 6 + i;
+                </literallayout>
+                <para>
+                    A wrapper-ekkel egy picit vigyázni kell, mert a háttérben akár cache-elhetnek is.
+                    Későbbiekben lesz egy aranyos feladat az Integer belső cache-elési szokásairól.
+                </para>
+                <para>
+                    A wrapper-ek több más fontos funkciót is betöltenek.
+                    Például az adott primitív típus szempontjából fontos kosntansok illetve segéd utility methodok biztosítása, mint például parse-olás.
+                    Primitív típusokkal ráadásul nem lehet kifejezni egy érték nem létezését, míg wrapper-el van lehetőségünk rá hiszen annak adhatunk null értéket.
+                </para>
+            </section>
+            <section>
+                <title>Literálok</title>
+                <para>
+                    Primitív típusú és obj ref változók értékadásához különböző literálokat használhatunk.
+                </para>
+                <itemizedlist>
+                    <listitem>
+                        <para>
+                            <link xlink:href="https://docs.oracle.com/javase/specs/jls/se11/html/jls-3.html#jls-NullLiteral">NullLiteral</link> - null</para>
+                    </listitem>
+                    <listitem>
+                        <para>Logikai értékek - false | true</para>
+                    </listitem>
+                    <listitem>
+                        <para>Egész oktális - 0301 </para>
+                    </listitem>
+                    <listitem>
+                        <para>Egész Hexadec - 0xff</para>
+                    </listitem>
+                    <listitem>
+                        <para>Egész decimális - 128</para>
+                    </listitem>
+                    <listitem>
+                        <para>Egész (long) - 128L</para>
+                    </listitem>
+                    <listitem>
+                        <para>Racionális (double) - 12.3 | 12.3e4</para>
+                    </listitem>
+                    <listitem>
+                        <para>Racionális (float) - 12.3f</para>
+                    </listitem>
+                    <listitem>
+                        <para>Karakter - 'a'</para>
+                    </listitem>
+                    <listitem>
+                        <para>String(Objektum) - "foo"</para>
+                    </listitem>
+                    <listitem>
+                        <para>Class - System.class</para>
+                    </listitem>
+                </itemizedlist>
+            </section>
+            <section>
+                <title>Változó Deklarációk</title>
+                <para>
+                    Az alábbi deklarációk megegyeznek
+                </para>
+                <literallayout>
+int x, y;
+                </literallayout>
+                <literallayout>
+int x;
+int y;
+                </literallayout>
+                <para>
+                    Az alábbiban pedig csak y kap értéket.
+                </para>
+                <literallayout>
+int x, y = 5;
+                </literallayout>
+                <para>
+                    A változók kezdeti értékének meghatározása, ha nincs explicit inicializálás a programozó részéről akkor két típusról beszélhetünk: adattagok, egyéb. 
+                    Adattagok esetén előre definiált értékekkel inicializálódnak a változók, azonban például method bodyban nem.
+                </para>
+                <para>
+                    Java-ban az array egy önálló típus. Több fajta módon is deklarálhatjuk: 
+                </para>
+                <literallayout>
+int[] foo;
+int bar[];
+                </literallayout>
+                <para>
+                    Példányosítani a new operátorral lehet. A foo-ba az array-re mutató referenciát fogunk tárolni.
+                    A tömböket a programozó nem tudja subclassolni, azonban ezen kívül objektum szerűen viselkednek.
+                </para>
+                <literallayout>
+int[] foo = new int[42];
+                </literallayout>
+                <para>
+                    Tömbből álló tömböket is létrehozhatunk:
+                </para>
+                <literallayout>
+int[][] foo = new int[3][];
+                </literallayout>
+                <para>
+                    Ennek a tömbnek ugye a nulladik indexe egy tömb-re fog mutatni.
+                </para>
+                <literallayout>
+foo[0][]  = new int[3];
+                </literallayout>
+                <para>
+                    Egyébként használhatunk tömbökhöz is literált!
+                </para>
+                <literallayout>
+String[] arr = {"Oh","God","Oh","Man"};
+                </literallayout>
+            </section>
+            <section>
+                <title>Enums</title>
+                <para>
+                Nézzün kegy példát alább.
+                Az enum-ok implementálhatnak interface-eket, viszont super class-uk kötött.
+                Nem lehet őket subclassolni, csak anonymous subclassolni(5. sor).
+                Lehetnek field-jeik, statikusak is.
+                Lehetnek methodjaik, statikusak is.
+                Lehetnek különböző ctor-aik, de ezeket csak maga az osztály használhatja (visibility).
+                Lehetnek abstract methodjaik (ebben az esetben azonban nem lesznek instance-eik csak anonymous subclassokba tartozóak).
+                </para>
+                <para>
+                Maga az osztály rendelkezik egy olyan method-dal amivel az összes példányt egy array-ben megkaphatjuk.
+                Emellett a super implementál egy method-ot, amivel elérhető a példány neve, ami egy private final field-je az Enum generikus class-nak.
+                </para>
+                <programlisting language="java" linenumbering="numbered">
+                    <textobject>
+                        <textdata fileref="l00/ch01s01/ThreadExample.java"/>
+                    </textobject>
+                </programlisting>
+            </section>
+            <section>
+                <title>Operátorok fejezet</title>
+                <para>
+                    Itt talán ami talán érdekes lehet, az hogy logikai operátorok esetén van lehetőségünk greedy és shortcircuit kiértékelés között választani.
+                    Alább írtam egy példát mind a kettőről.
+                    Figyeljük meg, hogy shortcircuit esetben nem kell folytatni az OR kiértékelését, hiszen foo kiértékelése true értéket adott vissza.
+                    Greedy esetben mind a kettő meghívásra kerül.
+                </para>
+                <programlisting language="java" linenumbering="numbered">
+                    <textobject>
+                        <textdata fileref="l00/ch01s01/ThreadExample.java"/>
+                    </textobject>
+                </programlisting>
+            </section>
+            <section>
+                <title>Type conversion</title>
+                <para>
+                    Type conversion több módon is történet. 
+                    Az <link xlink:href="https://docs.oracle.com/javase/specs/jls/se7/html/jls-5.html">Oracle</link> nem úgy csoportosítja mint a tankönyv.
+                </para>
+                <section>
+                    <title>Automatikus konverzió</title>
+                    <para>
+                        Primitív típusok automatikusan konvertálódnak a wrapper osztály példányává. 
+                        Wrapper osztályok automatikusan konvertálódnak a nekik megfelelő primitív típussá.
+                        Alábbi példa add method-ja erre egy példa.
+                    </para>
+                    <programlisting language="java" linenumbering="numbered">
+                        <textobject>
+                            <textdata fileref="l00/ch02s02/src/ch02s02/ConversionExample.java"/>
+                        </textobject>
+                    </programlisting>
+                    <para>
+                        Másik gyakori felhasználás, hogy egy class példányára történt hivatkozás-ból auto konverzióval gond nélkül kaphatunk
+                        super class-ára, vagy implementált interface-ére történő hivatkozást.
+                        (Interface-ek pedig az extendált interface-é)
+                    </para>
+                </section>
+                <section>
+                    <title>Explicit konverzió</title>
+                    <para>
+                        Ezen konverzióra akkor lehet szükségünk, ha szűkebb tartományt reprezentáló primitív típust akarunk kinyerni.
+                    </para>
+                    <literallayout>
+int a = 5;
+byte b = (byte)a;
+                    </literallayout>
+                    <para>
+                        Objektumoknál egy kicsit összetettebb. 
+                        Beszéljünk először statikus típusról. A statikus típus az, hogy egy obj ref-et tartalmazó változó milyen típusra is mutat.
+                        Dinamikus ezzel szemben a változó által hivatkozott konkrét példány típusa.
+                        Érthető, hogy a kettő szétválik, javarészt (Oh the puns!) ez az egyik lényege az interface-eknek, super class-oknak, hogy általánosan tudjunk kezelni dolgokat.
+                    </para>
+                    <literallayout>
+Super a = new Sub();
+Sub b = (Sub) a;
+                    </literallayout>
+                    <para>
+                        A probléma ott keletkezik, hogy ez nem type check-elhető statikusan ugye, és emiatt előállhat, hogy nem egy Sub class-ú objektumot akarunk konvertálni.
+                        Ilyenkor a rendszer felteszi a kezét és dob egy ClassCastException-t. 
+                        Runtime egyébként tudjuk ezt checkelni az instanceof operátorral.
+                        Az instanceof csak akkor lesz igaz, ha a check alatt lévő változó által tárolt obj ref egy olyan példányra mutat mely vagy pontosan olyan osztályú vagy leszármazottja annak az osztálynak, mint ami az operátor második operandusa.
+                    </para>
+                    <literallayout>
+Super a = new Sub();
+Sub b = (a instanceof Sub) ? (Sub)a : null;
+                    </literallayout>
+                </section>
+                <section>
+                    <title>String konverzió</title>
+                    <para>
+                        Ha egy kfiejezésben string-re van szükség, és a konkrét elem objektum vagy annak subclass-a akkor egyszerűen meghívja a toString method-ot.
+                        A toString method-ot negatív mellékhatások nélkül bátran override-olhatjuk így befolyásolhatjuk hogy egy adott user defined class példánya 
+                        milyen string-ként jelenjen meg.
+                    </para>
+                    <para>
+                        Érdemes azért vigyázni vele! Alább egy példa:
+                    </para>
+                    <literallayout>
+System.out.println(1 + 2 + "aa");
+// prints 3aa
+                    </literallayout>
+                </section>
+                <section>
+                    <title>Elérés</title>
+                    <para>
+                Ugyanazzal a szintaktikával érünk el mezőket, navigálunk a package hierarchy-ban.
+                    </para>
+                    <literallayout>
+import a.b.C;
+
+C.staticmethod();
+
+int i = C.staticfield;
+
+new C().instancemethod();
+
+int i = new C().instancefield;
+                    </literallayout>
+                    <para>
+                Majd később lesz róla szó, meg nem pont ide tartozik, de ha egy változó obj ref értéke null, akkor NullPointerException fogunk kapni.
+                (Természetesen csak példányoknál lehet ilyen.)
+                Változóról egyébként funky módon elérjük a static method-okat és field-eket, hisz a változó statikus typusa lényeg, az obj ref-et nem használjuk.
+                Így nem szokás használni, de technikailag lehet.
+                    </para>
+                    <literallayout>
+int i = new C().staticfield;
+                    </literallayout>
+                </section>
+            </section>
+        </section>
+        <section>
+            <title>Vezérlés</title>
+            <para>
+            </para>
+            <section>
+                <title>Utasítás és blokk</title>
+                <para>
+                Utasításoknak két nagy csoportja van: kifejezés utasítás és deklaráció utasítás.
+                </para>
+                <para>
+                Kifejezés utasítás csak a következőek egyike lehet: értékadás, postfix, prefix és unary op használat, method call, new operator.
+                </para>
+                <para>
+                Deklaráció utasítás egy változó létrehozásából és opcionálisan annak inicializálásából áll.
+                </para>
+                <para>
+                Több utasítást együttesen egy block fog össze, mely { } jelek közé írandó. 
+                Block-ban létrehozott lokális változók a block végéig maradnak scope-ban. 
+                </para>
+                <section>
+                    <title>Elágazás</title>
+                    <para>if-else elágazást más nyelvekhez hasonlóan itt is használhatunk, block vag block nélkül.</para>
+                    <literallayout>
+if (true)
+    System.out.println("A");
+else
+    System.out.println("B");
+
+if (true) {
+    System.out.println("A");
+} else {
+    System.out.println("B");
+}
+                    </literallayout>
+                    <para>
+                    Switch alapvetően fall through, azaz ha nincs break utasítás, akkor futtatni fogjuk a többi case ben megadott utasítások végrehajtását.
+                    Default-hoz ha elérünk, akkor az mindenképp lefut (azaz normal usage az, hogy minden case ben break-elünk).
+                    A case-ek után címkeértékek vannak. Kiértékeléskor a switch utáni egész kifejezés kiértékelése során kapott értéket vetjük össze a címkeértékekkel, és egyezés esetén belépünk a case utasításainak végrehajtásába.
+                    </para>
+                    <literallayout>
+int i = 0;
+switch (i) {
+case 1: {
+    System.out.println("B");
+    break;
+}
+
+default: {
+    System.out.println("A");
+    break;
+}
+}
+                    </literallayout>
+                    <para>
+                    Switch expression-nél nincs fall through.
+                    </para>
+                    <literallayout>
+public static int sswitchexpr(int i) {
+    switch (i) {
+    case 1 -&gt; i;
+
+    default -&gt; 0;
+    }
+}
+                    </literallayout>
+                </section>
+                <section>
+                    <title>Ciklusok</title>
+                    <para>
+                        Van lehtőségünk létrehozni elöltesztelő ciklust:
+                    </para>
+                    <literallayout>
+while(true){
+
+}
+                    </literallayout>
+                    <para>
+                        Van lehtőségünk létrehozni hátultesztelő ciklust:
+                    </para>
+                    <literallayout>
+do{
+
+}while(true)
+                    </literallayout>
+                    <para>
+                        Van lehtőségünk létrehozni elöltesztelő ciklust:
+                    </para>
+                    <literallayout>
+while(true){
+
+}
+                    </literallayout>
+                    <para>
+                        A léptető ciklus a következőt jelenti a háttérben:
+                    </para>
+                    <literallayout>
+init;
+while(logical expression){
+    statement;
+    step;
+}
+                    </literallayout>
+                    <para>Mivel ezt nagyon gyakran használjuk, ezért egy speciális szintaxist iss használhatunk. Erre alább egy példa:</para>
+                    <literallayout>
+for(int i = 0; i &lt; 10; i++){
+    System.out.println();
+}
+                    </literallayout>
+                    <para>
+                    Létezik egy enhanced for loop. (Igen ennek ez a neve, nem for each a doc szerint, hail His Majesty Oracle, King of the Andals, the Rhoynar, and the First Men, First of His Name).
+                    A trükk annyi, hogy minden Iterable interface-t implementáló osztállyal működni fog (illetve out of the box array-vel, a collections-t azért nem sorolom ide, mert azok explicit implementálják iterable-t). Példa.
+                    </para>
+                    <programlisting language="java" linenumbering="numbered">
+                        <textobject>
+                            <textdata fileref="l00/ch02s02/src/ch02s02/ConcreteIterable.java"/>
+                        </textobject>
+                    </programlisting>
+                    <para>
+                        C++-hez hasonlóan alkalmazhatunk break-et a ciklus azonalli elhagyására.
+                        continue-t használahtunk a ciklus jelenlegi iterációjának befejezésére és új kezdésére.
+                        return-el pedig bármikor visszatérhetün keg method body-ból. A visszatérési értékét a return mögé kell írni.
+                    </para>
+                </section>
+
+            </section>
+        </section>
+        <section>
+            <title>Osztályok, példányok</title>
+            <para>
+                Az osztályok állapotot és az ehhez kapcsolódó metódusokat csomagolják össze.
+                A nem oop nyelvek tapasztalatai alapján kialakult az az igény hogy az össze tartozó rekordokat/structokat a rajtuk operáló funkciókkal valahogy összekéne kapcsolni már a nyelv szintjén is.
+            </para>
+            <section>
+                <title>Overview</title>
+                <para>
+                Egy osztály páronként megegyező típusú értékek tárolására képes példányok multihalmaza.
+                Az osztálynak magának lehetnek field-jei és method-jai, ezeket a static keyword használatával kell jelölni.
+                Ha lenne időnk most javap-vel kitérnénk, hogy gazdaságosabb a static hívás, de most hagyjuk.
+                Ahogy már említettem, a class-nak magának mindig lehet init block-ja ,ami egyszer a class betöltésekpr fut le.
+                </para>
+                <para>
+                Az osztály szintű method-ok egy speciális essete az maga a Java programok belépési pontja. Ez általában a következő:
+                </para>
+                <literallayout>
+public static void main(String[] args){
+
+}
+                </literallayout>
+                <para>
+                A példányoknak is lehetnek fieldjeik és methodjaik és ctor-uk, sőt hasonlóan az osztályhoz init block-ok is megadhatóak, csak ilyenkor hanygaoljuk a sttaic keyword-ot.
+                Az instance methodok és ctor-ok body-jában használhatjuk a this kulcsszóval magát a jelenleg aktuális példányra hivatkozó obj ref-et. 
+                Az instance field-eket állíthatjuk konstans-ra a field keyword-del. 
+                Ez annyit fog jelenteni, hogy kezdeti értékadás után nem állítható be újabb érték.
+                Ha azonban ezt teszik, akkor vagy a deklaráció helyén egyben inicializálni is, vagy ctor-ban kell gondokodni róla.
+                </para>
+                <para>
+                Az összes változó és method default láthatósága átállítható, public, private, protected kulcsszavak használatával.
+                </para>
+                <para>
+                Az method-ok definiíciója két részből áll: method head, method body. 
+                A method head tartalmazza a: visszatérési értéket, method nevét, illetve zárójelben felsorolva a formális paramétereket típussal és névvel együtt.
+                Ezt követheti a method törzs, ami egy block. Ez csak akkor hagyható el, ha egy virtual method head-ben jeleztük abstract keyworddel ezt a compiler-nek. 
+                Ezt általában expliciten az abstract class-okban szoktuk használni. A célja az, hogy ezzel rákényszerítsük a subclass-okat a method implementálására.
+                A method head-ben megadott formális paraméterek a method scope-on belül léteznek.
+                A method-ok hívhatóak ha a method definíciójában megadott számú és típusú paramétert zárójelben felsorolva vesszővel elválasztva megadjuk.
+                </para>
+                <para>
+                A method overloading-al eltérő signature-ű de azonos nevű és return típe-ú methodok adhatóak meg.
+                </para>
+                <programlisting language="java" linenumbering="numbered">
+                    <textobject>
+                        <textdata fileref="l00/ch02s02/src/ch02s02/Overload.java"/>
+                    </textobject>
+                </programlisting>
+                <para>
+                A compiler compile time választja ki mely konkrét implementáció kell majd futtatni.
+                </para>
+            </section>
+            <section>
+                <title>Példányosítás</title>
+                <para>
+                Az objektumok példányosítását a new operátorral szoktuk végezni. A new operátor követi a típus neve, majd zárójelek között azon argumentumok, melyeket a ctor felé kell továbbítani.
+                </para>
+                <literallayout>
+A a = new A(1,"f");
+                </literallayout>
+                <para>
+                        Nem összekeverendő, hogy a ref vagy maga az objektum konstans. Vegyük példának:
+                </para>
+                <literallayout>
+final A a = new A(1,"f");
+a.value = 5;
+                </literallayout>
+                <para>
+                        A fenti egy teljesen legális kód, ugyanis final arra vonatkozik, hogy az a változó obj ref értéke nem változtatható, tehát a következőt titlja csak meg:
+                </para>
+                <literallayout>
+final A a = new A(1,"f");
+a = new A(2,"fb"); // Problematic
+                </literallayout>
+                <para>  
+                        Az példányok C++-tól eltérő módon explicit nem töröthetőek. Ha egy példányra már egyetlen referencia sem mutat akkor a garbage collector (előre nem definiált időben)
+                        felszabadíthatja (mármint az általa foglalt memóriát obviously a VM szintjén).
+                </para>
+            </section>
+            <section>
+                <title>Visibility</title>
+                <para>
+                    Látahtóságból a következőek vannak:
+                </para>
+                <para>
+                    Default: Csomagon (package) szinten mindeki láthatja.
+                </para>
+                <para>
+                    Private: csak osztáylon belül.
+                </para>
+                <para>
+                    Protected: csak inheritance hierarchy-n belüli osztályok.
+                </para>
+                <para>
+                    Public: bárki láthatja.
+                </para>
+            </section>
+            <section>
+                <title>Inheritance</title>
+                <para>
+                    Az öröklés legegyszerűbb esete, ha egy osztályt bővíteni akarunk új field-ekkel, methodokkal.
+                    Az öröklést az extends keyword-el tudjuk megadni.
+                </para>
+                <programlisting language="java" linenumbering="numbered">
+                    <textobject>
+                        <textdata fileref="l00/ch02s02/src/ch02s02/InheritA.java"/>
+                    </textobject>
+                </programlisting>
+                <para>
+                    A fenti példában InheritA egy instance-e rendelkezik egy int field-el, míg InheritASub egy példányának ezen felül még van egy másik is.
+                    Nested classes for the win!!! Let's make code unreadable again!
+                    Persze azt is meg kell jegyezni, hogy act method-ot gond nélkül felülírhatjuk hisz példány method révén virtual.
+                    Az override nem csökkentheti a visibility-t, nem válthat ki olyan checked exceptiont mely nem auto konvertálható a super method által dobottnak, illetve a return type-nak meg kell egyeznie(nem elég hogy auto konvertálható legyen, pl. wrapperrel).
+                </para>
+                <para>
+                    Ha ezt nem szeretnénk megengedni, csak használjuk a final-t. 
+                    A final használata class előtt azt jelenti, hogy megtitljuk a class örökölhetőségét.
+                </para>
+                <para>
+                    Egyszerre egy class csak egyetlen másik class-t extendálhat.
+                </para>
+                <para>
+                    Osztály method-oknál override nem lehetséges. Itt method hiding történik:
+                </para>
+                <programlisting language="java" linenumbering="numbered">
+                    <textobject>
+                        <textdata fileref="l00/ch02s02/src/ch02s02/MethodHiding.java"/>
+                    </textobject>
+                </programlisting>
+                <para>
+                    Field hiding-ra is van lehetőség, de lehetőleg kerüljük:
+                </para>
+                <programlisting language="java" linenumbering="numbered">
+                    <textobject>
+                        <textdata fileref="l00/ch02s02/src/ch02s02/FieldHiding.java"/>
+                    </textobject>
+                </programlisting>
+                <para>
+                    A fenti példában még látható, hogy a FieldExample class abstract kulcsszót tartalmazott.
+                    Ez annyit takar, hogy FieldExample nem példányosítható a new kulcsszóval.
+                    Ha FieldExample osztályt subclassoljuk és konkrét példányosítható osztályt akarunk definiálni, akkor implementálnunk kell az összes abstract-al jelölt method-ot.
+                </para>
+            </section>
+        </section>
+        <section>
+            <title>Interface</title>
+            <para>
+                Az interface-eket nem lehet példányosítani, nem lehetnek instance fieldjeik.
+                Java verziótól függően csak abstract method-jaik lehetnek, vagy nem (Java8).
+                Statikus fieldjeik lehetnek, ezek konstansokként szolgálnak.
+                Java verziótól függően statikus methodjaik nem lehetnek, vagy lehetnek (Java8).
+            </para>
+            <para>
+                Az interface csak egy másik interface-et örökölhet, ezt az extends keyworddel teszi.
+            </para>
+            <para>
+                Az interface-t egy class/ asbtract class implementálhatja, ezt az implements keyworddel teszi.
+                Alább egy állatorvosi ló példát csináltam:
+            </para>
+            <programlisting language="java" linenumbering="numbered">
+                <textobject>
+                    <textdata fileref="l00/ch02s02/src/ch02s02/InterfaceExample.java"/>
+                </textobject>
+            </programlisting>
+            <para>
+                A végére direkt beerőszakoltam azt is, hogy ha egy példány megvalósítja, vagy bármely super-je megvalósítja az adott interface-t akkor konvertálható az interface típusú változó-ra (ezzel persze a fenti példában csökkentjük a változó által hivatkozott példányon legálisan meghívható method-ok számát, hiszen intf változó statikus típusa InterfaceExample).
+            </para>
+        </section>
+        <section>
+            <title>Package</title>
+            <para>
+                A package-ek a kódunk további még magasabb szintű csoportosítására szolgálnak, illetve a default visibility miatt (package szintű láthatóság) a method-ok használhatóságát is zérni lehet end user elől.
+                A package-ek tartalmazhatnak osztályok, interface-ek fájljait, de egyéb (al)csomagokat is.
+                A package-ek fizikálisan a lokális fájlrendszerben történő leképezést is szolgálja.
+                Magyarul az a.b.c az a alatti b alatti c directory-t jelenti.
+                Azt hogy honnan indul a keresés (azaz mihez relatív az a.b.c) azt a CLASSPATH env var-ral, vagy a -cp illetve -classpath beírása a java parancs után, amit abszolút utak felsorolása követ.
+                Itt még annyit jegyezzünk meg, hogy a classpath-al mutathatunk jar-ra, vagy zip-re is.
+            </para>
+            <para>
+                Ha egy osztályban más osztályokat/interface-eket akarunk használni, akkor előtte importálnunk kell őket.
+                Ezt több fajta módon is tehetjük. Alább egy példa:
+            </para>
+            <programlisting language="java" linenumbering="numbered">
+                <textobject>
+                    <textdata fileref="l00/ch02s02/src/ch02s02/other/ImportExample.java"/>
+                </textobject>
+            </programlisting>
+            <para>
+                Az első példában a java.lang package ből a Math osztályt importáltuk.
+                 </para>
+                <para>
+                A második példa, a java.lang.reflect összes public típusának importálása.
+                Azaz ha csak egy class előtt nem jelezzük public kulcsszóval, akkor ilyen esetekben nem is fog importálódni.
+                </para>
+                <para>
+                A harmadik példa egy konkrét statikus import. Ennek során egy konstans értéket importálunk 
+                ch02s02 package-ből StaticExample osztályból, melynek neve STATIC_FIELD.
+                </para>
+        </section>
+        <section>
+            <title>Kivételkezelés</title>
+            <para>
+                A kivételkezelés szerves része a Java nyelvnek, ezzel fogunk ezen fejezetben foglalkozni.
+            </para>
+            <section>
+                <title>Hibák keletkezése, hiba kezelők</title>
+                <para>
+                    Hibák több fajta módon is keletkezhetnek.
+                </para>
+                <para>
+                    Program futása közben rendellenes esemény. Nullával osztás, ran out fo memory, osztály sikertelen betöltése.
+                </para>
+                <para>
+                    throw utasítással valamely programrészlet hibát váltott ki explicit módon.
+                </para>
+                <para>
+                    Több szálon futó program valamely szálában hiba lépett fel, ezt aszinkron hibának hívjuk.
+                </para>
+                <para>
+                    A hiba kiváltódása pillanatában a továábi végrehajtása a jelenlegi programrésznek megszakad.
+                    A vezérlés NEM tér vissza a hibakezelése után erre a helyre a végrehajtásban.
+                </para>
+                <para>
+                    A hiba keletkezése után tehát a JVM egy olyan helyet keres a kódban mely képes kezelni a hibát.
+                    A hibakezelők közül az kezelheti a hibát, mely vagy pontosan azon hiba típust kezeli, vagy annak valamely super class-át.
+                    Mivel több catch is megadható, a JVM azt fogja preferálni melynek kezelt típusa a legközelebb áll a dinamikus típusához a hibának.
+                </para>
+            </section>
+            <section>
+                <title>Try-catch, Try-catch-finally, with resources</title>
+                <para>
+                    A Java ban a try-catch-finally szerkezet szolgál a felbukkanó események kezelésére. 
+                    Azért nem hibát mondok, mert igazság szerint bármi részt tud venni ebben a mechanizmusban ami örökli a Throwable class-t.
+                </para>
+                <para>
+                    A Throwable-nek két fő alosztálya van: Exception és Error.
+                </para>
+                <para>
+                    Az Exception lehet checked vagy unchecked. Ha checked Exception-t dobunk egy methodban, azt vagy kötelességünk elkapni, vagy deklarálnunk kell hogy a method-unk hibát dobhat.
+                    Unchecked esetben erre nincs szükség.
+                    Szóval ha azt hiszed biztonságban vagy azért mert egy method nem írja hogy dobhat, nos... van egy rossz hírem :)
+                </para>
+                <programlisting language="java" linenumbering="numbered">
+                    <textobject>
+                        <textdata fileref="l00/ch01s01/ExceptionExample.java"/>
+                    </textobject>
+                </programlisting>
+                <para>
+                    A példában fent még látható egy finally block is ami mindig lefut.
+                    Azaz ha try-ban dobódik throwable és akkor is ha nem.
+                </para>
+                <programlisting language="java" linenumbering="numbered">
+                    <textobject>
+                        <textdata fileref="l00/ch01s01/ExceptionWithResources.java"/>
+                    </textobject>
+                </programlisting>
+                <para>
+                    A példában fent még látható egy try catch with resources módszer.
+                    Minden olyan osztály lehet ezen kontextusban resource ami AutoCloseable interface-t implementál.
+                    Én a fenti példában egy Pool prefixű osztályokkal implementáltam az AutoCloseable interface-t és csináltam 3 különböző példát.
+                    Mivel a JVM ezen keresés közben elhagyhatja teljesen a method scope-ot, ezért ilyenkor meg is semmisíti a method futásához szükséges tárolt adatokat.
+                    (szóval például a method-ban létrehozott objektum példányokra ha csak lokális változól hivatkoztak, akkor a hiba után mivel már nem mutat rájuk senki ezért a gc számára felszabadíthatóakká válnak)
+                </para>
+                <para>
+                    Első esetben, a visitPool hibát dob, ezután meghívódik a close method, majd lefut a catch és végül a finally.
+                </para>
+                <para>
+                    A második esetben, a visitPool hibát dob, ezután meghívódik a close method de az is hibát dob, de ezen hiba elnyomódik (gets suppressed), majd lefut a catch (ami ugye a visitPool által dobott hibát kapja) és végül a finally.
+                </para>
+                <para>
+                    A harmadik esetben, nem dobódik hiba és rendeltetés szerint lezárjuk az AutoCloseable resource-t a try utáni block befejeztével.
+                </para>
+            </section>
+            <section>
+                <title>Assertions</title>
+                <para>
+                    Ha állítások vizsgálatával szeretnénk biztonságosabbá tenni a programunkat futás időben, akkor az -ea opcióval használva a JVM-et használhatjuk az assert kulcsszót.
+                </para>
+                <para>
+                    Az assert után egy logikai kifejezés áll, ami ha hamisra értékelődik ki akkor hiba történt.
+                    Ebben az esetben egy AssertionError-t fog dobni ezen a ponton a program.
+                    Az első kifejezés után kettőspont után megadott másik kifejezésnek egy értéket kell szolgáltatnia, mely továbbadódik az AssertionError ctor-ának mely ezt az értéket automatikusan konvertálja String típusra, és az így keletkezett AssertionError példány fog dobódni.
+                </para>
+                <programlisting language="java" linenumbering="numbered">
+                    <textobject>
+                        <textdata fileref="l00/ch02s02/src/ch02s02/AssertExample.java"/>
+                    </textobject>
+                </programlisting>
+            </section>
+
+        </section>
+        <section>
+            <title>Generics</title>
+            <para>
+                A Java-ban lehetőségünk van generikus method-ok, vagy akár class-ok létrehozására.
+                A C++ template-től eltérően a Java generic csak egy compile-time trükközés. 
+                Ez teljesen ellehetetleníti a C++-ban gyakori CRTP-t, hiszen valójában egyetlen egyszer "példányosodik" a C++ template-hez képest egy generic class.
+                Annak ellenére hogy borzasztóan sokat veszít így kifejező képességéből, előnye is van:
+                A konkrét paraméter értékének pontos ismerete nélkül is ellenőrizhető, és csak egy osztály jön létre belőle, mely független tud maradni azon kódtól mely felhasználta konkrét paraméterekkel.
+                Az egész különbség a type erasure-ön alapul.
+                Ez a gyakorlatban a következőt jelenti:
+            </para>
+            <programlisting language="java" linenumbering="numbered">
+                <textobject>
+                    <textdata fileref="l00/ch02s02/src/ch02s02/GenericExample.java"/>
+                </textobject>
+            </programlisting>
+            <para>
+                A fenti első nested class példájában látható a Generic névre hallgató osztály.
+                Bármilyen nem primitív típust használhatunk paraméterként.
+                A második példa azt mutatja hogyan is fog kinézni a Generic type erasure után.
+                Compile time a type check-ek után egyszerűen a második definíciót fogjuk használni.
+                (Mármint ez mind a háttérben zajlik...)
+                A következő eset a bounded type-ra példa, a példában a paraméterezéshez csak olyan típust használhatunk mely megvalósítja a Comparable interface-t. 
+                Azt is láthatjuk, hogy mivel Comparable is bounded, ezért a végén raw type lesz belőle.
+                A raw type olyan generikus típus mely nem rendelekzik típus paraméterrel.
+            </para>
+            <para>
+                Nagyon fontos külön választani a generic type-ot a type paramétertől inheritance szempontból.
+                Azaz egy List&lt;Number&gt; és egy List&lt;Integer&gt; típus SEMMILYEN kapcsolatban nincsenek egymással inheritance szempontból, annak ellenére hogy Number az Integer super-je. 
+                Ezt fontos hgoy megértsük, de ettől az apróságtól eltérve hasonlóan működik öröklésük, hiszen valójában type erasure után teljesen hétköznapi class-okként viselkednek.
+            </para>
+            <para>
+                Type inference nevezzük azt amikor a compiler képes egy method hívásból eldönteni a típus argumentumot ahhoz hogy a hívás legális legyen.
+                (More about that in Haskell I guess, where they actually designed the language to work that way.)
+                Az előző példában látható, hogy a lokális változók deklarációban kiírtam a típus paramétereket a new operátoros példányosításban pedig kihagytam, hadd gondolkodjon rajta a compiler.
+            </para>
+            <para>
+                Az alábbi példában egy belső osztályt definiáltunk, ami látható módon képes a külső paraméterét használni, míg ha statikus, akkor nem.
+            </para>
+            <programlisting language="java" linenumbering="numbered">
+                <textobject>
+                    <textdata fileref="l00/ch02s02/src/ch02s02/GenericNesting.java"/>
+                </textobject>
+            </programlisting>
+            <para>
+                A type erasure miatt azonban két probléma előáll:
+            </para>
+            <para>
+                Mivel runtime nem fogjuk tudni a típus adatokat, ezért a new operator-t nem fogjuk tudni használni.
+            </para>
+            <para>
+                Mivel runtime nem fogjuk tudni a típus adatokat, ezért típus specifikus array-t sem tudunk példányosítani, csak egy Obejct[] array-t majd azt átcastoli T[] típussá.
+            </para>
+            <para>
+                A tankönyv belemegy egy picit a Class-ba, de akkor már miért nem menjün reflection-be, bumm:
+            </para>
+            <programlisting language="java" linenumbering="numbered">
+                <textobject>
+                    <textdata fileref="l00/ch02s02/src/ch02s02/ClassUsage.java"/>
+                </textobject>
+            </programlisting>
+            <para>
+                Wildcard-okra egy jó példa az alábbi kód sum method-ja. Ezen method-ban csak olyan listákat akarunk befogadni melyek elemei Number vagy annak subclassának példányai.
+            </para>
+            <programlisting language="java" linenumbering="numbered">
+                <textobject>
+                    <textdata fileref="l00/ch02s02/src/ch02s02/GenericMethod.java"/>
+                </textobject>
+            </programlisting>
+        </section>
+        <section>
+            <title>Collections Framwork</title>
+            <para>
+                A Java próbált egy átlalános megoldást nyújtani a leggyakrabban előfordukó, és egyértelműen implementálható adatszerkezetekből, ezt nevezik Collections Framework-nek. 
+                <link xlink:href="https://docs.oracle.com/javase/8/docs/technotes/guides/collections/overview.html">Ezen a linken található az összefoglaló a teljes Collections Framework-ről</link>
+                A Collectin Framework generikus és a különböző interface-eket próbálták úgy kialakítani, hogy a legtöbb igénynek megfelelő esetben lehessen megfelelő interface-t találni.
+            </para>
+            <para>
+                    A Collections framework két különböző gyökérből indul.
+                    Az egyik gyökér a Collection interface mely subclassolja Iterable interface-t, míg a másik a Map interface.
+            </para>
+            <section>
+                <title>Collection(Gyűjtemény)</title>
+                <para>
+                    Az összes gyűjteményre jellemző, hogy méretét lekérdezhetjük, megtudhatjuk üres-e, megtudhatjuk egy példány eleme-e, illetve hozzáadhatunk és elvehetünk elemet.
+                    Mivel az Iterable interface-t örökli, ezért képes Iterator példány készítésére, amivel bejárható a gyűjtemény.
+                </para>
+                <para>
+                    Leszármazottjai a következők: Set (Halmaz, Lista, Sor)
+                </para>
+                <section>
+                    <title>Halmaz</title>
+                    <para>
+                    Ezen interface azt hivatott jelenteni, hogy a halmaz-ban egyszerre egy elemből csak egy létezhet.
+                    Azonban azt ne felejtsük el, hogy az elemek bejárhatóak mert örökli az Iterable interface-t. 
+                    Alább röviden írtam pár konkrét class-ról melyek képesek ezen interface implementálására.
+                    </para>
+                    <section>
+                        <title>TreeSet</title>
+                        <para>
+                     Long story short, decompile that JDK TreeSet class!
+                    Ahogy látjuk egy wah-bam egy private transient field-et használ melynek típusa NavigableMap&lt;E,Object&gt;.
+                    Egyébként ctorban pedig ha nem adunk neki map-et akkor ő maga példányosít egy TreeMap-et.
+                    Na jó, de mi történik add method hívásánál? Nos, egyszerűen mi beadunk egy arg-ot, az lesz az új entry kulcsa, az érték pedig egy static konstant Object PRESENT néven.
+                        </para>
+                    </section>
+                    <section>
+                        <title>HashSet</title>
+                        <para>
+                    Itt egy HashMap van a háttérben, de ugyanúgy használja az előbb látott PRESENT konstansos jelzési mechanizmust.
+                        </para>
+                    </section>
+                    <section>
+                        <title>LinkedHashSet</title>
+                        <para>
+                    Az előző subclass-a, annyi változtatással, hogy az elemeket egy kétszeresen láncolt listában adminisztrálja.
+                    Ezt az általam látott <link xlink:href="https://github.com/AdoptOpenJDK/openjdk-jdk11/blob/master/src/java.base/share/classes/java/util/LinkedHashMap.java">implementáció</link> egy neste generikus class-al(Entry) oldotta meg ami subclassolta a HashMap.Node-ot.
+                        </para>
+                    </section>
+                </section>
+                <section>
+                    <title>Lista</title>
+                    <para>
+                    A lista elméleti adatszerkezet interface-e. Egy listában duplikált elemek is létezhetnek.
+                     Alább röviden írtam pár konkrét class-ról melyek képesek ezen interface implementálására.
+                    </para>
+                    <section>
+                        <title>ArrayList</title>
+                        <para>
+                        Erre nem akarok sok szót pazarolni, mert ezzel kezdtük bevprog-on.
+                        Valójában a háttérben egy arrayt tart fenn, ami ha betelik, akkor általában egy kétszer nagyobb elem számú array-t foglal, majd Arrays.copyOf-al effektíve egy új de nagyobb array-vel tér vissza.
+                        Nem szinkronizált többszálúság szempontjából.
+                        </para>
+                    </section>
+                    <section>
+                        <title>Vector</title>
+                        <para>
+                    Hasonló az ArrayList-hez, legnagyobb eltérés, hogy szinkronizált.
+                        </para>
+                    </section>
+                    <section>
+                        <title>LinkedList</title>
+                        <para>
+                    Kétszeresen láncolt lista, maga a Node class egy nested class-ként magában LinkedList-ben található. 
+                        </para>
+                    </section>
+                </section>
+                <section>
+                    <title>Queue (Sor)</title>
+                    <para>
+                    FIFO, first in first out adatszerkezet.
+                    Az igazán nagy különbség az offer, mely ha nem volt sikeres egy elem beillesztésében, akkor false visszatérési értéket ad, és nem dob kivételt.
+                    A poll eltávolít egy elemet, de ha már nincs több eltávolítható elemet és így hívjuk meg akkor null-t ad vissza ahelyett hogy hibát dobna.
+                    A peek és element method-ok a poll által visszaadott értéket fogják visszaadni, de bent hagyják az adatszerkezetben magát az elemet.
+                    Alább röviden írtam pár konkrét class-ról melyek képesek ezen interface implementálására.
+                    </para>
+                    <section>
+                        <title>PriorityQueue</title>
+                        <para>
+                    Adatszerkezetekből tanult kupac.
+                        </para>
+                    </section>
+                    <section>
+                        <title>ArrayDeque</title>
+                        <para>
+                    Átméretezhető dinamikusan viselkedő array implementáció.
+                        </para>
+                    </section>
+                </section>
+            </section>
+            <section>
+                <title>Map(Leképezés)</title>
+                <para>
+                Kulcs érték párokat használó adat szerkezet. Minden kulcshoz csak egy érték tartozhat.
+                    Leszármazottjai a következők: Set (Halmaz, Lista, Sor)
+                    Alább röviden írtam pár konkrét class-ról melyek képesek ezen interface implementálására.
+                </para>
+                <section>
+                    <title>TreeMap</title>
+                    <para>
+                    Adatszerkezetkből tanult piros-fekete fa.
+                    </para>
+                </section>
+                <section>
+                    <title>HashMap</title>
+                    <para>
+                    Adatszerkezetkből tanult kulcstranszformációs táblázat, túlcsordulási listával (bucketed hash map).
+                    </para>
+                </section>
+            </section>
+            <section>
+                <title>Szinkronizációs burok</title>
+                <para>
+                    A burok egy olyan osztály meg egy másik osztályt magába foglal, viszont viselkedéseit implementálja.
+                    Egy fajta proxy-ként működve.
+                    Ezenkívül módosíthat is bizonyos viselkedéseket és újakat is adhat hozzá. 
+                    Hogy bemutassan miről van szó, egy egyszerű példát csináltam: 
+                </para>
+                <programlisting language="java" linenumbering="numbered">
+                    <textobject>
+                        <textdata fileref="l00/ch02s02/src/ch02s02/BurockExample.java"/>
+                    </textobject>
+                </programlisting>
+                <para>
+                    Magyarul biztosítja hogy egy synchronized block-ban fusson a not thread safe kód, míg önmagát használja a szinkronizálást használó lockolható erősforrásnak.
+                </para>
+            </section>
+        </section>
+        <section>
+            <title>L fejezet</title>
+            <para>
+            </para>
+        </section>
+        <section>
+            <title>J fejezet</title>
+            <para>
+            </para>
+        </section>
+    </section>
+
+</chapter>
+
+

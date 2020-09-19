@@ -3,11 +3,15 @@ package intf;
 public class Racle implements PostJ8CompliantInterface {
 
 	public static void main(String[] args) {
-		try {
-			new Racle().feature3();
-		} catch (NullPointerException e) {
-			System.out.println("https://youtu.be/MmkHAlhCvWg?t=100");
-		}
+		new PostJ8CompliantInterface() {
+		}.act();
+		
+		new PreJ8CompliantInterface() {
 
+			@Override
+			public void act() {
+				System.out.println("act casually");
+			}
+		}.act();
 	}
 }

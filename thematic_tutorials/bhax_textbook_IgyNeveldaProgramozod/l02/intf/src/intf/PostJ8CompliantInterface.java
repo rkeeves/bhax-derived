@@ -2,14 +2,12 @@ package intf;
 
 public interface PostJ8CompliantInterface {
 
-	default void feature3() {
-		feature2.equals(feature2);
+	default void act() {
+		System.out.println("act");
 	}
 	
-	static PlansToMakeJdkFreeAgain feature1() {
-		return feature2;
+	static void act_static() {
+		System.out.println("act_static");
 	}
-	
-	// null intentionally
-	static PlansToMakeJdkFreeAgain feature2 = null;
+
 }

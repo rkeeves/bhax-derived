@@ -4,5 +4,7 @@ package intf;
  * Contains no implementation.
  */
 public interface PreJ8CompliantInterface {
-	void rollOutNewFeature();
+	void act();
+	
+	static int DEFAULT = 0;
 }
