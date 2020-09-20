@@ -230,30 +230,30 @@ synchronized public double nextGaussian() {
 		return newNode;
 	}
 ...
-                </literallayout>
-                    <para>
+            </literallayout>
+            <para>
             Sajnos nem szép, hogy a treep átállítása egy mélyen eldugott mellékhatása a method-nak, de ezt örökültük a kiindulási C++-ból. (ezen feladat kidolgozása végén van egy olyan megoldás
              mely a fát immutable-é teszi és a treep-t egy új builder class kezeli és az építés is a builder felelőssége.)
-                    </para>
-                    <para>
+            </para>
+            <para>
             Alább látható a kód, de utána bemutatom a program kimenetén a deep copy-t.
-                    </para>
-                    <programlisting language="java" linenumbering="numbered">
-                        <textobject>
-                            <textdata fileref="l01/lzw/prog2/lzw/BaseTree.java"/>
-                        </textobject>
-                    </programlisting>
-                    <para>
+            </para>
+            <programlisting language="java" linenumbering="numbered">
+                <textobject>
+                    <textdata fileref="l01/lzw/prog2/lzw/BaseTree.java"/>
+                </textobject>
+            </programlisting>
+            <para>
             A copy és move ctor hiánya miatt láthatjuk, hogy a main method végén létrehozunk egy új változót, mely egy már létező instance-re mutat.
             Az új változón alkalmazunk egy olyan metódust mely módosítja az instance állapotát, és látható az utána történő kiíratásban
-                    </para>
-                    <para>
+            </para>
+            <para>
                         Először is kezdjük a deep copy-val.
                         Alább látható a program kimenet releváns része.
                         Készítünk egy deep copy-t, majd az így létrehozott új példányt módosítjuk, utána pedig kiíratjuk az eredetit és a másolatot.
                         Csak másolat változott (A sorok végén a zárójelben 0 szerepel az eredeti 1 helyett, ez egyébként egy counter nevű field értéke egy adott node-ban.). 
-                    </para>
-                    <literallayout language="c" linenumbering="numbered">
+            </para>
+            <literallayout language="c" linenumbering="numbered">
 [Mutate ZLWTree-copy]
 [ZLWTree-orig]
 4 ------------1 (1) 
@@ -277,13 +277,13 @@ synchronized public double nextGaussian() {
 3 ---------1 (0) 
 2 ------0 (0) 
 3 ---------0 (0) 
-                    </literallayout>
-                    <para>
+            </literallayout>
+            <para>
                     A második alkalommal csak létrehozunk egy új változót, értékül adjuk az első változóban tárolt eredeti példány referenciáját.
                     Módosítjuk az összes node-ot majd kiíratjuk a fát mindkát változóban tárolt referenciáról.
                     Látható alább, hogy mindkettő változott (a sorok végén a zárójelekben mostmár 0 van)
-                    </para>
-                    <literallayout language="c" linenumbering="numbered">
+            </para>
+            <literallayout language="c" linenumbering="numbered">
 [Mutate just_ref]
 [ZLWTree-just_ref]
 4 ------------1 (0) 
@@ -307,289 +307,476 @@ synchronized public double nextGaussian() {
 3 ---------1 (0) 
 2 ------0 (0) 
 3 ---------0 (0) 
-                    </literallayout>
-                    <para>
+            </literallayout>
+            <para>
                     Tanulság, hogy mivel nincs kifejezett mozgató/másoló szemantika Java-ban ezért C++ átírásánál érdemes picit figyelemmel lenni.
-                    </para>
-                </section>
-                <section>
-                    <title>Overengineered</title>
-                    <para>
+            </para>
+        </section>
+        <section>
+            <title>Overengineered</title>
+            <para>
                         Létrehoztam egy teljesen másik változatot, ami nem 1:1 átírás C++-ról, hanem próbáltam csökkenteni a fa felelősségeit, és egy builder class-ba delegálni az építési viselkedést és az ehhez szükséges állapotváltozót (Node&lt;T&gt; treep).
                         Továbbá próbáltam kisebb részekre bontani a 10+ soros methodokat olvashatóság miatt, bár a megoldással továbbra sem vagyok megelégeve (ugyanis nincs konkrét előírás arra, hogy mit kell betartania a fának, azaz nem kaptunk egy letisztult tervet vagy interface-t az elvárt működésről).
-                    </para>
-                    <para>
+            </para>
+            <para>
                         Alább látható, hogy a Node-ot kiemeltem saját fájlba. 
                         Ez a változtatás egyébként abszolút nem szükséges, sőt olykor az inner class különösen hasznos.
-                    </para>
-                    <programlisting language="java" linenumbering="numbered">
-                        <textobject>
-                            <textdata fileref="l01/lzw/prog2/lzw2/Node.java"/>
-                        </textobject>
-                    </programlisting>
-                    <para>
+            </para>
+            <programlisting language="java" linenumbering="numbered">
+                <textobject>
+                    <textdata fileref="l01/lzw/prog2/lzw2/Node.java"/>
+                </textobject>
+            </programlisting>
+            <para>
                         Alább látható, hogy a Tree nem felelős a felépülésért csak a bejárásért.
-                    </para>
-                    <programlisting language="java" linenumbering="numbered">
-                        <textobject>
-                            <textdata fileref="l01/lzw/prog2/lzw2/Tree.java"/>
-                        </textobject>
-                    </programlisting>
-                    <para>
+            </para>
+            <programlisting language="java" linenumbering="numbered">
+                <textobject>
+                    <textdata fileref="l01/lzw/prog2/lzw2/Tree.java"/>
+                </textobject>
+            </programlisting>
+            <para>
                         Alább látható, hogy az építés át lett hárítva egy absztrakt class-ra.
                         Az ezt subclass-oló osztályok feladata a konkrét építés implementálása.
-                    </para>
-                    <programlisting language="java" linenumbering="numbered">
-                        <textobject>
-                            <textdata fileref="l01/lzw/prog2/lzw2/TreeBuilder.java"/>
-                        </textobject>
-                    </programlisting>
-                    <para>
+            </para>
+            <programlisting language="java" linenumbering="numbered">
+                <textobject>
+                    <textdata fileref="l01/lzw/prog2/lzw2/TreeBuilder.java"/>
+                </textobject>
+            </programlisting>
+            <para>
                         Alább látható, hogy az építő határozza meg milyen fa is fog létrejönni.
                         Próbáltam a viszonylag hosszú, sok elágazást tartalmazó eredeti metódust kicsit rövidebbé és talán olvashatóbbá tenni.
-                    </para>
-                    <programlisting language="java" linenumbering="numbered">
-                        <textobject>
-                            <textdata fileref="l01/lzw/prog2/lzw2/BinTreeBuilder.java"/>
-                        </textobject>
-                    </programlisting>
-                    <para>
+            </para>
+            <programlisting language="java" linenumbering="numbered">
+                <textobject>
+                    <textdata fileref="l01/lzw/prog2/lzw2/BinTreeBuilder.java"/>
+                </textobject>
+            </programlisting>
+            <para>
                         Végül pedig egy példa a használatra.
-                    </para>
-                    <programlisting language="java" linenumbering="numbered">
-                        <textobject>
-                            <textdata fileref="l01/lzw/prog2/lzw2/Main.java"/>
-                        </textobject>
-                    </programlisting>
-                    <para>
+            </para>
+            <programlisting language="java" linenumbering="numbered">
+                <textobject>
+                    <textdata fileref="l01/lzw/prog2/lzw2/Main.java"/>
+                </textobject>
+            </programlisting>
+            <para>
                         A fenti feladatokban a 01111001001001000111 sorozatot  <link xlink:href="https://progpater.blog.hu/2011/03/05/labormeres_otthon_avagy_hogyan_dolgozok_fel_egy_pedat">Bátafai Tanár Úrtól vettem át</link>.
-                    </para>
-                    <figure>
-                        <title>Lzw Java</title>
-                        <mediaobject>
-                            <imageobject>
-                                <imagedata fileref="l01/lzw/build0.png" scale="50" />
-                            </imageobject>
-                            <textobject>
-                                <phrase>Lzw Java</phrase>
-                            </textobject>
-                        </mediaobject>
-                    </figure>
-                </section>
-            </section>
-
-            <section>
-                <title>Gagyi</title>
-                <para>
-			Az  ismert  formális „while  (x  &lt;&#x3d;  t  &amp;&amp;  x  >=  t  &amp;&amp; t !=  x);” tesztkérdéstípusra  adj  a  szokásosnál (miszerint  x,  t  az  egyik  esetben  az  objektum  által  hordozott  érték,  a  másikban  meg  az  objektum referenciája) „mélyebb” választ,  írj  Java  példaprogramot  mely  egyszer  végtelen  ciklus,  más  x,  t értékekkel meg nem! Apéldát építsd a JDK Integer.java forrására4, hogy a 128-nál inkluzív objektum példányokat poolozza!
-                </para>
-                <para>
-									A shallow comparison <literal>t !=  x</literal>simán referenciákat összehasonlítja, hogy ugyanoda mutatnak-e.
-									Ez amiatt problémás mert az OpenJDK implementáció [-128, 127] tartományon mielőtt átad egy instance-t a kliensnek becacheli és későbbi hívásoknál ezt adja vissza.
-                </para>
-                <para>
-                	A dolgot mi is kipróbálhatjuk. Létrehoztam egy primitív egyszerűségű pool-t nested class-ként. Itt simán annyit teszünk, hogy értéktől függetlenül eltárolunk minden instance-t mielőtt átadjuk a kliensnek.
-                </para>
-                <para>
-                	A programban több esetet is végigvizsgálunk. Az elsődleges dolog amit szem előtt kell tartani minden esetben, hogy melyik konkrét instance-ről is lehet szó. Ez a feladat abból a szempontból érdekes, hogy egy egyszerű példán keresztül mutatja be, hogy milyen szépen elválasztható az életciklus kezelés a kliens kódtól (Na jó, valójában itt pont problémát okoz, de ez egy mesterséges példa...).
-                </para>
-                <programlisting language="java" linenumbering="numbered">
+            </para>
+            <figure>
+                <title>Lzw Java</title>
+                <mediaobject>
+                    <imageobject>
+                        <imagedata fileref="l01/lzw/build0.png" scale="50" />
+                    </imageobject>
                     <textobject>
-                        <textdata fileref="l01/jdkint/src/jdkint/Main.java"/>
+                        <phrase>Lzw Java</phrase>
                     </textobject>
-                </programlisting>
-            </section>
-            <section>
-                <title>Yoda</title>
-                <section>
-                    <title>Feladat</title>
-                    <para>
+                </mediaobject>
+            </figure>
+        </section>
+    </section>
+
+    <section>
+        <title>Gagyi</title>
+        <para>
+			Az  ismert  formális „while  (x  &lt;&#x3d;  t  &amp;&amp;  x  >=  t  &amp;&amp; t !=  x);” tesztkérdéstípusra  adj  a  szokásosnál (miszerint  x,  t  az  egyik  esetben  az  objektum  által  hordozott  érték,  a  másikban  meg  az  objektum referenciája) „mélyebb” választ,  írj  Java  példaprogramot  mely  egyszer  végtelen  ciklus,  más  x,  t értékekkel meg nem! Apéldát építsd a JDK Integer.java forrására4, hogy a 128-nál inkluzív objektum példányokat poolozza!
+        </para>
+        <para>
+            A shallow comparison <literal>t !=  x</literal>simán referenciákat összehasonlítja, hogy ugyanoda mutatnak-e.
+            Ez amiatt problémás mert az OpenJDK implementáció [-128, 127] tartományon mielőtt átad egy instance-t a kliensnek becacheli és későbbi hívásoknál ezt adja vissza.
+            Alább egy snippet erről:
+        </para>
+        <literallayout>
+public static Integer valueOf(int i) {
+    if (i &gt;= FinnAndJake.low &amp;&amp; i &lt;= FinnAndJake.high)
+        return FinnAndJake.cache[i + (-IntegerCache.low)];
+    return new Integer(i);
+}
+        </literallayout>
+        <para>
+    Hopp, na itt láthatjuk, hogy valami nincs rendben! Látható, hogy a kód a copyright okok miatt FinnAndJake-nek nevezett osztályt használja, ennek is static fieldjeibe olvasgat.
+    Mi lehet ez a bleeding edge technológia?
+    Nézzünk bele:
+        </para>
+        <literallayout>
+...
+private static class FinnAndJake {
+        static final int low = -128;
+        static final int high;
+        static final Integer cache[];
+...
+    static{
+        // bla bla bla usual init stuff
+        // also, it can get the value of high from a VM prop java.lang.Integer.IntegerCache.high
+    }
+        </literallayout>
+        <para>
+            Egyszerűen az Integer class betöltésekor létrehoz -128, 127 tartományban Integer példányokat berakja őket egy arraybe, aztán őket adja vissza.
+        </para>
+        <para>
+            A dolgot mi is kipróbálhatjuk. Létrehoztam egy primitív egyszerűségű pool-t nested class-ként. Itt simán annyit teszünk, hogy értéktől függetlenül eltárolunk minden instance-t mielőtt átadjuk a kliensnek.
+        </para>
+        <para>
+            A programban több esetet is végigvizsgálunk. 
+            Az elsődleges dolog amit szem előtt kell tartani minden esetben,
+            hogy melyik konkrét instance-ről is lehet szó. 
+            Ez a feladat abból a szempontból érdekes, hogy egy egyszerű példán keresztül mutatja be, 
+            hogy milyen szépen elválasztható az életciklus kezelés a kliens kódtól 
+            (Na jó, valójában itt pont problémát okoz, de ez egy mesterséges példa...).
+        </para>
+        <para>
+            A lényeg az, hogy két referencia egy Integer-re mely az 5 primitív értékű int-et wrappeli nem feltétlen ugyanarra az Integer instance-re mutat.
+            Azért hoztam létre egy pool-t hogy az Integer class-ban látható módon mi is cache-eljünk.
+            Azaz, ha kérek egy 500-as értékű Integer-t Integer.valueOf-al, akkor az mindig más instance lesz.
+            A pool-unkból viszont Ints.of-al kérve mindig garantáltan ugyanazt az instance-t fogjuk kapni.
+        </para>
+        <para>
+            És hogy jön ez ide? Nos úgy hogy <literal>a == b</literal> kifejezés azt hivatott összehasonlítani, ha a és b is obj ref-eket tartalmazó változók hogy az obj ref ugyanoda mutatnak-e!
+            Csúnya példa, de gondoljunk rá úgy mint ha két pointert összehasonlítanánk tisztán aszerint hogy a cím ahova mutatnak megegyezik-e, nem a mutatott memória terület tartalma a fontos.
+            Azaz lehet létezik két memória hely ahol ugyanaz a bitminta van, mégsem tekintendőek ugyanannak.
+            Remélem így már érthető.
+        </para>
+        <programlisting language="java" linenumbering="numbered">
+            <textobject>
+                <textdata fileref="l01/jdkint/src/jdkint/Main.java"/>
+            </textobject>
+        </programlisting>
+    </section>
+    <section>
+        <title>Yoda</title>
+        <section>
+            <title>Feladat</title>
+            <para>
 			Írjunk  olyan  Java  programot,  ami  java.lang.NullPointerEx-el  leáll,  ha  nem  követjük  a <link xlink:href="https://en.wikipedia.org/wiki/Yoda_conditions">Yoda conditions</link>-t! 
-                    </para>
-                </section>
-                <section>
-                    <title>Java</title>
-                    <para>
+                    KÉREM A GYAKVEZ-T HOGY VEGYE FIGYELEMBE HOGY DIREKT NEM HAGYTAM HOGY LEHALJON HANEM ELKAPTAM MAIN-BEN.
+            </para>
+        </section>
+        <section>
+            <title>Java</title>
+            <para>
                         A feladat csak annyiról szól, hogy ha nem primitív típusokról van szó, akkor sohasem szabad elfelejteni, hogy bármi lehet null.
                         Emiatt általában, ha arra vagyunk kénszerülve hogy valamilyen nem static methodot kell hívnunk akkor ott a lehetősége a NullPointerException-nek.
-                    </para>
-                    <para>
-                    Ezen problémának egy megoldása a Disney Cashgrab conditions.
+            </para>
+            <para>
+                    Ezen problémának egy megoldása a Copyrighted By Disney conditions.
                     A lényege annyi, hogy például equals használata esetén, ha van lehetőség, akkor lehetőleg a nagyob bizonyossággal nem null objektum résézéről kell hívni a metódust (és a null-t majd ezen létező instance methodja majd lekezeli.)
-                    </para>
-                    <para>
-                        A null nem egy osztály és nem egy osztály példánya, hanem egy kulcsszó.
+            </para>
+            <para>
+                        A null nem egy osztály és nem egy osztály példánya, hanem egy kulcsszó, amely az obj ref egyetlen literállal megadható értékét jelenti (ORacle doc-ban NullLiteral).
                         Egyébként attól hogy maga az object ref null, még a statikus típust lehet használni, alább példa a static method hívhatóságára.
-                    </para>
-                    <para>
+            </para>
+            <para>
                         Egyébként a megoldásban van egy másik is ami Optional-t használ, utána pedig erre mappelünk (plusz egy default értéket adunk vissza null ref esetén).
-                    </para>
-                    <programlisting language="java" linenumbering="numbered">
-                        <textobject>
-                            <textdata fileref="l01/yoda/src/prog2/yoda/Yoda.java"/>
-                        </textobject>
-                    </programlisting>
-                </section>
-            </section>
-            <section>
-                <title>Kódolás from scratch</title>
-                <para>
+            </para>
+            <programlisting language="java" linenumbering="numbered">
+                <textobject>
+                    <textdata fileref="l01/yoda/src/prog2/yoda/Yoda.java"/>
+                </textobject>
+            </programlisting>
+            <para>
+                        Ezt C++ és C esetében is lehet használni egy másik dologra. Ha logikai kifejezésnél egy == operátort elgépelünk könnyen lehet galiba, és sajnos mivel implicit konverzió léphet fel numerikus típusok esetén ezért a compiler nem fog szólni:
+            </para>
+            <literallayout>
+int a = 0;
+if(a == 1)
+    std::cout&lt;&lt; a &lt;&lt; std::endl;
+if(a = 0)
+    std::cout&lt;&lt; a &lt;&lt; std::endl;
+            </literallayout>
+            <para>
+                    A fenti példa utoldó előtti sorában láthatjuk hogy probléma lép fel, amit a compiler nem tud érzékelni.
+                    A problémát könnyen orvosolhatjuk azzal, ha alkalmazzuk a Copyrighted By Disney conditions!
+            </para>
+            <literallayout>
+int a = 0;
+if(1 == a)
+    std::cout&lt;&lt; a &lt;&lt; std::endl;
+if(0 = a)
+    std::cout&lt;&lt; a &lt;&lt; std::endl;
+            </literallayout>
+            <para>
+                Az így javított esetben már nagyon helyesen fel fog sírni a compiler mint egy újszülött, hiszen így értelmezhetetlenné válik az assignment.
+            </para>
+        </section>
+    </section>
+    <section>
+        <title>Kódolás from scratch</title>
+        <para>
 			Induljunk ki <link xlink:href="http://crd-legacy.lbl.gov/~dhbailey/dhbpapers/bbp-alg.pdf">ebből</link> a tudományos közleményből: és csak ezt tanulmányozva írjuk meg Java nyelven a BBP algoritmus megvalósítását! <link xlink:href="https://www.tankonyvtar.hu/hu/tartalom/tkt/javat-tanitok-javat/apbs02.html#pi_jegyei">Ha  megakadsz,  de  csak  végső  esetben</link>: (mert ha csak lemásolod, akkor pont az a fejlesztői élmény marad ki, melyet szeretném, ha átélnél).
-                </para>
-                <para>
-			Tanulságok, tapasztalatok, magyarázat...
-                </para>
-                 <programlisting language="java" linenumbering="numbered">
-                        <textobject>
-                            <textdata fileref="l01/bbp/src/bbp/BBP.java"/>
-                        </textobject>
-                    </programlisting>
-            </section>
-            <section>
-                <title>EPAM: Java Object metódusok</title>
-                <para>
+        </para>
+        <para>
+			Ide direkt nem írtam semmi magyarázatot, mert csak poénból írtam meg a kódot. Ezen feladat nélkül is meg van a heti 5.
+            Szimplán csak érdekelt mit csinál ez a dolog.
+        </para>
+        <programlisting language="java" linenumbering="numbered">
+            <textobject>
+                <textdata fileref="l01/bbp/src/bbp/BBP.java"/>
+            </textobject>
+        </programlisting>
+    </section>
+    <section>
+        <title>EPAM: Java Object metódusok</title>
+        <para>
 			Mutasd be a Java Object metódusait és mutass rá mely metódusokat érdemes egy saját osztályunkban felüldefiniálni és miért. (Lásd még Object class forráskódja)
-                </para>
-                <para>
+        </para>
+        <para>
 			Az equals method felülírása ajánlatos.
 			Ezt mi is és sok JDK beli osztály is használhatja objektumunkon.
 			Ha nem írjuk felül akkor a default shallow equality fog futni (Az Object class method-ja amit mi felülírhatunk). Ez pedig azt jelenti, hogy ha csak nem ugyanarra a helyre mutató referenciáról van szó két instance-t mindig eltérőnek fog ítélni. Ez nagyon sok esetben nem előnyös.
-                </para>
-                <para>
+        </para>
+        <para>
                 Az equals method override-al nem igazán okozhatunk hibát (de de erről később), szóval mindig megéri.
-                </para>
-                <para>
+        </para>
+        <para>
                 	A hashCode is az Objektum-tól örökölt viselkedést. Ez a java.util-os és egyéb más collection jellegű osztályok használják (pl.: HashTable). Ez is viszonylag fontos. Ami az igazi trükk az egészben, hogy vagy mindkettőt implementáljuk vagy egyiket se (bár ezt a másodikat nem bátorítanám). Alább jó pár pédát hozok az override-ra.
-                </para>
-                <para>
+        </para>
+        <para>
                 	Az Object <literal>finalize</literal> method-ját nem érdemes implementálni, és deprecated is.
-                </para>
-                <para>
+        </para>
+        <para>
                 	A <literal>toString</literal> method-ot opcionálisan átírhatjuk. A célja az hogyha például PrintStream-re jut, akkor a PrintStream a példány ezen method-ját meghívja és a kapott String-et próbálja kiírni.
-                </para>
-                <para>
+        </para>
+        <para>
                 	A <literal>clone</literal> method-ot ha használni akarjuk akkor felül KELL írnunk. Másrészről ha láthatóvá akarjuk tenni öröklési hierarchián kívül akkor emelnünk kell a láthatóságát <literal>protected</literal>-ről <literal>public</literal>-ra.
-                </para>
-                <para>
-                	A <literal>hashCode</literal>, <literal>equals</literal>, <literal>toString</literal> egyébként generálható IDE-vel, vagy még jobb esetben Lombok-kal.
-                </para>
-                <para>
+        </para>
+        <para>
+                	A <literal>hashCode</literal>,            <literal>equals</literal>,            <literal>toString</literal> egyébként generálható IDE-vel, vagy még jobb esetben Lombok-kal.
+        </para>
+        <para>
                 	Annak aki unja a feladatot alább egy Reflectionnel történő ctor használat és var arg továbbítás. Nem szeretek könyveket írni vagy magyar szövegeket, de egyébként is bot egyszerű: csak példányosít random beadott class-t boohoo. A komment arra utal hogy elég vadul semmi előzetes check nélkül beleindexelünk az array-be stb. Védelememre szóljon hogy a célom csak az API próbálgatása volt és valószínűleg rajtam kívül soha senki nem fogja látni se a kódot se ezen mondatot, and this is how you break down a 4th wall.
-                </para>
-                <programlisting language="java" linenumbering="numbered">
-										<textobject>
-												<textdata fileref="l01/object-overrides/src/prog2/objovrride/Main.java"/>
-										</textobject>
-								</programlisting>
-								<programlisting language="java" linenumbering="numbered">
-										<textobject>
-												<textdata fileref="l01/object-overrides/src/prog2/objovrride/NotOverridedObject.java"/>
-										</textobject>
-								</programlisting>
-								<programlisting language="java" linenumbering="numbered">
-										<textobject>
-												<textdata fileref="l01/object-overrides/src/prog2/objovrride/OverriddenObject.java"/>
-										</textobject>
-								</programlisting>
-								<programlisting language="java" linenumbering="numbered">
-										<textobject>
-												<textdata fileref="l01/object-overrides/src/prog2/objovrride/EqOverriddenObject.java"/>
-										</textobject>
-								</programlisting>
-								<programlisting language="java" linenumbering="numbered">
-										<textobject>
-												<textdata fileref="l01/object-overrides/src/prog2/objovrride/HashOverriddenObject.java"/>
-										</textobject>
-								</programlisting>
-								
-            </section>
-            <section>
-                <title>EPAM: Eljárásorientál vs Objektumorientált</title>
-                <para>
-			Írj egy 1 oldalas értekező esszé szöveget, amiben összehasonlítod az eljárásorientált és az objektumorientált paradigmát, igyekezve kiemelni az objektumorientált paradigma előnyeit!
-                </para>
-                <para>
-			Tanulságok, tapasztalatok, magyarázat...
-                </para>
-            </section>
-            <section>
-                <title>EPAM: Objektum példányosítás programozási mintákkal</title>
-                <para>
-			Hozz példát mindegyik “creational design pattern”-re és mutasd be mikor érdemes használni őket!
-                </para>
-                <para>
-			Tanulságok, tapasztalatok, magyarázat...
-                </para>
+        </para>
+        <programlisting language="java" linenumbering="numbered">
+            <textobject>
+                <textdata fileref="l01/object-overrides/src/prog2/objovrride/Main.java"/>
+            </textobject>
+        </programlisting>
+        <programlisting language="java" linenumbering="numbered">
+            <textobject>
+                <textdata fileref="l01/object-overrides/src/prog2/objovrride/NotOverridedObject.java"/>
+            </textobject>
+        </programlisting>
+        <programlisting language="java" linenumbering="numbered">
+            <textobject>
+                <textdata fileref="l01/object-overrides/src/prog2/objovrride/OverriddenObject.java"/>
+            </textobject>
+        </programlisting>
+        <programlisting language="java" linenumbering="numbered">
+            <textobject>
+                <textdata fileref="l01/object-overrides/src/prog2/objovrride/EqOverriddenObject.java"/>
+            </textobject>
+        </programlisting>
+        <programlisting language="java" linenumbering="numbered">
+            <textobject>
+                <textdata fileref="l01/object-overrides/src/prog2/objovrride/HashOverriddenObject.java"/>
+            </textobject>
+        </programlisting>
 
-                <section>
-                    <title>Factory</title>
-                    <para>
+    </section>
+    <section>
+        <title>EPAM: Eljárásorientál vs Objektumorientált</title>
+        <para>
+			Írj egy 1 oldalas értekező esszé szöveget, amiben összehasonlítod az eljárásorientált és az objektumorientált paradigmát, igyekezve kiemelni az objektumorientált paradigma előnyeit!
+        </para>
+        <para>
+			Tanulságok, tapasztalatok, magyarázat...
+        </para>
+    </section>
+    <section>
+        <title>EPAM: Objektum példányosítás programozási mintákkal</title>
+        <para>
+			Hozz példát mindegyik “creational design pattern”-re és mutasd be mikor érdemes használni őket!
+        </para>
+        <para>
+			A programozási minták általánosan jól bevált tapasztalati úton kifejleszett tanácsok és ajánlások.
+            Ezekből fogunk bemutatni párat.
+        </para>
+        <section>
+            <title>Factory</title>
+            <para>
+                <link xlink:href="https://github.com/rkeeves/bhax-derived/tree/master/thematic_tutorials/bhax_textbook_IgyNeveldaProgramozod/l01/patterns/src/prog2/patterns/creational/factory">my implementation</link>
+            </para>
+            <para>
     Factory esetén a példányosítás felelősségét átruházza a hívó a Factory-ra.
     Gyakorlatban már önmagában hasznos tud lenni, ha például sok argumentum van, nem akarunk több egymásra épülő ctor-t stb.
-                    </para>
-                    <para>
+            </para>
+            <para>
     Másik alkalmazás ha a ctor hívás előtt valami tevékenységet kell végezni és ennek felelősségét leakarjuk venni a hívó válláról.
-                    </para>
-                    <para>
+            </para>
+            <para>
     Harmadrészt olykor már csak amiatt is megéri, mert így egy helyen történik a példányosítás, egyszerűbb a debug.
-                    </para>
-                    <para>
+            </para>
+            <para>
     Negyedrészt, az alábbi látható ábrán (UMLetben csináltam olyan is) egy interface-el el is választhatjuk a konkrét implementációt a hívótól.
     Mármint arra célzok, hogy ilyen esetben a hívó csak a Behavior interface-től fog függni, és az implementációt pedig szabadon változtathatjuk.
-                    </para>
-                <figure>
-                    <title>Factory</title>
-                    <mediaobject>
-                        <imageobject>
-                            <imagedata fileref="l01/patterns/factory.jpg" scale="50" />
-                        </imageobject>
-                        <textobject>
-                            <phrase>Factory</phrase>
-                        </textobject>
-                    </mediaobject>
-                </figure>
-            </section>
-
-            <section>
-                <title>Abstract Factory</title>
-                <para>
+            </para>
+            <figure>
+                <title>Factory</title>
+                <mediaobject>
+                    <imageobject>
+                        <imagedata fileref="l01/patterns/factory.jpg" scale="50" />
+                    </imageobject>
+                    <textobject>
+                        <phrase>Factory</phrase>
+                    </textobject>
+                </mediaobject>
+            </figure>
+            <para>
+                A factory mellé gyakran odarakják a director-t is, de szerintem csak opcionális dolog.
+                Szerintem a lényeg a factoryban hogy a hazsnálati helytől elszeparáljuk a példányosítás helyét a kódban, but I'm just a sad old man.
+            </para>
+        </section>
+        <section>
+            <title>Abstract Factory</title>
+            <para>
+                <link xlink:href="https://github.com/rkeeves/bhax-derived/tree/master/thematic_tutorials/bhax_textbook_IgyNeveldaProgramozod/l01/patterns/src/prog2/patterns/creational/abstractfactory">my implementation</link>
+            </para>
+            <para>
     AbstractFactory esetén eggyel tovább növeljük a szeparációt.
     Mostmár a hívó nem egy konkrét factory implementációhoz van kötve.
-                </para>
-                <para>
+            </para>
+            <para>
     Gyakran arra használjuk, hogy a hívó válláról annak felelősségét vegyük le, hogy neki kelljen összeválogatni különböző implementációkat.
     Például OS függő esetekben lehet használni.
-                </para>
-                <para>
+            </para>
+            <para>
                     A Factory-hoz képest az a legnagyobb eltérés (és az ok ami életre hívja), hogy az AbstractFactory valamilyen, a típus rendszerrel nehezen kifejezehető üzleti logika miatt összetartozó osztályok példányosítását kezeli.
-                </para>
-                <para>
+            </para>
+            <para>
                     Apró negatívuma, hogy az absztrakció növelése miatt már nem egy helyen kezeljük a problémát, hanem több factory implementáció van.
-                </para>
-                <figure>
-                    <title>Abstract Factory</title>
-                    <mediaobject>
-                        <imageobject>
-                            <imagedata fileref="l01/patterns/abstractfactory.jpg" scale="50" />
-                        </imageobject>
-                        <textobject>
-                            <phrase>Abstract Factory</phrase>
-                        </textobject>
-                    </mediaobject>
-                </figure>
-            </section>
-            <section>
-                <title>Builder</title>
-                <para>Én akkor szoktam használni, mikor unmutable dolgot kell összerakni több lépésben.</para>
-                <para>Nagy negatívuma, hogy... nos személy szerint én a ctor injection-t preferálom mert mockolni is egyszerűbb.</para>
-            </section>
-            <section>
-                <title>Singleton</title>
-                <para>Anti-pattern. Ugyanolyan deathtrap mint a service locator, plusz win-en dll határon nem működik.</para>
-            </section>
-            <section>
-                <title>Prototype</title>
-                <para>...more to come...</para>
-            </section>
+            </para>
+            <figure>
+                <title>Abstract Factory</title>
+                <mediaobject>
+                    <imageobject>
+                        <imagedata fileref="l01/patterns/abstractfactory.jpg" scale="50" />
+                    </imageobject>
+                    <textobject>
+                        <phrase>Abstract Factory</phrase>
+                    </textobject>
+                </mediaobject>
+            </figure>
         </section>
-    </chapter>                
+        <section>
+            <title>Builder</title>
+            <para>
+                <link xlink:href="https://github.com/rkeeves/bhax-derived/tree/master/thematic_tutorials/bhax_textbook_IgyNeveldaProgramozod/l01/patterns/src/prog2/patterns/creational/builder">my implementation</link>
+            </para>
+            <para>
+            Én akkor szoktam használni, mikor unmutable dolgot kell összerakni, de több lépésben akarom csinálni.
+            Mármint más lehetőségek is vannak, de nekem itt a leghasznosabb.
+            </para>
+            <para>
+                Nagy negatívuma, hogy... nos személy szerint én a ctor injection-t preferálom mert mockolni is egyszerűbb.
+                Plusz ha nincs director, vagy nem használjuk a StepBuilder advancedebb pattern-t, akkor a sorrendiség nem biztosítható. 
+                Bár jó érv ezen negatívum ellen, hogyha már olyan bonyolult dolgot csinálsz hogy külön lépésekből gráf rajzolódik ki, akkor van ennél jobb módszer is.
+            </para>
+            <para>
+                A Director-t is belehet keverni, de nem a pattern szerves része (I dont really care about anyone's opinion on this matter. FYI just take a look at the JDK, lo and behold, they use it too without Director...).
+            </para>
+            <figure>
+                <title>Builder</title>
+                <mediaobject>
+                    <imageobject>
+                        <imagedata fileref="l01/patterns/builder.jpg" scale="50" />
+                    </imageobject>
+                    <textobject>
+                        <phrase>Builder</phrase>
+                    </textobject>
+                </mediaobject>
+            </figure>
+        </section>
+        <section>
+            <title>Singleton</title>
+            <para>
+                <link xlink:href="https://github.com/rkeeves/bhax-derived/tree/master/thematic_tutorials/bhax_textbook_IgyNeveldaProgramozod/l01/patterns/src/prog2/patterns/creational/singleton">my implementation</link>
+                De ne használjuk, inkább használjunk valami framework-öt.
+                BTW, itt egy gagyi pár soros implementáció a lényegről(arg forwarding nincs, a factory-k között nem épül ki dependencia gráf stb. de nem is egy IOC framework volt a feladat csak annak a megmutatása hogy a Singleton-t ki lehet kerülni.): 
+                <link xlink:href="https://github.com/rkeeves/bhax-derived/tree/master/thematic_tutorials/bhax_textbook_IgyNeveldaProgramozod/l01/patterns/src/prog2/patterns/creational/nosingleton">my implementation</link>
+            </para>
+            <para>Anti-pattern. Ugyanolyan deathtrap mint a service locator, plusz win-en dll határon meglepetés fog érni bennünket C++-ban Singleton pattern-el.</para>
+            <figure>
+                <title>Singleton</title>
+                <mediaobject>
+                    <imageobject>
+                        <imagedata fileref="l01/patterns/singleton.jpg" scale="50" />
+                    </imageobject>
+                    <textobject>
+                        <phrase>Singleton</phrase>
+                    </textobject>
+                </mediaobject>
+            </figure>
+            <para>
+                Ezt arra mondom hogy teljesen szembemegy a separation of concerns-el.
+                Gondoljuk csak végig mit is csinálunk?
+            </para>
+            <itemizedlist>
+                <listitem>
+                    <para>
+Biztosítunk a caller-nek egy method-ot amivel adunk egy instance-t.
+                    </para>
+                </listitem>
+                <listitem>
+                    <para>
+Biztosítjuk a tárolást, a háttérben.
+                    </para>
+                </listitem>
+                <listitem>
+                    <para>
+Felelünk az objektum ctor-áért.
+                    </para>
+                </listitem>
+            </itemizedlist>
+            <para>
+                    Egész szép lista! ÉS mi ebben az igazán szuper hosszú távon?
+                    Nos, az egész codebase-ünk tele lesz random helyeken ezen hívásokkal, és mivel static methoddal hívosgatjuk, ezért nem is tudjuk előre.
+                    Mármint egy 300 soros class file-t végig kell néznünk ahhoz hogy ráakadjunk hogy igen a 254.sor ban használjuk.
+                    Nincs konkrétan ott a dependencia a field-jei között stb.
+            </para>
+            <para>
+                    Ez akkor tud igazán jó lenni, amikor egy programon belül kell tudni használni szinkronizáltan is, de bizonyos helyeken meg overkill lenne.
+            </para>
+            <para>
+                    Összességében nagyon módjával használjuk.
+                    Egyébként alább nézzünk meg egy nem singleton-os implementáció-t, amiben ha akarjuk működik singleton-ként, ha meg nem akarjuk nem...
+            </para>
+            <programlisting language="java" linenumbering="numbered">
+                <textobject>
+                    <textdata fileref="l01/patterns/src/prog2/patterns/creational/nosingleton/Main.java"/>
+                </textobject>
+            </programlisting>
+        </section>
+        <section>
+            <title>Prototype</title>
+            <para>
+                <link xlink:href="https://github.com/rkeeves/bhax-derived/tree/master/thematic_tutorials/bhax_textbook_IgyNeveldaProgramozod/l01/patterns/src/prog2/patterns/creational/builder">my implementation</link>
+            </para>
+            <para>A javascript-nél ezzel a patternnel gyakran fogunk majd találkozni.
+            A lényeg az, hogy a kliens nem fér hozzá, és ne is biztos hogy tud bizonyos fieldekről, így nem tudja elvégezni a mésolást.
+            Emiatt a másolást delegáljuk magukra az objektumokra (pontosabban az ő osztályukra).</para>
+            <para>
+                Ezt a pattern-t akkor is lehet használni, ha háttérben be kell kötni sok mindent ctor-ba és ahelyett hogy ezeket újra le kéne keresnünk csak az eredeti instance referenciáit átmásoljuk.
+            </para>
+            <para>
+                Az alább látható class a kliens felé úgy néz ki mint egy but dictionary, de az id értéket nem a map-ből nyeri.
+            </para>
+             <programlisting language="java" linenumbering="numbered">
+                <textobject>
+                    <textdata fileref="l01/patterns/src/prog2/patterns/creational/prototy/Entity.java"/>
+                </textobject>
+            </programlisting>
+            <figure>
+                <title>Prototype</title>
+                <mediaobject>
+                    <imageobject>
+                        <imagedata fileref="l01/patterns/prototype.jpg" scale="50" />
+                    </imageobject>
+                    <textobject>
+                        <phrase>Prototype</phrase>
+                    </textobject>
+                </mediaobject>
+            </figure>
+        </section>
+    </section>
+</chapter>                
