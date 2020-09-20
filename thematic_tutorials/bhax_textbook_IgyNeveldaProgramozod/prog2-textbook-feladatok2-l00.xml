@@ -20,7 +20,7 @@
             <para>
       				Nagyjábóli áttekintés.
             </para>
-      
+
             <section>
                 <title>Első két alkalmazás</title>
                 <para>
@@ -39,35 +39,35 @@
                 hogy érdemes átképezni munkaerejüket erre a paradigmára.
                 Nem szeretnék most belemenni a tovább részleteibe, de természetesen OOP nem csak ennyi van pl.: lifecycle management, dynamic dispatch és a többi.
                 </para>
-                    <para>
+                <para>
                 De mi is az a Java? Elég a beszédből, írjunk egy új fájlt HelloJava.java néven!
-                    </para>
-                    <programlisting language="java" linenumbering="numbered">
-                        <textobject>
-                            <textdata fileref="l00/ch01s01/HelloJava.java"/>
-                        </textobject>
-                    </programlisting>
-                    <para>
+                </para>
+                <programlisting language="java" linenumbering="numbered">
+                    <textobject>
+                        <textdata fileref="l00/ch01s01/HelloJava.java"/>
+                    </textobject>
+                </programlisting>
+                <para>
                 Ha ez meg volt, gépeljük be terminálba a következő két parancsot ( a második egy szöveges kimenetet ad, szóval stdout-ját befolyathatjuk egy új fájlba is, egyébként csak kiköpi terminálra )!
-                    </para>
-                    <literallayout>
+                </para>
+                <literallayout>
 javac -g HelloJava.java 
 javap -l -c HelloJava
-                    </literallayout>
-                    <para>
+                </literallayout>
+                <para>
                     Valami ilyesmit kell kapnunk:
-                    </para>
-                    <programlisting language="c" linenumbering="numbered">
-                        <textobject>
-                            <textdata fileref="l00/ch01s01/HelloJava.txt"/>
-                        </textobject>
-                    </programlisting>
-                    <para>
+                </para>
+                <programlisting language="c" linenumbering="numbered">
+                    <textobject>
+                        <textdata fileref="l00/ch01s01/HelloJava.txt"/>
+                    </textobject>
+                </programlisting>
+                <para>
                     Már a szövegből is láthatjuk hogy bármi is a VM, kell hogy legyen benne stack.
                     Abszolút nem cpu instrukciókat látunk, egyszerű stack műveleteket.
                     Mi ez az egész?
-                    </para>
-                    <para>
+                </para>
+                <para>
                     Később fogunk róla beszélni, de a mi kis OO forrásfájljainkat a compiler egy egyszerű gép szintjére fordítja és ezt bytecode-nak nevezzük.
                     Ezen bytecode-ok összessége jelentheti a programunkat, library-nket stb.
                     (A VM nem csak egy stack. Ez egy teljes hazugság, a stack csak egy a sok fontos részlet közül. Maga a frame, native callok, constant pools, dynamic dispatch stb. 
@@ -75,39 +75,39 @@ javap -l -c HelloJava
                     Mármint lesz szó jó pár dologról ahol javap-vel decompile-olva a bytecode-ot nézünk stb.
                     Most még elégedjünk meg azzal hogy egy method bodyban kiszámítjuk mennyi 1+1 és gondolkodunk azon hogy milyen zenekar lehet az a LIFO :) 
                     Ha valakit mégis a top-down szemlélet érdekel itt egy hasznos link: <link xlink:href="https://blog.jamesdbloom.com/JVMInternals.html#memory_management">JVM Internals</link>).
-                    </para>
-                    <para>
+                </para>
+                <para>
                     Láthatjuk (42.sor), hogy annak ellenére hogy semmi ctor-t nem írtunk, a compiler mégis begenerált egy default-ot. 
                     Sőt, szemfülesebbek észrevehetik azt is, hogy miután aload_0-val(42.sor) a LocalVariableTable 0 indexén lévő elemét (this) benyomta stack-re. 
                     Ezután invokespecial-el(43.sor) meghívja a super class ctor-át majd visszatér.
-                    </para>
-                    <para>
+                </para>
+                <para>
                     Ami kicsit furcsa lehet az a dup (57. sor). Miért duplikálja a stack top-ot?
                     Nos, utána egyértelműen hívja a ctor-t. Nézzük meg a ctor mivel végződik: return-el. 
                     Azaz a ctor leveszi a stack-ről a példány referenciáját használgatja, majd befejeződik.
                     Szóval ha nem dup-olnánk, akkor ugyan lefutna a ctor, de nem tudnánk megcsinálni az astore_1(59.sor) utasítást, hiszen üres lenne a stack, mert azt az 1 példány referenciát a ctor előbb lekapta a stackről (LIFO stack).
-                    </para>
-                    <para>
+                </para>
+                <para>
                     Ha megnézzük akkor látható, hogy a LocalVariableTable-ben láthatjuk is a, b, c változóink adatait!
                     Ebbe az egészbe csak amiatt mentem bele, hogy értsük, hogy az egész Java nyelv csak egy absztrakciós layer egy stackmachine felett.
                     Jön a kérdés, hogy akkor bármi ami valid bytecode-ot generál elfut-e?
                     Igen, teljesen random nyelveket is lehet csinálni. Sőt csinálnak is, IntelliJ-t készítő cég is azt hiszem főként talán Android célra.
                     Mi ebben a könyvben csak és kizárólag a Java nyelvről fogunk tanulni.
-                    </para>
-                    <para>
+                </para>
+                <para>
                     A könyv említi, hogy optimalizálás miatt futáskor a fizikális gépi kódra is fordíthatja, hogy gyorsabban fusson, de JIT compiler-ek esetén például lehetséges automata inline-ing.
                     Ebből az egészből annyi a lényeg, hogy csak hobbiból szórakozzunk bytecode-al.
-                    </para>
-                    <para>
+                </para>
+                <para>
                     A továbbiakban egyébként én Eclipse-et fogok használni, mert E betűvel kezdődik ami a buddhizmusban .
                     Csináljunk egy új class-t!
-                    </para>
-                    <programlisting language="java" linenumbering="numbered">
-                        <textobject>
-                            <textdata fileref="l00/ch01s01/HelloWorld.java"/>
-                        </textobject>
-                    </programlisting>
-                    <para>
+                </para>
+                <programlisting language="java" linenumbering="numbered">
+                    <textobject>
+                        <textdata fileref="l00/ch01s01/HelloWorld.java"/>
+                    </textobject>
+                </programlisting>
+                <para>
                     A System Class Loader(A Bootstrap tölti a jdk-t, az Ext a külső libeket) betölti a class-t, inicializálja
                     ezek után hívja a main method-ot. Azért tudja hívni, mert ez egy static method és külsőleg bárki által hívható azaz public.
                     A main method-nak nem célja értelmes érték visszaadása ezért void kulcsszóval megadott a return type.
@@ -116,9 +116,9 @@ javap -l -c HelloJava
                     Ez ugye a System class-al történik, mely egy wrapper class az os körül illetve sok method-ja convenience jellegű simán egy ugyanolyan nevű methodot hív a Runtime osztályból.
                     A mi esetünkben fontosabb, hogy van egy public static PrintStream fieldje, és mi ennek az objektumnak hívjuk a println methodját.
                     Ezek után visszatérünk a main body-ból, és mivel vége a programnak, a VM végrehajtja a shutdownhook-jainkat (Runtime osztály megfelelő methodját használjuk hook regisztrálásra), majd pedig elkezdi a cleanup-ot.
-                    </para>
+                </para>
             </section>
-   
+
             <section>
                 <title>Applet</title>
                 <para>
@@ -949,15 +949,15 @@ a = new A(2,"fb"); // Problematic
             </programlisting>
             <para>
                 Az első példában a java.lang package ből a Math osztályt importáltuk.
-                 </para>
-                <para>
+            </para>
+            <para>
                 A második példa, a java.lang.reflect összes public típusának importálása.
                 Azaz ha csak egy class előtt nem jelezzük public kulcsszóval, akkor ilyen esetekben nem is fog importálódni.
-                </para>
-                <para>
+            </para>
+            <para>
                 A harmadik példa egy konkrét statikus import. Ennek során egy konstans értéket importálunk 
                 ch02s02 package-ből StaticExample osztályból, melynek neve STATIC_FIELD.
-                </para>
+            </para>
         </section>
         <section>
             <title>Kivételkezelés</title>
@@ -1126,7 +1126,16 @@ a = new A(2,"fb"); // Problematic
             <para>
                 A Java próbált egy átlalános megoldást nyújtani a leggyakrabban előfordukó, és egyértelműen implementálható adatszerkezetekből, ezt nevezik Collections Framework-nek. 
                 <link xlink:href="https://docs.oracle.com/javase/8/docs/technotes/guides/collections/overview.html">Ezen a linken található az összefoglaló a teljes Collections Framework-ről</link>
-                A Collectin Framework generikus és a különböző interface-eket próbálták úgy kialakítani, hogy a legtöbb igénynek megfelelő esetben lehessen megfelelő interface-t találni.
+                A Collection Framework generikus és a különböző interface-eket próbálták úgy kialakítani, hogy a legtöbb igénynek megfelelő esetben lehessen megfelelő interface-t találni.
+            </para>
+            <para>
+                A Collection Framework alján azonban implementációkat is kell adni, ezek pedig az Algoritmusok és Adatszerkezetek tárgyból ismerős adatszerkezetek. 
+                A saját nagyon primitív, egyszerű, nem generikus, és csúnya implementációkból párat felraktam a <link xlink:href="https://github.com/rkeeves/bhax-derived/tree/master/thematic_tutorials/bhax_textbook_IgyNeveldaProgramozod/l00/datastructures">repo egyik subdirectory-jába</link>.
+                Ezeket anno adatszerkhez csináltam, mert annak ellenére hogy egy félévig foglalkoztunk vele egyetlen C++ vagy Java kódot sem láttunk.
+                <link xlink:href="https://youtu.be/Gr_p7Tfl2e0?t=32">Persze ennek biztos pedagógiai okai voltak.</link>
+                Az implementációk célja nem a használat volt, hanem hogy poénból leprogramozzam, hogy tudjam a későbbiekben értékelni a Collections-t STL-t stb.
+                Például red-black tree, AVL fa clrs és okasaki, táblák stb. A lényeg ezzel csak az, hogy tudjuk értékelni azt a tényt hogy nem nekünk kell megírni a HashMap-et nullából, hanem van Collections.
+                A másik lényeg amit bev prog-on az egyik fiatal, de annál inkább emberközelibb és gyakorlatibb oktatóm mondott: "Persze ezeket legalább egyszer mindenkinek ki kell próbálnia, de munkahelyen ne kezd el megírni a sort algoritmusokat, mert kirúgnak."
             </para>
             <para>
                     A Collections framework két különböző gyökérből indul.
@@ -1258,15 +1267,200 @@ a = new A(2,"fb"); // Problematic
                     Magyarul biztosítja hogy egy synchronized block-ban fusson a not thread safe kód, míg önmagát használja a szinkronizálást használó lockolható erősforrásnak.
                 </para>
             </section>
+            <section>
+                <title>Algoritmusook</title>
+                <para>
+                    Az STL-hez hasonlóan itt is van lehetőságünk általános algoritmusok használatára a collections osztályokon.
+                </para>
+                <para>
+                    Sort, azaz rendezés lehetővé teszi egy gyűjtemény elemeinek rendezését.
+                    Alább egy példa. Nem natural order-t használtam, hogy szépen látszódjon, hogy bármilyen Comparator-t használhatunk.
+                </para>
+                <programlisting language="java" linenumbering="numbered">
+                    <textobject>
+                        <textdata fileref="l00/ch02s02/src/ch02s02/CollectionsSort.java"/>
+                    </textobject>
+                </programlisting>
+                <para>
+                    Láthatjuk, hogy magának a lista elemek osztályának nem is kell feltétlen Comparable-nek lenniük.
+                    Mi saját magunk hoztunk létre két különböző Comparator-t implementáló class-t, és ezek más és más sorrendet eredményeznek rendezés után.
+                    A rendezettséget megszüntethetjük shuffle-el.
+                </para>
+                <programlisting language="java" linenumbering="numbered">
+                    <textobject>
+                        <textdata fileref="l00/ch02s02/src/ch02s02/ShuffleExample.java"/>
+                    </textobject>
+                </programlisting>
+                <para>
+                    A copy, reverse és fill method-ok használatára alább csináltam egy példát.
+                    Vigyázzunk a copy-val! Ha a forrás (src) lista hosszabb mint a cél (dst) akkor runtime (unchecked) exceptiont fog dobni a method! 
+                    (Ezért is passzolom be az ArrayList ctor-ba az előző listát).
+                </para>
+                <programlisting language="java" linenumbering="numbered">
+                    <textobject>
+                        <textdata fileref="l00/ch02s02/src/ch02s02/CopyRevFillExample.java"/>
+                    </textobject>
+                </programlisting>
+                <para>
+                    Bináris keresést is csinálhatunk, de ugye ehhez már tanultuk, hogy rendezett lista kell.
+                    Max és min is kereshető, akár ha az elem osztály megvalósítja a Comparable-et, vagy akár Comparator instance bepasszolásával.
+                    Alább egy rövid kis példa a használatára.
+                </para>
+                <programlisting language="java" linenumbering="numbered">
+                    <textobject>
+                        <textdata fileref="l00/ch02s02/src/ch02s02/BinSearchExample.java"/>
+                    </textobject>
+                </programlisting>
+                <para>
+                    Ez csak pár példa a sok hasznos algoritmusra. 
+                    Amit a fenti példákból megtanultunk az az hogy mindig olvassuk el, milyen precondition-öket feltételeznek és miket dobhatnak.
+                    Azaz ha egy algo csak úgy működik, hogy már rendezett a lista, akkor nem csodálkozzunk hogyha ez nem áll fenn és meghívjuk az algot akkor butaságot kapunk.
+                </para>
+            </section>
         </section>
         <section>
-            <title>L fejezet</title>
+            <title>C++ vs Java</title>
             <para>
+               Alapvető különbség, hogy a Java egy virtuális gépen fut, azaz a VM által elfogadott bytecode-ot generál a compiler.
+               A C++-ban azonban egyenesen az adott architektúrára specifikus kódot generál a compiler.
+                <link xlink:href="https://youtu.be/Gr_p7Tfl2e0?t=32">Ha van kedvünk akár böngészőből is nézegethetjük, melyik compiler mit generál.</link>
             </para>
-        </section>
-        <section>
-            <title>J fejezet</title>
             <para>
+                Javaban nincs lehetőségünk a konkrét memóriához férni és kezelni azt, ezt csak hivatkozásokon keresztül tudjuk megtenni.
+                C++-ban azonban gond nélkül megy ez, sőt emiatt pl. C-ben írt programmal gond nélkül tudunk együtt működni. 
+                Például ha van egy C-ben írt progi és ez biztosít egy API-t és valamilyen dinamikus könyvtár betöltési lehetőséget akkor C++ is írhatunk ilyet, csak pár dologra figyelnünk kell (pl. name mangling).
+            </para>
+            <para>
+                A C++ static és dynamic library illetve maga a linking phase kimarad a Java-ból hiszen nincs szükség rá. 
+                Az osztályok class file-okra fordulnak. Még az első fejezetben láthattuk, hogy az soztáyl nevek szószerint String-ként kerülnek a constant pool-ba, azaz az importált class-okra történő hivatkozás "feloldását" a VM végzi.
+            </para>
+            <programlisting language="c" linenumbering="numbered">
+                <textobject>
+                    <textdata fileref="l00/ch01s01/HelloJava.txt"/>
+                </textobject>
+            </programlisting>
+            <para>
+                C++ esetén azonban ez nem tud így működni, hiszen konkrét címeket kell majd számolni, és konkrét foglalandó méretek kellenek.
+            </para>
+            <para>
+                A Java-ba a primitív típusokon kívül minden más objektum referencia.
+                Emiatt nem szükséges move és copy szemantika, míg C++ oldalon ezek a nyelv egyik alapvető építő tégláját képezik.
+            </para>
+            <para>
+                Egy másik óriási különbség az, hogy a Java-ban nincs lehetőség explicit manuális dinamikus memória menedzsment-re. 
+                Ezt a GC (vagy GC-k generációnként) végzi.
+                C++ esetben azonban annak ellenére hogy sok segédeszközünk van (smart pointer), mégis at the end of the day nekünk kell gondoskodnunk a dinamikus memória kezelésről. 
+                Java esetben lehetőség szerint kerülni kell a finalize és shutdown hook-ok használatát.
+                C++ esetben ezzel ellentétben a dtor szerves része egy programnak.
+            </para>
+            <para>
+                Mivel C++-ban konkrét hozzáférésünk van a memóriához, ezért teljesen mély kontrollunk van arra is, hogy a memóriában milyen képet mutassanak adataink (alignment stb.).
+                Java esetén ehhez nem tudunk hozzáérni, teljes egészében a konkrét VM implementációtől függ.
+            </para>
+            <para>
+                A Java előnye azonban emiatt az, hogy érvénytelen mem access a szó C C++ segfault-osan aranyos értelmében nem lehetséges hétköznapi programok során.
+            </para>
+            <para>
+                A Java-ban ráadásul mivel VM-en futunk, ezért elképesztő mennyiségű plusz dolgot tudunk használni amit a C++-ben saját kézzel kéne írnunk.
+                A tankönyv itt az env vars-ra megy rá. Igen Java-ban a VM-től betudjuk ezen infokat szerezni, nem kell a C++ non standard dolgokat használni.
+                De az értelmes és fantáziadús olvasó megértheti, hogy az a tény hogy egy OS agnosztikus VM-en futunk és ő ad nekünk egy Runtime-nak (plusz System) nevezett entry point-ot nem a történet vége.
+                Ilyen példa a SystemClassLoader. Ezt használja a VM az osztályok betöltésére impliciten. De ezt használhatjuk explicit módon is.
+            </para>
+            <para>
+                A Java nem támogatja a fejállományokat, makrókat stb.
+                (Ugye az is különbség hogy Java-ban nincs szükség forward declaration-re)
+                Ez sok tekintetben hátrány, azonban meg kell jegyeznem, hogy egy csomószor láttam, hogy a makrók, nos... NAGYON nehezen debuggolhatóak.
+                Véleményem szerint a Java szellemiségét nagyon jól tükrözi, hogy az egyszerűség és biztonság kedvéért ezt kihagyták.
+                Egyszerű analógiával élve a Java egy nagyon jó kis fésű, amivel beállíthatod a hajad akármilyen trendi formára, viszont nem tudod megszúrni vele véletlenül a fejbőröd.
+                Ezen trendi hajbeállítós analógiában a C++ a <link xlink:href="https://en.wikipedia.org/wiki/CRISPR">CRISPR</link>.
+            </para>
+            <para>
+                Java-ban nincs értelme fejállományoknak, C++-ban azonban elég fontos a szerepük (<link xlink:href="https://en.cppreference.com/w/cpp/language/pimpl">pimpl</link>).
+            </para>
+            <para>
+                A Java-ban a bináris kompatibilitás miatt a primitív típusok megvalósítása ki van kötve.
+                C++ esetén azonban ezt meghagyják, hogy az adott platform szerint leghatékonyabb lehessen, azaz compile time dől el.
+                Ez azzal a negatívummal jár, hogy a különböző architektúrák más és más kódot generálnak.
+            </para>
+            <para>
+                OS szinten is elég komoly eltérés van. Mármint arra gondolok, hogy C++ esetén bizonyos OS-ek által biztosított funkcionalitások teljesen másképp működhetnek.
+                Ezzel szemben Javaban egy annyira komolyan OS függő dolog is mint az ablak kezelés is az absztrakció miatt hasonlóan kezelhető.
+            </para>
+            <para>
+                wchar pl. nem eldöntött C++ esetén. Erre egy régi történetet hoznék:
+                Egyszer kellett írnom egy dll-t egy progihoz, és az API-ja úgy volt megírva, hogy a dll entry pointnál az dll írójának egy API function-be kellett továbbítani a wchar méretét stb.
+            </para>
+            <para>
+                Java-ban másik ilyen különbség az implicit type conversion hiánya számok és a boolean között. C és C++ esetében például egy 0 értékű int-et implicit módon értelmezhetünk false-ként.
+            </para>
+            <para>
+                A C++-al ellentétben stack-en nem tárolunk objektumokat. Azok mindig a dinamikus tárban tárolódnak, stack-en maximum az erre mutató referenciák találhatóak.
+            </para>
+            <para>
+                A hivatkozások összehasonlítására használható a Java-ban objektum ref-ek esetén a == operátor. Ez szó szerint össze hasonlítja a két referenciát.
+                NEM A KÉT HIVATKOZOTT PÉLDÁNYT.
+                Ha mélyebb összehasonlítást akarunk, arra az equals method használatos.
+            </para>
+            <para>
+                C++-ban a const kulcsszóval nagyon sok mindent jelölhetünk.
+                Például, hogy nem változtathatjuk meg hogy egy ptr hova mutasson.
+                Másik felhasználása hogy a mutatott példánynak olyan funkcióját ne hívhassuk meg mely maga nem garantálja const-al, hogy nem változtatja az objektum állapotát.
+                Java-ban a const nem értelmezhető. 
+            </para>
+            <para>
+                A C++-ban argumentumoknak default érték adható, Java-ban nincs ilyen nyelvi feature.
+                C++-ban base class és member init-re ctor initialization list-et használhatunk.
+                Ilyen megint csak nincs Java-ban, a super ctor-t például explicit ctor body-ban hívjuk.
+            </para>
+            <para>
+                A C++-ban értelmezett a static keyword function body-n belül.
+                Java-ban ez nincs így method body-n belül.
+            </para>
+            <para>
+                Java-ban minden instance method virtual.
+                C++-ban annyira nagyon nem, hogy öröklés miatt még a dtor-t is virtual-nak kell jelölni, különben meg fogunk lepődni.
+                Másrészről az egész interface hiányzik C++-ból.
+                A C++-ban leginkább egy olyan abstract class-al tudjuk ezt kezelni melynek nincsenek adat tagjai, és az össze funckiója virtual és töröljük implementációjukat.
+            </para>
+            <para>
+                C++-ban a visibility fajtákból hiányzik a package szintű default, hisz maga a package nem értelmezhető. 
+                A Java-ban ráadásul öröklésnél maga a base class láthatóságát nem állíthatjuk.
+                C++-ban technikailag címke alapon történik a visibility értelmezése, míg Java esetén minden field és method elé explicit le kell írni a visibility fajta kulcsszavát.
+                C++-ban ez az egész nem kőbevésett, hiszen a friend feature-rel ezt meg lehet kerülni.
+                Java-ban nem létezik friend feature.
+            </para>
+            <para>
+                A struct a C-vel történő együtt működésre használatos, passzív, pusztán adattárolásra szánt.
+                Ehhez hasonló indíttatású a Java-ban a POJO.
+            </para>
+            <para>
+                Unió C++ oldalon értelmezett, míg Java-ban nem.
+                Egyébként union-nal sokat találkozhatunk ha C-vel dolgozunk, sőt Hálózatokból egy nagyon korrekt gyakvez tanítgatott minket, és természetesen említette hogy back in the old days mi volt az elfogadott <link xlink:href="https://beej.us/guide/bgnet/html/">socket-földén</link>.
+            </para>
+            <para>
+                String kezelés szempontjából a Java biztonságosabb mint a C++, ugyanis a String létrejötte után immutable-nek tekinthető, C++-al ellentétben.
+            </para>
+            <para>
+            C++ esetén látott namespace-ek eltűntek, viszont cserébe egy icipicit hasonló feature jött be a package-ek. 
+            A C++ és a Java eltér a dependenciák használatában.
+            A Java azt a hitet vallja, hogy a a különböző dependenciák kezelése legalább annyira fontos része a programozó munkájának mint a kód megírása. 
+            Később fogjuk tanulni, hogy a package feature a web-es alkalmazások területén is nagy segítség.
+            On the other hand, in my honest opinion, C++ just doesn't care, and therefore suffers from it immensely, but you can always use Cmake which evolved into kind of a trainwreck form, but it gets the job done at least.
+            </para>
+            <para>
+                Futási idejű típus információk kinyerésére Java-ban vannak operátorok (e.g. instanceof) sőt az egész Reflection API.
+                A C++-ból direkt ki is akarták hagyni. Egy wonky módon typeinfo-t lehet használni, de ha jól értem inkább érdemes <link xlink:href="https://en.wikipedia.org/wiki/Curiously_recurring_template_pattern">CRTP</link>-vel statikusan kezelni az ilyen dolgokat ha lehet.  
+            </para>
+            <para>
+                A template-ek és generikus class-ok közt óriási különbség van. Egy teljes fejezetben írtunk a template-ek ről Java-ban, de a végén kiderült hogy igazság szerint csak egy hack az egész.
+                C++-ban egy adott paraméterekkel generált template class le is generálódik.
+                Az előbb mutatott <link xlink:href="https://en.wikipedia.org/wiki/Curiously_recurring_template_pattern">CRTP</link> counter-es példát nem is lehetne Java esetén megtenni, hiszen a valóságban egyetlen class fog létrejönni type erasure miatt.
+                A type erasure-nek pont az az előnye, hogy egyetlen "implementáció" fog létrejönni.
+                Negatívuma pedig pont az, hogy a runtime típus-t elveszítjük.
+                A másik probléma, hogy a generic class-nak önmagában fordíthatónak kell lennie.
+                A C++-ban azonban (pl. specializáció) nagyon komolyan is függhetünk a használati paraméterektől.
+                <link xlink:href="https://en.cppreference.com/w/cpp/language/template_parameters">Annyira, hogy nem csak típusokkal paraméterezhetjük a template-et</link>. 
+                A Java viszont pontosan a kevesebb lehetőség és type erasure miatt átláthatóbb, biztonságos működést nyújt, gyengébb kifejezőképesség és a CRTP lehetőségének elvesztése árán.
             </para>
         </section>
     </section>
