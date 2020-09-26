@@ -113,7 +113,7 @@
                 Mivel azonban Penguin esetén erre nincs lehetőség hibát kell hogy dobjunk.
                 Ez viszont azt vonzza magával, hogy ha ezen megoldásnál maradunk, minden hely ahol Bird class-t használunk az egy potenciális hely runtime_error-ra.
             </para>
-            <programlisting language="cpp" linenumbering="numbered">
+            <programlisting language="c++" linenumbering="numbered">
                 <textobject>
                     <textdata fileref="l02/liskov-cpp/liskov_violate.cpp"/>
                 </textobject>
@@ -122,7 +122,7 @@
                 A fenti probléma kiküszöbölhető, ha csak a valóban közös viselkedést és állapotváltozókat definiáljuk super class-ban. 
                 Jelen esetben a Bird osztály csak a lay_egg function implementációját kényszeríti ki.
             </para>
-            <programlisting language="cpp" linenumbering="numbered">
+            <programlisting language="c++" linenumbering="numbered">
                 <textobject>
                     <textdata fileref="l02/liskov-cpp/liskov_abide.cpp"/>
                 </textobject>
