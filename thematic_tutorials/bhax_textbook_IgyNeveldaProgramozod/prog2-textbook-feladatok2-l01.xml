@@ -758,14 +758,6 @@ Felelünk az objektum ctor-áért.
             <para>
                 Ezt a pattern-t akkor is lehet használni, ha háttérben be kell kötni sok mindent ctor-ba és ahelyett hogy ezeket újra le kéne keresnünk csak az eredeti instance referenciáit átmásoljuk.
             </para>
-            <para>
-                Az alább látható class a kliens felé úgy néz ki mint egy but dictionary, de az id értéket nem a map-ből nyeri.
-            </para>
-             <programlisting language="java" linenumbering="numbered">
-                <textobject>
-                    <textdata fileref="l01/patterns/src/prog2/patterns/creational/prototype/Entity.java"/>
-                </textobject>
-            </programlisting>
             <figure>
                 <title>Prototype</title>
                 <mediaobject>
@@ -777,6 +769,14 @@ Felelünk az objektum ctor-áért.
                     </textobject>
                 </mediaobject>
             </figure>
+            <para>
+                Az alább látható class a kliens felé úgy néz ki mint egy but dictionary, de az id értéket nem a map-ből nyeri.
+            </para>
+            <programlisting language="java" linenumbering="numbered">
+                <textobject>
+                    <textdata fileref="l01/patterns/src/prog2/patterns/creational/prototype/Entity.java"/>
+                </textobject>
+            </programlisting>
         </section>
     </section>
 </chapter>                

@@ -1,0 +1,273 @@
+<chapter xmlns="http://docbook.org/ns/docbook"
+    xmlns:xlink="http://www.w3.org/1999/xlink"
+    xmlns:xi="http://www.w3.org/2001/XInclude" version="5.0" xml:lang="hu">
+    <info>
+        <title>Helló, Liskov!</title>
+        <keywordset>
+            <keyword/>
+        </keywordset>
+    </info>
+
+    <section>
+        <title>Liskov helyettesítés sértése</title>
+        <section>
+            <title>Feladat</title>
+            <para>
+            Írjunk olyan OO, leforduló Java és C++ kódcsipetet, amely megsérti a Liskov elvet! 
+            Mutassunk rá a megoldásra: jobb OO tervezés.
+            </para>
+        </section>
+        <section>
+            <title>Általános</title>
+            <para>
+               A subclassolás egy a típusok közötti reláció. Például legyen Ember egy típus, míg Emlős és Állat egy-egy másik.
+            Valahogy jelezni kéne azt az informális tudást, hogy az Ember egy Emlős. Jelüljük úgy hogy Ember &lt;: Emlős.
+            A hivatalos általában használt szokás szerint Ember &lt;: Ember (reflexív).
+            Ezentúl, ha Ember &lt;: Emlős és Emlős &lt;: Állat, akkor Ember &lt;: Állat (tranzitív).
+            Mivel a fenti reláció a Típushoz Típust rendel, reflexív és tranzitív ezáltal előrendezés a Típusok halmazán (ez csak informális, valójában ez a megállási problémához hasonló helyzetet <link xlink:href="https://agda.readthedocs.io/en/v2.6.0/language/universe-levels.html#universe-levels"> idézne elő </link>.).
+            Ez az a rendezés amivel szoktunk a gyakorlati életben találkozni (mikor elsírja magát az IDE).
+            </para>
+            <para>
+                A subtype behelyettesíthetősége annyi tesz ha A &lt;: B fenn áll, akkor B helyén A használata lehetséges.
+                Sajnos a valóságban ezt sok módon tönkre lehet tenni, és itt jönnek be a Liskov elvek.
+            </para>
+            <para>
+                A subtype behelyettesíthetősége annyi tesz ha A &lt;: B fenn áll, akkor B helyén A használata lehetséges.
+                Sajnos a valóságban ezt sok módon tönkre lehet tenni, és itt jönnek be a Liskov elvek.
+            </para>
+            <para>
+                Kovariancia esetén megtartjuk a fentebb ismertetett relációt.
+                Kontravariancia esetén a fenti rendezés fordítottját alkalmazzuk.
+            </para>
+            <para>
+                Liskov alapján a method által visszaadott típus esetén kovariancia elvárt.
+                Alábbi programrészlet bemutatja, hogy D-ben a return type D, annak ellenére, hogy a superclass B return type-ot ír elő.
+            </para>
+            <programlisting language="java" linenumbering="numbered">
+                <textobject>
+                    <textdata fileref="l02/liskov/src/prog2/liskov/basic/Variance.java"/>
+                </textobject>
+            </programlisting>
+            <para>
+                Liskov alapján a method argumentumok típusa esetén kontravariancia elvárt.
+                A fenti kód részben látható, hogy ez egy picit másképp működik Java-ban (nem így megy) ezért nem egy override lesz, hanem overload.
+            </para>
+            <para>
+                Emellett még sok más megkötés is található, ezekre egy informális példa a következő szekcióban.
+            </para>
+        </section>
+        <section>
+            <title>Java</title>
+            <para>
+                A geometriai tapasztalatokból kiindulva gondolhatnánk azt, hogy a négyzet egy speciális téglalap.
+                A probléma azonban egyből szembe tűnik, ha az alábbi kód részeket megfigyeljük:
+            </para>
+            <programlisting language="java" linenumbering="numbered">
+                <textobject>
+                    <textdata fileref="l02/liskov/src/prog2/liskov/violate/Rectangle.java"/>
+                </textobject>
+            </programlisting>
+            <programlisting language="java" linenumbering="numbered">
+                <textobject>
+                    <textdata fileref="l02/liskov/src/prog2/liskov/violate/Square.java"/>
+                </textobject>
+            </programlisting>
+            <programlisting language="java" linenumbering="numbered">
+                <textobject>
+                    <textdata fileref="l02/liskov/src/prog2/liskov/violate/Main.java"/>
+                </textobject>
+            </programlisting>
+            <para>
+                Látható, hogy a Square nem képes betartatni azt hogy oldalai ugyanolyan hosszúak legyenek 
+                a rosszul választott öröklődési hierarchia miatt.
+            </para>
+            <para>
+                Alábbi kód részletekben látszuk, hogy egy jobban kiválasztott hierarchiával és csak a valójában közös állapot változók és viselkedéseket örökölteteve a probléma megoldható.
+            </para>
+            <programlisting language="java" linenumbering="numbered">
+                <textobject>
+                    <textdata fileref="l02/liskov/src/prog2/liskov/abide/Rectangular.java"/>
+                </textobject>
+            </programlisting>
+            <programlisting language="java" linenumbering="numbered">
+                <textobject>
+                    <textdata fileref="l02/liskov/src/prog2/liskov/abide/Rectangle.java"/>
+                </textobject>
+            </programlisting>
+            <programlisting language="java" linenumbering="numbered">
+                <textobject>
+                    <textdata fileref="l02/liskov/src/prog2/liskov/abide/Square.java"/>
+                </textobject>
+            </programlisting>
+            <programlisting language="java" linenumbering="numbered">
+                <textobject>
+                    <textdata fileref="l02/liskov/src/prog2/liskov/abide/Main.java"/>
+                </textobject>
+            </programlisting>
+        </section>
+        <section>
+            <title>C++</title>
+            <para>
+                C++-hoz a gyakori madaras példát választottam.
+                A probléma abból ered, hogy a Bird class kényszeríti az összes subclass-át egy funkció implementálására.
+                Mivel azonban Penguin esetén erre nincs lehetőség hibát kell hogy dobjunk.
+                Ez viszont azt vonzza magával, hogy ha ezen megoldásnál maradunk, minden hely ahol Bird class-t használunk az egy potenciális hely runtime_error-ra.
+            </para>
+            <programlisting language="cpp" linenumbering="numbered">
+                <textobject>
+                    <textdata fileref="l02/liskov-cpp/liskov_violate.cpp"/>
+                </textobject>
+            </programlisting>
+            <para>
+                A fenti probléma kiküszöbölhető, ha csak a valóban közös viselkedést és állapotváltozókat definiáljuk super class-ban. 
+                Jelen esetben a Bird osztály csak a lay_egg function implementációját kényszeríti ki.
+            </para>
+            <programlisting language="cpp" linenumbering="numbered">
+                <textobject>
+                    <textdata fileref="l02/liskov-cpp/liskov_abide.cpp"/>
+                </textobject>
+            </programlisting>
+        </section>
+    </section>
+    <section>
+        <title>Szülő-gyerek</title>
+        <section>
+            <title>Feladat</title>
+            <para>
+            Írjunk Szülő-gyerek Java és C++ osztálydefiníciót, amelyben demonstrálni tudjuk, hogy az ősön keresztül csak az ős üzenetei küldhetőek!
+                <link xlink:href="https://arato.inf.unideb.hu/batfai.norbert/PROG2/Prog2_1.pdf">Lásd 98. fólia!</link>
+            </para>
+        </section>
+        <section>
+            <title>Java</title>
+            <para>
+                Alábbi programkódot alapul véve:
+            </para>
+            <programlisting language="java" linenumbering="numbered">
+                <textobject>
+                    <textdata fileref="l02/parent-child/src/prog2/parentchild/simple/Main.java"/>
+                </textobject>
+            </programlisting>
+            <para>
+                A main method-ot szemügyre vehetjük, hogy amíg <literal>a</literal> változónk statikus típusa megegyezik a dinamikus típussal addig semmi probléma nincs, hívhatjuk <literal>behaviorOther</literal> method-ot. 
+                A feladat által vizsgált problémával <literal>b</literal> változónál szembesülünk.
+                A problémát azért nem láttuk, mert a statikus típus véletlenül pont a dinamikus volt, viszont <literal>b</literal> változó esetén ez már eltér.
+                Statikus típusunk Sup, azaz <literal>behaviorOther</literal> method-ot nem hívhatjuk.
+            </para>
+            <para>
+                Ami viszont még ennél is érdekesebb az az hogy mi is fog történni runtime, ha <literal>behavior</literal> method-ot hívjuk.
+                Ugyan a statikus típus miatt a Sup class <literal>behavior</literal> method-jának kéne futnia, azonban mivel virtuális, ezért a dinamikus típus a saját method-jával felülírja azt, azaz a Sub class <literal>behavior</literal> method-ja fog futni.
+            </para>
+            <para>
+                Viszont <literal>behavior2</literal> esetén mégis Sup egy method-ja hívódik meg, ugyanis az overload-olta azt a generikusabb method-ot amit Sub felülírt.
+                Ugyan a statikus típus miatt a Sup class <literal>behavior</literal> method-jának kéne futnia, azonban mivel virtuális, ezért a dinamikus típus a saját method-jával felülírja azt, azaz a Sub class <literal>behavior</literal> method-ja fog futni.
+            </para>
+        </section>
+    </section>
+    <section>
+        <title>Ciklomatikus komplexitás</title>
+        <section>
+            <title>Feladat</title>
+            <para>
+            Számoljuk ki valamelyik programunk függvényeinek ciklomatikus komplexitását!
+                <link xlink:href="https://arato.inf.unideb.hu/batfai.norbert/UDPROG/deprecated/Prog2_2.pdf">Lásd 98. (77-79. fóliák)!</link>
+            </para>
+        </section>
+        <section>
+            <title>Megoldás</title>
+            <para>
+                Addig kerestem neten amíg meg nem lett az aranycsapatos kód.
+                Nézzük a Támadó osztály komplexitását.
+            </para>
+            <programlisting language="java" linenumbering="numbered">
+                <textobject>
+                    <textdata fileref="l02/cyclo/Tamado.java"/>
+                </textobject>
+            </programlisting>
+            <para>
+                Láthatjuk a kódon, hogy az első if 3 ágú, míg a belső if 4.
+                Tovább bonyolítja a helyzetet, hogy az első if két kondíción &amp;&amp; operátorral logikai és hajtottunk végre.
+            </para>
+            <figure>
+                <title>Ciklomatikus komplexitás</title>
+                <mediaobject>
+                    <imageobject>
+                        <imagedata fileref="l02/cyclo/cyclo.png" scale="50" />
+                    </imageobject>
+                    <textobject>
+                        <phrase>Ciklomatikus komplexitás</phrase>
+                    </textobject>
+                </mediaobject>
+            </figure>
+            <para>
+                Próbáltam egy gráfot készíteni a programrészről.
+                Érdemes megfigyelni, hogy a végső node-ot visszaköttötem a kezdő node-ba hogy erősen összefüggő legyen a gráf.
+                Az ábrán a számítási képletbe behelyettesítettem.
+                (A számok a csomópontok és élek alatt/felett sorszámok.)
+            </para>
+            <para>
+                A ciklomatikus komplexitás egy naív kód metrika.
+                A nagy ciklomatikus komplexitás azért rossz, mert nehéz átlátni, illetve karbantartani.
+                Másrészt amikor 10-nél nagyobb komplexitással találkozunk, akkor érdemes lehet valamilyen tervezési mintával kiváltani (pl. strategy pattern).
+                Azért gondolom hogy naív, mert nem veszi figyelembe a szemantikát.
+                Alább egy példa:
+            </para>
+<literallayout>
+void foo()
+{
+    if(false)
+        return 0;
+    else 
+        return 1;
+}
+</literallayout>
+        <para>
+            Ezen példában a CC 2, annak ellenére, hogy nagy valószínűséggel ha az IDE nem is jelzi a compiler kioptimalizálja a nem szükséges részt.
+            Jogos a kérdés, hogy ki írna ilyet?
+            A válasz az, hogy ha olyan nyelven dolgozunk ahol nincs preprocesszor, akkor arra kényszerülhetünk, hogy debug build-et ilyen és ehhez hasonló módokon definiáljuk (false helyett természetesen egy konstans stb.). 
+        </para>
+        </section>
+    </section>
+    <section>
+        <title>EPAM: Interfész evolúció Java-ban</title>
+        <section>
+            <title>Feladat</title>
+            <para>
+            Mutasd be milyen változások történtek Java 7 és Java 8 között az interfészekben.
+            Miért volt erre szükség, milyen problémát vezetett ez be?
+            </para>
+        </section>
+    </section>
+    <section>
+        <title>EPAM: Liskov féle helyettesíthetőség elve, öröklődés</title>
+        <section>
+            <title>Feladat</title>
+            <para>
+            Adott az alábbi osztály hierarchia.
+                <literal>class Vehicle, class Car extends Vehicle, class Supercar extends Car</literal>
+Mindegyik osztály konstruktorában történik egy kiíratás, valamint a Vehicle osztályban szereplő
+                <literal>start()</literal> metódus mindegyik alosztályban felül van definiálva.
+Mi történik ezen kódok futtatása esetén, és miért?
+                <literallayout>
+Vehicle firstVehicle = new Supercar();
+firstVehicle.start();
+System.out.println(firstVehicle instanceof Car);
+Car secondVehicle = (Car) firstVehicle;
+secondVehicle.start();
+System.out.println(secondVehicle instanceof Supercar);
+Supercar thirdVehicle = new Vehicle();
+thirdVehicle.start();
+                </literallayout>
+            </para>
+        </section>
+    </section>
+    <section>
+        <title>EPAM: Interfész, Osztály, Absztrakt Osztály</title>
+        <section>
+            <title>Feladat</title>
+            <para>
+            Mi a különbség Java-ban a Class, Abstract Class és az Interface között? Egy tetszőleges példával vagy példa kódon keresztül mutasd be őket és hogy mikor melyik koncepciót célszerű használni.
+            </para>
+        </section>
+    </section>
+</chapter>                
