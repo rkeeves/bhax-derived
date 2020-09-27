@@ -770,13 +770,18 @@ Felelünk az objektum ctor-áért.
                 </mediaobject>
             </figure>
             <para>
-                Az alább látható class a kliens felé úgy néz ki mint egy but dictionary, de az id értéket nem a map-ből nyeri.
+                Az alább látható példában a class a kliens felé úgy néz ki mint egy but dictionary, de az id értéket nem a map-ből nyeri.
+                (Pl. ilyen és ehhez hasonló trükközéssel lehet Lua-ban C++ objektumokat használni, pl. <link xlink:href="https://www.lua.org/pil/28.1.html">user data</link>-val és <link xlink:href="https://www.lua.org/pil/28.5.html">light user data</link>-val)
             </para>
             <programlisting language="java" linenumbering="numbered">
                 <textobject>
                     <textdata fileref="l01/patterns/src/prog2/patterns/creational/prototype/Entity.java"/>
                 </textobject>
             </programlisting>
+            <para>
+                A prototype akkor is jó megoldás lehet, ha valami miatt gátolni akarjuk a user-t abban hogy explicit ő saját maga példányosítsa az adott osztályt.
+                Ilyen esetben szolgáltathatunk egy instance-t a user-nek aki aztán - ha új példány kell neki - klónozással hozhat létre újakat.
+            </para>
         </section>
     </section>
 </chapter>                
