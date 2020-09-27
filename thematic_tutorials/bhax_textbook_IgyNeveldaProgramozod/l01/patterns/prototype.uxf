@@ -10,7 +10,7 @@
       <h>70</h>
     </coordinates>
     <panel_attributes>&lt;&lt;Interface&gt;&gt;
-*Prototype*
+Prototype
 --
 + clone()</panel_attributes>
     <additional_attributes/>
@@ -24,7 +24,7 @@
       <h>70</h>
     </coordinates>
     <panel_attributes>&lt;&lt;Interface&gt;&gt;
-*PrototypeA*
+PrototypeA
 --
 + clone()</panel_attributes>
     <additional_attributes/>
@@ -38,7 +38,7 @@
       <h>70</h>
     </coordinates>
     <panel_attributes>&lt;&lt;Interface&gt;&gt;
-*PrototypeA*
+PrototypeA
 --
 + clone()</panel_attributes>
     <additional_attributes/>
@@ -73,18 +73,19 @@
       <w>100</w>
       <h>30</h>
     </coordinates>
-    <panel_attributes>*Client*</panel_attributes>
+    <panel_attributes>Client</panel_attributes>
     <additional_attributes/>
   </element>
   <element>
     <id>Relation</id>
     <coordinates>
       <x>350</x>
-      <y>90</y>
+      <y>80</y>
       <w>160</w>
-      <h>30</h>
+      <h>40</h>
     </coordinates>
-    <panel_attributes>lt=&lt;.</panel_attributes>
-    <additional_attributes>10.0;10.0;140.0;10.0</additional_attributes>
+    <panel_attributes>lt=&lt;.
+&lt;&lt;uses&gt;&gt;</panel_attributes>
+    <additional_attributes>10.0;20.0;140.0;20.0</additional_attributes>
   </element>
 </diagram>
