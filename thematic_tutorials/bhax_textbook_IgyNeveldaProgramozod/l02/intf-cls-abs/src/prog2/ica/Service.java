@@ -11,9 +11,8 @@ package prog2.ica;
  * static methods
  * static vars
  */
-public interface Service {
+public interface Service extends Initializable, Initializable2, Destroyable {
+
 	
-	void initialize();
-	
-	void destroy();
+
 }

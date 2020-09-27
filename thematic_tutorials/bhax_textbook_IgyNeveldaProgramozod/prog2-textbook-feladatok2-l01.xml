@@ -465,7 +465,7 @@ private static class FinnAndJake {
             </para>
             <para>
                         A null nem egy osztály és nem egy osztály példánya, hanem egy kulcsszó, amely az obj ref egyetlen literállal megadható értékét jelenti (ORacle doc-ban NullLiteral).
-                        Egyébként attól hogy maga az object ref null, még a statikus típust lehet használni, alább példa a static method hívhatóságára.
+                        Egyébként attól hogy maga az object ref null, még a változó típust lehet használni, alább példa a static method hívhatóságára.
             </para>
             <para>
                         Egyébként a megoldásban van egy másik is ami Optional-t használ, utána pedig erre mappelünk (plusz egy default értéket adunk vissza null ref esetén).

@@ -149,20 +149,50 @@
                 </textobject>
             </programlisting>
             <para>
-                A main method-ot szemügyre vehetjük, hogy amíg <literal>a</literal> változónk statikus típusa megegyezik a dinamikus típussal addig semmi probléma nincs, hívhatjuk <literal>behaviorOther</literal> method-ot. 
+                A main method-ot szemügyre vehetjük, hogy amíg <literal>a</literal> változónk típusa megegyezik a példány típusával addig semmi probléma nincs, hívhatjuk <literal>behaviorOther</literal> method-ot. 
                 A feladat által vizsgált problémával <literal>b</literal> változónál szembesülünk.
-                A problémát azért nem láttuk, mert a statikus típus véletlenül pont a dinamikus volt, viszont <literal>b</literal> változó esetén ez már eltér.
-                Statikus típusunk Sup, azaz <literal>behaviorOther</literal> method-ot nem hívhatjuk.
+                A problémát azért nem láttuk, mert a változó típusa véletlenül pont egybeesett a példány típusával, viszont <literal>b</literal> változó esetén ez már eltér.
+                Változónk típusa Sup, azaz <literal>behaviorOther</literal> method-ot nem hívhatjuk.
             </para>
             <para>
                 Ami viszont még ennél is érdekesebb az az hogy mi is fog történni runtime, ha <literal>behavior</literal> method-ot hívjuk.
-                Ugyan a statikus típus miatt a Sup class <literal>behavior</literal> method-jának kéne futnia, azonban mivel virtuális, ezért a dinamikus típus a saját method-jával felülírja azt, azaz a Sub class <literal>behavior</literal> method-ja fog futni.
+                Ugyan a változó típusa miatt a Sup class <literal>behavior</literal> method-jának kéne futnia, azonban mivel virtuális, ezért a hivatkozott példány típus a saját method-jával felülírja azt, azaz a Sub class <literal>behavior</literal> method-ja fog futni.
             </para>
             <para>
                 Viszont <literal>behavior2</literal> esetén mégis Sup egy method-ja hívódik meg, ugyanis az overload-olta azt a generikusabb method-ot amit Sub felülírt.
-                Ugyan a statikus típus miatt a Sup class <literal>behavior</literal> method-jának kéne futnia, azonban mivel virtuális, ezért a dinamikus típus a saját method-jával felülírja azt, azaz a Sub class <literal>behavior</literal> method-ja fog futni.
+                Ugyan a változó típusa miatt a Sup class <literal>behavior</literal> method-jának kéne futnia, azonban mivel virtuális, ezért a mutatott példány típus a saját method-jával felülírja azt, azaz a Sub class <literal>behavior</literal> method-ja fog futni.
             </para>
         </section>
+        <section>
+            <title>C++</title>
+            <para>
+                Alábbi kódrészletet vegyük szemügyre:
+            </para>
+            <programlisting language="java" linenumbering="numbered">
+                <textobject>
+                    <textdata fileref="l02/parent-child-cpp/parent_child.cpp"/>
+                </textobject>
+            </programlisting>
+            <para>
+                Látható, hogy a stack-en létrehozunk egy Child osztályú instance-t. 
+                Ezután azonban egy <literal>Parent</literal> osztályra mutató referenciával hivatkozunk ezen példányra.
+                Ami a Java példától eltérő lehet hogy egyrészt virtuálissá kell tennünk a dtor-t (különben undefined behavior).
+            </para>
+            <para>
+                A másik - jelen példa szempontjából fontosabb - különbség, hogy <literal>f</literal> hívására a <literal>Parent</literal>  osztály implementációját kapjuk.
+                Ez amiatt történik, mert ezt a funkciót deklarációjakor nem láttuk el a virtual kulcsszóval.
+                Emiatt a fordító megelégszik a változó típus (<literal>Parent</literal> class) megfelelő funkciójának hívásával.
+            </para>
+            <para>
+             Ezzel szemben az <literal>g</literal> funkció hívásakor a példány típus (jelen esetben <literal>Child</literal>)                <literal>g</literal> funkciója lesz meghívva.
+                Ez amiatt lehetséges, mert a compiler-rel tudattuk a <literal>Parent</literal> class <literal>g</literal> funkció deklarációjánál, hogy ezt a funkciót felülírhatják subclassok.
+            </para>
+            <para>
+             Utolsó sorban pedig láthatjuk hogy <literal>h</literal> funkciónak nincs implementációja a <literal>Parent</literal> class-ban, de virtuális.
+             Mivel a <literal>Child</literal> class implementálja a <literal>h</literal> funkciót, ezért viszont nem lesz fordítási idejű hiba, és runtime a rendszer a a <literal>Child</literal> class <literal>h</literal> funkcióját fogja meghívni.
+            </para>
+        </section>
+
     </section>
     <section>
         <title>Ciklomatikus komplexitás</title>
@@ -212,7 +242,7 @@
                 Azért gondolom hogy naív, mert nem veszi figyelembe a szemantikát.
                 Alább egy példa:
             </para>
-<literallayout>
+            <literallayout>
 void foo()
 {
     if(false)
@@ -220,21 +250,11 @@ void foo()
     else 
         return 1;
 }
-</literallayout>
-        <para>
+            </literallayout>
+            <para>
             Ezen példában a CC 2, annak ellenére, hogy nagy valószínűséggel ha az IDE nem is jelzi a compiler kioptimalizálja a nem szükséges részt.
             Jogos a kérdés, hogy ki írna ilyet?
             A válasz az, hogy ha olyan nyelven dolgozunk ahol nincs preprocesszor, akkor arra kényszerülhetünk, hogy debug build-et ilyen és ehhez hasonló módokon definiáljuk (false helyett természetesen egy konstans stb.). 
-        </para>
-        </section>
-    </section>
-    <section>
-        <title>EPAM: Interfész evolúció Java-ban</title>
-        <section>
-            <title>Feladat</title>
-            <para>
-            Mutasd be milyen változások történtek Java 7 és Java 8 között az interfészekben.
-            Miért volt erre szükség, milyen problémát vezetett ez be?
             </para>
         </section>
     </section>
@@ -260,6 +280,54 @@ thirdVehicle.start();
                 </literallayout>
             </para>
         </section>
+        <section>
+            <title>Megoldás</title>
+            <para>
+                <link xlink:href="https://github.com/rkeeves/bhax-derived/tree/master/thematic_tutorials/bhax_textbook_IgyNeveldaProgramozod/l02/liskov-epm/src/prog2/liskov/epm">Itt található az implementációm.</link>
+            </para>
+            <para>
+               Az egész feladat előtt tisztáznunk kell azt, hogy egy változó deklarált típusa nem feltétlenül a mutatott példány konkrét runtime típusa (polimorfizmus).
+               Ez ugye compile time tudható, különösebb megerőltetés nélkül pusztán a változó deklarációjából. 
+               Az már egy másik kérdés, hogy az objektum referencia által mutatott objektum valós runtime típusa mi is vajon.
+               Ez a példány típusa.
+            </para>
+            <programlisting language="java" linenumbering="numbered">
+                <textobject>
+                    <textdata fileref="l02/liskov-epm/src/prog2/liskov/epm/Main.java"/>
+                </textobject>
+            </programlisting>
+            <para>
+                <literal>firstVehicle</literal>
+                <literal>start</literal> methodjának hívása trükkös, ugyanis <literal>Vehicle</literal> class-nak egy instance method-ját akarnánk hívni de ez ugye virtual.
+                A példány típusunk <link xlink:href="https://youtu.be/uo4Wv2p62vM?t=12">SuperCar</link> ami felülírja <literal>Vehicle</literal> ezen methodját (pontosabban Car felülírja Vehicle virtual method-ját, de ezt meg a SuperCar írja felül).
+            </para>
+            <para>
+             Mivel egyszerű volt a példa ezért bedobtam egy overload-ot a start-ra, hogy lássunk ilyet is.
+            </para>
+            <para>
+            Ezután eljátszuk ugyanezt egy új változóval aminek már Car a típusa és az obj ref értékét pedig úgy kapjuk hogy explicit át castoljuk az firstVehicle obj ref-ét.
+            </para>
+            <para>
+                Az eredeti feladat utolsó sorát <literal>Supercar thirdVehicle = new Vehicle();</literal> nem teljesen értem. Gondolom azt akarták bemutatni, amit a Liskov kovarianciánál és kontravarianciánál már tárgyaltunk.
+                Azaz, hogy egy általánosabb class-t nem kényszeríthetünk speciálisabb típusú változóba.
+            </para>
+            <para>
+                Az <literal>instanceof</literal> operátorral csak azt akarták bemutatni, hogy a mutatott példány konkrét runtime típusát lehet check-elni. 
+                Én a tisztánlátás miatt a kód végére írtam két esetet, ezekkel fogok foglalkozni.
+            </para>
+            <literallayout>
+Vehicle firstVehicle = null;
+firstVehicle = new Supercar();
+System.out.println("firstVehicle instanceof Supercar : " + (firstVehicle instanceof Supercar));
+firstVehicle = new Car();
+System.out.println("firstVehicle instanceof Supercar : " + (firstVehicle instanceof Supercar));
+            </literallayout>
+            <para>
+                A két instanceof alkalmazása más eredményt ad.
+                Először true utána false.
+                Mivel firstVehicle változó típusa nem változott, csak a mutatott példány típus, ezért láthatóan a példány konkrét runtime típusát checkelhetjük ezzel az operátorra.
+            </para>
+        </section>
     </section>
     <section>
         <title>EPAM: Interfész, Osztály, Absztrakt Osztály</title>
@@ -268,6 +336,84 @@ thirdVehicle.start();
             <para>
             Mi a különbség Java-ban a Class, Abstract Class és az Interface között? Egy tetszőleges példával vagy példa kódon keresztül mutasd be őket és hogy mikor melyik koncepciót célszerű használni.
             </para>
+            <section>
+                <title>Interface</title>
+                <para>
+                Java-ban az interface-re (hétköznapi programozás szempontjából) érdemes úgy tekinteni, mint egy felelősség vállalásra.
+                Ha egy osztály implementálja az interface-et azáltal megára vállalja, hogy az interface-ben deklarált method-okat megvalósítja.
+                </para>
+                <para>
+                    Az interface-ben deklarálhatunk method-okat de ezek láthatósága csak publc lehet, illetve régen amikor még törődtek legalább a látszattal nem lehetett method body, de mostmár azt is lehet.
+                    Egy interface-nek nem lehetnek instance field-jei. 
+                    Az osztálynak azonban lehetnek statikus field-jei és statikus method-jai.
+                </para>
+                <para>
+                    Egy interface csak interface-t örökölhet, alább egy példa:
+                </para>
+                <programlisting language="java" linenumbering="numbered">
+                    <textobject>
+                        <textdata fileref="l02/intf-cls-abs/src/prog2/ica/Service.java"/>
+                    </textobject>
+                </programlisting>
+                <para>
+                    A fenti példán látszik hogy <literal>extends</literal> kulcsszó használatával történik az öröklődés. 
+                    Az is látható hogy akár több interface-t is örökölhetünk.
+                    Ami pedig végül feltűnő lehet a C++-ból jövő emberek számára, hogy azonos methodokat deklaráló interface-eket is lehet örökölni.
+                    És most értünk el ahhoz a ponthoz hogy miért nem szeretem a default methodokat:
+                    Ha leöröklök két azonosan deklarált default methodot tartalmazó interface-et akkor most mi legyen?
+                </para>
+                <programlisting language="java" linenumbering="numbered">
+                    <textobject>
+                        <textdata fileref="l02/intf-cls-abs/src/prog2/ica/Initializable.java"/>
+                    </textobject>
+                </programlisting>
+                <programlisting language="java" linenumbering="numbered">
+                    <textobject>
+                        <textdata fileref="l02/intf-cls-abs/src/prog2/ica/Initializable2.java"/>
+                    </textobject>
+                </programlisting>
+                <para>
+                    Amíg nem lehetett definíciót adni, addig ebből nem volt probléma.
+                    Most viszont már compile-time gondoskodni kell a dolog megfogásáról.
+                    Szerencsére az Oracle gyárban a segédmunkások feldobtak emiatt egy megfelelő compile-time errort a kamionra.
+                </para>
+            </section>
+            <section>
+                <title>Class</title>
+                <para>
+                    A class a Java alapja. A Java-ban minden class, kivéve nagyon sok dolgot :).
+                    Egy class-nak lehetnek statikus fieldjei, methodjai.
+                    Lehetnek példány szintű fieldjei, methodjai.
+                    Egy class-nak egyedül abstract methodja nem lehet.
+                    Emelett ha el akarja vállalni valamely interface-ek biztosítását akkor azokat a <literal>implements</literal> kulcsszó után vesszővel felsorolva meg is teheti.
+                    Egy osztály ezenkívül azonban örökölhet más abstract vagy sima class-okat. 
+                    C++-hoz képesti különbség hogy csak egy class-t örökölhet (no matter if it is abstract or not).
+                    (Emiatt is szokás mondani, hogy a C++ egy 21. századi nyelv, ugyanis Java-ban egy Person class vagy a Male vagy a Female class-t örökölheti, míg C++-ban egyszerre a kettőt, sőt még egy ApacheHelicopter class-t is ha meg tud birkózni vele az őt <link xlink:href="https://en.cppreference.com/w/cpp/language/virtual">programozó</link>.)
+                </para>
+                <programlisting language="java" linenumbering="numbered">
+                    <textobject>
+                        <textdata fileref="l02/intf-cls-abs/src/prog2/ica/HelloService.java"/>
+                    </textobject>
+                </programlisting>
+            </section>
+            <section>
+                <title>Abstract Class</title>
+                <para>
+                    Az abstract class nem példányosítható a new keyworddel.
+                    Ha egy class-ban legalább egy method abstract, akkor magának az osztálynak is annak kell lennie.
+                    Abstract classok egyébként egy az egyben mindenre képesek amire a class-ok. 
+                    Két különleges képességük van:
+                    Deklarálhatnak method-okat abstract kulcsszóval, így rákényszeríthetik a subclassaikra ezen method definiálását.
+                    Másik képességük hogy a codebase-t nehezen újrahasználhatóvá teszik.
+                    Tervezéskor informálisan úgy érdemes őket használni mint például az array-t: A tervezőnek nagyon jól meg kell tudnia indokolnia azt hogy miért is van szükség egy ennyire erős kötésre.
+                    Persze lehet jól használni, és sokszor nagyon sokat tud segíteni kód duplikáció elkerülésében, de ha lehet akkor kompozíciót kell előnyben részesíteni (bár ez magáról az inheritance-ről is elmondható.).
+                </para>
+                <programlisting language="java" linenumbering="numbered">
+                    <textobject>
+                        <textdata fileref="l02/intf-cls-abs/src/prog2/ica/BaseService.java"/>
+                    </textobject>
+                </programlisting>
+            </section>
         </section>
     </section>
 </chapter>                

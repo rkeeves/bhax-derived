@@ -13,6 +13,8 @@ public class Main {
 		// because of dynamic binding the runtime type's (Supercar) start method
 		// override gets called
 		firstVehicle.start();
+		// overloaded method
+		firstVehicle.start(0);
 		// the object bound to firstVehicle is (during runtime) SuperCar which is an
 		// instance of Car.
 		System.out.println(firstVehicle instanceof Car);
@@ -36,6 +38,11 @@ public class Main {
 		} catch (ClassCastException e) {
 			System.out.println("Runtime class cast exception");
 		}
+		
+		firstVehicle = new Supercar();
+		System.out.println("firstVehicle instanceof Supercar : " + (firstVehicle instanceof Supercar));
+		firstVehicle = new Car();
+		System.out.println("firstVehicle instanceof Supercar : " + (firstVehicle instanceof Supercar));
 	}
 
 }

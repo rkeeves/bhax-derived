@@ -572,8 +572,8 @@ byte b = (byte)a;
                     </literallayout>
                     <para>
                         Objektumoknál egy kicsit összetettebb. 
-                        Beszéljünk először statikus típusról. A statikus típus az, hogy egy obj ref-et tartalmazó változó milyen típusra is mutat.
-                        Dinamikus ezzel szemben a változó által hivatkozott konkrét példány típusa.
+                        Beszéljünk először változó típusáról. A változó típusa az, hogy egy obj ref-et tartalmazó változó milyen típusra is mutat.
+                        A példány runtime típusa ezzel szemben a változó által hivatkozott példány konkrét runtime típusa.
                         Érthető, hogy a kettő szétválik, javarészt (Oh the puns!) ez az egyik lényege az interface-eknek, super class-oknak, hogy általánosan tudjunk kezelni dolgokat.
                     </para>
                     <literallayout>
@@ -581,7 +581,7 @@ Super a = new Sub();
 Sub b = (Sub) a;
                     </literallayout>
                     <para>
-                        A probléma ott keletkezik, hogy ez nem type check-elhető statikusan ugye, és emiatt előállhat, hogy nem egy Sub class-ú objektumot akarunk konvertálni.
+                        A probléma ott keletkezik, hogy ez nem type check-elhető runtime előtt ugye, és emiatt előállhat, hogy nem egy Sub class-ú objektumot akarunk konvertálni.
                         Ilyenkor a rendszer felteszi a kezét és dob egy ClassCastException-t. 
                         Runtime egyébként tudjuk ezt checkelni az instanceof operátorral.
                         Az instanceof csak akkor lesz igaz, ha a check alatt lévő változó által tárolt obj ref egy olyan példányra mutat mely vagy pontosan olyan osztályú vagy leszármazottja annak az osztálynak, mint ami az operátor második operandusa.
@@ -625,7 +625,7 @@ int i = new C().instancefield;
                     <para>
                 Majd később lesz róla szó, meg nem pont ide tartozik, de ha egy változó obj ref értéke null, akkor NullPointerException fogunk kapni.
                 (Természetesen csak példányoknál lehet ilyen.)
-                Változóról egyébként funky módon elérjük a static method-okat és field-eket, hisz a változó statikus typusa lényeg, az obj ref-et nem használjuk.
+                Változóról egyébként funky módon elérjük a static method-okat és field-eket, hisz a változó típusa lényeg, az obj ref-et nem használjuk.
                 Így nem szokás használni, de technikailag lehet.
                     </para>
                     <literallayout>
@@ -925,7 +925,7 @@ a = new A(2,"fb"); // Problematic
                 </textobject>
             </programlisting>
             <para>
-                A végére direkt beerőszakoltam azt is, hogy ha egy példány megvalósítja, vagy bármely super-je megvalósítja az adott interface-t akkor konvertálható az interface típusú változó-ra (ezzel persze a fenti példában csökkentjük a változó által hivatkozott példányon legálisan meghívható method-ok számát, hiszen intf változó statikus típusa InterfaceExample).
+                A végére direkt beerőszakoltam azt is, hogy ha egy példány megvalósítja, vagy bármely super-je megvalósítja az adott interface-t akkor konvertálható az interface típusú változó-ra (ezzel persze a fenti példában csökkentjük a változó által hivatkozott példányon legálisan meghívható method-ok számát, hiszen intf változó típusa InterfaceExample).
             </para>
         </section>
         <section>
@@ -985,7 +985,7 @@ a = new A(2,"fb"); // Problematic
                 <para>
                     A hiba keletkezése után tehát a JVM egy olyan helyet keres a kódban mely képes kezelni a hibát.
                     A hibakezelők közül az kezelheti a hibát, mely vagy pontosan azon hiba típust kezeli, vagy annak valamely super class-át.
-                    Mivel több catch is megadható, a JVM azt fogja preferálni melynek kezelt típusa a legközelebb áll a dinamikus típusához a hibának.
+                    Mivel több catch is megadható, a JVM azt fogja preferálni melynek kezelt típusa a legközelebb áll a példány típusához a hibának.
                 </para>
             </section>
             <section>

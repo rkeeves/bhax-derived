@@ -20,6 +20,7 @@ public abstract class BaseService implements Service{
 		return id;
 	};
 	
+	@Override
 	public void initialize() {
 		System.out.println("Service "+id+" pre initialize.");
 		onInit();
@@ -27,7 +28,8 @@ public abstract class BaseService implements Service{
 	};
 	
 	protected abstract void onInit();
-
+	
+	@Override
 	public void destroy() {
 		System.out.println("Service "+id+" pre destroy.");
 		onDestroy();
