@@ -575,15 +575,6 @@ if(0 = a)
 
     </section>
     <section>
-        <title>EPAM: Eljárásorientál vs Objektumorientált</title>
-        <para>
-			Írj egy 1 oldalas értekező esszé szöveget, amiben összehasonlítod az eljárásorientált és az objektumorientált paradigmát, igyekezve kiemelni az objektumorientált paradigma előnyeit!
-        </para>
-        <para>
-			Tanulságok, tapasztalatok, magyarázat...
-        </para>
-    </section>
-    <section>
         <title>EPAM: Objektum példányosítás programozási mintákkal</title>
         <para>
 			Hozz példát mindegyik “creational design pattern”-re és mutasd be mikor érdemes használni őket!

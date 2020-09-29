@@ -1,0 +1,3 @@
+public POJO{
+	 int a;
+}

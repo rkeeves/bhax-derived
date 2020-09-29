@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Diagram>
+  <ID>JAVA</ID>
+  <OriginalElement>prog2.BaseTree</OriginalElement>
+  <nodes>
+    <node x="0.0" y="381.5">prog2.BaseTree.BinTree</node>
+    <node x="358.0" y="348.0">prog2.BaseTree.ZLWTree</node>
+    <node x="169.7638888888888" y="367.0416666666667">prog2.BaseTree.Node</node>
+    <node x="88.5" y="0.0">prog2.BaseTree</node>
+  </nodes>
+  <notes />
+  <edges>
+    <edge source="prog2.BaseTree.BinTree" target="prog2.BaseTree">
+      <point x="37.75" y="-49.5" />
+      <point x="113.25" y="328.0" />
+      <point x="188.1" y="328.0" />
+      <point x="-66.4" y="149.0" />
+    </edge>
+    <edge source="prog2.BaseTree.Node" target="prog2.BaseTree">
+      <point x="0.0" y="-82.5" />
+      <point x="0.0" y="149.0" />
+    </edge>
+    <edge source="prog2.BaseTree.ZLWTree" target="prog2.BaseTree">
+      <point x="-56.75" y="-83.0" />
+      <point x="414.75" y="328.0" />
+      <point x="320.9" y="328.0" />
+      <point x="66.39999999999998" y="149.0" />
+    </edge>
+  </edges>
+  <settings layout="Hierarchic Group" zoom="0.8089887640449438" x="292.5" y="267.0" />
+  <SelectedNodes>
+    <node>prog2.BaseTree.Node</node>
+  </SelectedNodes>
+  <Categories>
+    <Category>Fields</Category>
+    <Category>Constructors</Category>
+    <Category>Methods</Category>
+    <Category>Properties</Category>
+    <Category>Inner Classes</Category>
+  </Categories>
+  <SCOPE>All</SCOPE>
+  <VISIBILITY>private</VISIBILITY>
+</Diagram>
+

@@ -19,19 +19,42 @@ kapcsolatára a forráskódban és a diagramon, lásd még: <link xlink:href="ht
 Lásd fóliák!
             </para>
         </section>
+
+        <section>
+            <title>IntelliJ</title>
+            <para>
+           IntelliJ-vel generált UML alább látható. Jelenleg azon küzdök, hogy használható UML legyen belőle ne csak az alább látható színes de nem szabványos ábra.
+            </para>
+            <figure>
+                <title>Binfa UML</title>
+                <mediaobject>
+                    <imageobject>
+                        <imagedata fileref="l03/uml-java/BaseTree.png" scale="60" />
+                    </imageobject>
+                    <textobject>
+                        <phrase>Binfa UML</phrase>
+                    </textobject>
+                </mediaobject>
+            </figure>
+        </section>
+        <section>
+            <title>Egyéb</title>
+            <para>
+                A legújabb eclipse-hez még nem készültek jó plugin-ok (persze vannak pénzesek). Jelenleg azután keresgélek, hogy melyik régebbi Eclipse-nél van legalább egy stable dolog, ami nested class-októl nem esik össze...
+           </para>
+        </section>
     </section>
 
     <section>
-        <title>BPMN</title>
+        <title>Forward engineering UML osztálydiagram</title>
         <section>
             <title>Feladat</title>
             <para>
-            Rajzoljunk le egy tevékenységet BPMN-ben!
-                <link xlink:href="https://arato.inf.unideb.hu/batfai.norbert/PROG2/Prog2_7.pdf">(34-47 fólia)</link>.
+            UML-ben tervezzünk osztályokat és generáljunk belőle forrást!
             </para>
         </section>
     </section>
-   
+
     <section>
         <title>EPAM: Neptun tantárgyfelvétel modellezése UML-ben</title>
         <section>
@@ -45,6 +68,16 @@ Lásd fóliák!
             <para>
                 A feladat megoldásához a gyakvezér által mutatott <link xlink:href="http://app.genmymodel.com">genmymodel</link>-t használtam.
             </para>
+
+            <title>Tantárgy regisztráció UML</title>
+            <para>
+                    Ezt a feladatot én úgy értettem, hogy a tantárgy felvételhez szükséges adathordozó objektumokat kell tervezni, és azt sem in-depth. 
+                    Azért gondolom, mert egy kicsit overkill lenne elvárni az összes service, controller stb. modellezését, főként hogy a feladatot egy heti csokorból egy darab.
+                    Ennek szellemiségében próbáltam dolgozni.
+            </para>
+            <para>
+                    Ezen leírásban próbálok okot adni pár első ránézésre furcsa döntésemnek.
+            </para>
             <figure>
                 <title>Tantárgy regisztráció UML</title>
                 <mediaobject>
@@ -56,9 +89,78 @@ Lásd fóliák!
                     </textobject>
                 </mediaobject>
             </figure>
+            <section>
+                <title>Deleted</title>
+                <para>
+                    A deleted field mögött annyi a tervezési ötlet, hogy nem szeretjük a hard delete-t. Tekintetbe véve az intézményben jellemző általános káoszt nincs az az Isten, hogy én valós DB szintű törlést kiadjak.
+                    Ez ráadásul elég gyakori.
+                    A másik fontos oka az az, hogy ha az admin tényleg törölni akar stb. akkor tudja időzíteni. Pl.: Kihirdeti a karbantartást, pénteken csinál egy backup-ot és utána a halott elemeket törölheti, mindezt pedig kontrollált, saját maga által felügyelt körülmények között.
+                    Harmadik fontos oka, hogy egy update nem viszi annyira le a runtime performance-t mint egy tötlési kaszkád.
+                </para>
+            </section>
+            <section>
+                <title>ID eyecandy</title>
+                <para>
+                    ID. Az azonosítók elég problémásak. Mivel országos szintű szabályokat kell betartani, ezért a user-ek String jellegű ID-kat szeretnek.
+                    A probléma ezzel az, hogy így a legfontosabb dolgot (primary key) odaadtuk bürokratáknak akik nem feltétlen foglalkoznak a valósággal.
+                    A lényeg annyi, hogy valahogyan elkéne érni "hard" id-k használatát a valós működésre míg "soft" id-kat használni, hogy a bürokraták is boldogak legyenek.
+                    Magyarul ha az én neptun kódom AAAAAA, akkor NE ez legyen a primary key. A primary key legyen csak egy gép generálta Long, a "soft" id pedig csak eyecandy.
+                    Nagyon félek attól, hogyha bürokráciára hagyjuk az ID generálást akkor clash lesz.
+                    A jó hír, hogy az átlag user vagy business admin nem is fog tudni a valós ID létezéséről, ha nem mutogatjuk front end-en.
+                </para>
+            </section>
+            <section>
+                <title>Tantárgy-Kurzus</title>
+                <para>
+                    Tantárgy-Kurzus. Óriási problémám hogy egy tantárgyhoz 0 vagy n kurzus tartozhat, ezt pedig nem kezeli le jelenleg a neptun.
+                    Azon agyaltam, hogy szét kéne szakítani.
+                    Példa problémás tárgyra: Munkavédelem (nincs előadás, se gyakorlat, se labor).
+                </para>
+                <para>
+                    Egy probléma viszont maradt, a modellbe implicit bele van kódolva egy általam kitalált dolog.
+                    Ez pedig a kurzus fajtája.
+                    Mivel más field rögzíti az előadást (0..1) és a gyakorlati kurzusokat (0..n), itt nagyon sok minden össze lett mosva.
+                    Ez egy borzasztóan rossz megoldás, de jelenleg ez jutott eszembe. (Pl. nem kezeli a hajdúszoboszlói kihelyezett óvónő képzésen felmerülő külsős óvoda látogatós órákat. Btw this is not a joke, google it up, it is a fully legit thing.)
+                </para>
+            </section>
+            <section>
+                <title> Kurzus-Óra</title>
+                <para>
+                        Ez a legtrükkösebb rész. Ez nincs megoldva a Neptun-ban sem.
+                        Jöjjön a példa: "Az egyházszakadás története: Luther és az Angular 2.0"
+                        Ez a tárgy szeminárium jellegű, azaz 4-szer kerül megrendezésre egy félévben, minden alkalommal máshol.
+                        Jelenleg ezt a Neptun a következő módon kezeli: felvesznek egy placeholder kurzust fake attribútumokkal és megjegyzés mezőbe beírják, hogy mikor hol.
+                </para>
+                <para>
+                        Ehelyett lehetne azt a megoldást követni, hogy létrehozzuk az összes várható órát és kapcsoljuk a kurzushoz.
+                        Hogy az admin haja ne hulljon ki, persze csökkenteni lehet a workload-ot, hogyha autogeneráljuk.
+                        Például ha heti rendszerességű a tárgyat választ egy form-on akkor mi ennek hatására le fogjuk generálni mind a 14-et. 
+                </para>
+                <para>
+                        Ezzel egyben lehetne kezelni a két heti bontásban működő dolgokat (A és B hét), illetve a random levelezős képzéses dolgokat.
+                </para>
+                <para>
+                        Azt teljesen jogos ellenérvként el tudom fogadni, hogy ez túl sok plusz adat stb., viszont legalább valahogy kezeli a problémát.
+                </para>
+            </section>
+            <section>
+                <title>Composite Keys</title>
+                <para>
+                    A KISS miatt kerülném a kompozit kulcsokat, de egyet beraktam a UML-be pont amiatt hogy felhozhassam az esetet.
+                </para>
+                <para>
+                    A problémám az a kompozit kulcsokkal(ebben a példában), hogy az egyszerű esethez képest (PK egy konkrét field) trükkös az implementálása, illetve ha meggondoljuk magunkat kompozitról nagyon nehéz lesz átállni.
+                </para>
+            </section>
+            <section>
+                <title>DataTypes</title>
+                <para>
+                    Ez az egyetlen dolog aminek nincs értelme, csak kiakartam próbálni.
+                </para>
+            </section>
         </section>
     </section>
-  
+
     <section>
         <title>EPAM: Neptun tantárgyfelvétel UML diagram implementálása</title>
         <section>
@@ -68,7 +170,7 @@ Lásd fóliák!
             </para>
         </section>
     </section>
-      
+
     <section>
         <title>OO modellezés</title>
         <section>
@@ -79,7 +181,7 @@ Lásd fóliák!
            A témához Jeszenszky Tanár Úr  <link xlink:href="https://arato.inf.unideb.hu/jeszenszky.peter/download/prt/presentations/oo.pdf">egyik hasznos diasorát</link> használtam a sok-sok általa elérhetővé tett közül.
             </para>
         </section>
-        
+
         <section>
             <title>SOLID</title>
             <para>
@@ -134,11 +236,11 @@ class Person{
 
     boolean hasBdayToday(){...}
 }
-                    </literallayout>
-                        <para>
+                </literallayout>
+                <para>
                     Mármint, ha a Person objektum egyetlen felelőssége (a név és többin kívül) a születési idő betárolása, akkor három dolgot is nyerünk:
-                        </para>
-                        <literallayout>
+                </para>
+                <literallayout>
 class Person{
     String name;
     Date dob;
@@ -150,44 +252,44 @@ class AgeService{
         ...
     }
 }
-                        </literallayout>
-                        <para>
+                </literallayout>
+                <para>
                     1. Ugye kimozgattuk a "születésnapos-e?" számítást, tehát nagy valószínűséggel a date of birth a Person-ból fogjuk venni továbbra is, de maga a Person osztály már csak egy passzív adatstruktúra.
-                        </para>
-                        <para>
+                </para>
+                <para>
                     2. Mivel "születésnapos-e?" metódust kihoztuk a Person osztályból, mostmár nem kell egy teljes Person példányt létrehozni teszt célból.
-                        </para>
-                        <para>
+                </para>
+                <para>
                     3. Mivel "születésnapos-e?" metódust kihoztuk a Person osztályból, mostmár ha kell bárminek a születésnaposságát eldönthetjük, hiszen az egyetlen argumentumunk a születési idő.
-                        </para>
-                    </section>
-                    <section>
-                        <title>Open/Closed Principle</title>
-                        <para>
+                </para>
+            </section>
+            <section>
+                <title>Open/Closed Principle</title>
+                <para>
                     Értsd: nyitott a bővítésre, zárt a módosításra, avagy új funkcionalitás hozzáadását támogató kódot kell írnunk, azonban az eddigi szerződések betartásával.
-                        </para>
-                        <para>
+                </para>
+                <para>
                             Miért is fontos ez?
                             A módoításra való zártság amiatt szükséges mert különben úgy járunk mint az Angular 2 hahaha ksözönöm az Oscart.
                             Viccet félretéve, ha egy létező interface, class, abstract class-ba kénytelenek vagyunk belenyúlni, és ez a módosításunk törlés, akkor ez azzal jár, hogy lehet hogy más kódrészek, melyek ettől függtek idáig, innentől nem fognak működni.
-                        </para>
-                        <para>
+                </para>
+                <para>
                             Tegyük fel valami <link xlink:href="https://blog.cleancoder.com/uncle-bob/2014/05/12/TheOpenClosedPrinciple.html">plugin</link>-t írunk egy progihoz.
                             Tegyük fel a fő progi adott, ez induláskor létrehoz gombokat a GUI-n. Ezek a gombok a főprogi alapfunkciói:
-                        </para>
-                        <literallayout>
+                </para>
+                <literallayout>
 class Prog{
     void start(){
         buttons.add( new FileButton());
         buttons.add( new EditButton());
     }
 }
-                        </literallayout>
-                        <para>
+                </literallayout>
+                <para>
                             A kérdés most az, hogy akkor hogyan fogják tudni a plugin-ok a saját gombjaikat hozzáadni?
                             Ugye a következő megoldást nem követhetjük, mert akárhányszor a cégünk előrukkol egy új pluginnal, annyiszor kell a fő progit módosítani:
-                        </para>
-                        <literallayout>
+                </para>
+                <literallayout>
 class Prog{
     void start(){
         buttons.add( new FileButton());
@@ -197,11 +299,11 @@ class Prog{
        
     }
 }
-                        </literallayout>
-                        <para>
+                </literallayout>
+                <para>
                             Sőt, tegyük fel bizonyos plugin-oknak csak egy speckó licensz esetén szabad elindulniuk:
-                        </para>
-                        <literallayout>
+                </para>
+                <literallayout>
 class Prog{
     void start(){
         buttons.add( new FileButton());
@@ -214,17 +316,17 @@ class Prog{
         }
     }
 }
-                        </literallayout>
-                        <para>
+                </literallayout>
+                <para>
                             Ajjaj, ez elég rosszul néz ki! 
                             Mostmár nem csak hogy a főprogi példányosítja a gombokat, de mostmár ő is kezeli a licenszelést.
                             Akárhányszor van valami új dolog, az magában a főprogiban okoz változást.
                             Sőt, még rosszabb: Ha valamelyik plugin elszáll startup közben, akkor az egész programnak vége.
-                        </para>
-                        <para>
+                </para>
+                <para>
                             A megoldásnak valami olyasminek kéne lennie, hogy valamilyen módon el tudjuk érni, hogy újabb gombokat lehessen hozzáadni, anélkül hogy a többi részben kárt okoznánk. 
-                        </para>
-                        <literallayout>
+                </para>
+                <literallayout>
 interface LicenseManager{
     void has(String featureName);
 }
@@ -265,18 +367,18 @@ class Prog implements LicenseManager{
         }
     }
 }
-                        </literallayout>
-                        <para>
+                </literallayout>
+                <para>
                             A fenti megoldással a plugin-ok annyi gombot regisztrálnak amennyit akarnak, és nem a mi feladatunk a licensz feature-ök check-je, csak a licensz feature-öket tároló objektum vagy service továbbítása a plugin felé.
                             Egyébként csak azért listában adják vissza a gombokat, mert egyszerűre akartam fogni (és ez a legegyszerűbb módja annak, hoghya mindjuk egy 2 gombot regisztráló plugin elhal a második gomb regisztrációnál akkor rollback-elnünk kell az elsőt. Persze ez csak egy gagyi iskolai példa).
-                        </para>
-                    </section>
-                    <section>
-                        <title>L - Liskov Substitution Principle</title>
-                    <para>
+                </para>
+            </section>
+            <section>
+                <title>L - Liskov Substitution Principle</title>
+                <para>
                             A Liskov elveket nem lehet elégszer gyakorolni. Ugyan már más feladatban is foglalkoztunk vele, most nézzünk egy Vehicle példát megcsavarva!
-                    </para>
-                    <literallayout>
+                </para>
+                <literallayout>
 class Vehicle{
     void takeSeat();
     void startEngine();
@@ -318,57 +420,57 @@ class Roller extends Vehicle{
         //...
     }
 }
-                    </literallayout>
-                    <para>
+                </literallayout>
+                <para>
                           A fenti kód amiatt problémás, mert ahol lehet használni Vehicle-t ott nem biztos hogy lehet használni Roller-t. 
                           Innentől kezdve bárhol ahol használjuk Vehicle-t try-catch-elni kell.
-                    </para>
-                </section>
-                <section>
-                    <title>Interface Segregation</title>
-                    <para>
+                </para>
+            </section>
+            <section>
+                <title>Interface Segregation</title>
+                <para>
                     Nagy interface-eket kisebbekké kell tenni ha lehetséges.
                     De miért is jó ez?
-                    </para>
-                    <para>
+                </para>
+                <para>
                     Sajnos nem tudom kihagyni a Collections-t mert gyönyörú példa, és szerintem megérthető, hogy nem az interface-ekhez van köze igazából.
                     Szerintem sokkal inkább arról van szó, hogy csak olyan dolgokat várjunk el, melyekre valóban szükség lesz.
-                    </para>
-                    <para>
+                </para>
+                <para>
                     Tegyük fel, hogy kapni akarunk egy listát amin egyszer végig fogunk menni, no random access.
                     Ebben az esetben túl is specifikálhatjuk a dolgot:
-                    </para>
-                    <literallayout>
+                </para>
+                <literallayout>
 interface Foo{
     void bar(LinkedList&lt;String&gt; l);
 }
-                    </literallayout>
-                    <para>
+                </literallayout>
+                <para>
                     A bökkenő az, hogy egy ArrayList-et nem fogunk tudni elfogadni, annak ellenére, hogy az pedig képes lenne erre.
                     (Ha pedig átírjuk ArrayList-re, akkor pedig LinkedList-el lesz baj.)
                     Írjuk akkor át így:
-                    </para>
-                    <literallayout>
+                </para>
+                <literallayout>
 interface Foo{
     void bar(List&lt;String&gt; l);
 }
-                    </literallayout>
-                    <para>
+                </literallayout>
+                <para>
                     Ez már akár jó is lehet, de igazságszerint, még ennél is kevesebbre van szükség.
                     Például akarjuk a contains methodpt használni? Nem.
                     Nos, mivel a Collections-t próbálták ezen elvek szerint készíteni mielőtt jött az Orac...mármint mivel ezen elvek szerint készítették, ezért lehetünk még specifikusabbak:
-                    </para>
-                    <literallayout>
+                </para>
+                <literallayout>
 interface Foo{
     void bar(Iterator&lt;String&gt; l);
 }
-                    </literallayout>
-                    <para>
+                </literallayout>
+                <para>
                     Ez már akár jó is lehet, de igazságszerint, még ennél is kevesebbre van szükség.
                     Például akarjuk a contains methodpt használni? Nem.
                     Nos, mivel a Collections-t próbálták ezen elvek szerint készíteni mielőtt jött az Orac...mármint mivel ezen elvek szerint készítették, ezért lehetünk még specifikusabbak:
-                    </para>
-                    <literallayout>
+                </para>
+                <literallayout>
 public class Main implements Iterator&lt;String&gt;{
 
 	private int current = 0;
@@ -398,21 +500,21 @@ public class Main implements Iterator&lt;String&gt;{
 	}
 
 }
-                    </literallayout>
-                    <para>
+                </literallayout>
+                <para>
                         A fenti példából látszik, hogy még egy "mock" jellegű iterátort is tudtunk faragni a Main class-ból.
                         Az egész tanulsága az, hogy ezt csak azért tudtuk megtenni, mert a Collections interface-ei elég granulárisak.
                         Tudom, hogy ennél fancybb példát is lehetne csinálni, mint pl. a Baeldung-os Zookeeper-ös, de ezen példa amiatt jó, hogy gyakrabban fog előfordulni életünkben mint egy állatkerti dolog.
-                    </para>
-                </section>
-                <section>
-                    <title>Dependency Inversion</title>
-                    <para>
+                </para>
+            </section>
+            <section>
+                <title>Dependency Inversion</title>
+                <para>
                     A magasabb szintű komponensek ne függjenek az alacsonyabb szintű komponensektől.
                     Azaz próbáljunk absztrakciós szinteket létrehozni és lehetőleg ezeken belül maradni.
                     Tegyük fel valami játékot írunk:
-                    </para>
-                    <literallayout>
+                </para>
+                <literallayout>
 class App{
     OpenGLRenderer opengl;
 
@@ -445,20 +547,20 @@ class App{
         opengl.cleanup();
     }
 }
-                    </literallayout>
-                    <para>
+                </literallayout>
+                <para>
                     A fenti kód részlet nagyon jól tudna működni.
                     A probléma az, hogy innentől kezdve OpenGL-el működünk.
                     Bármit is rajzolunk annak a vége OpenGL lesz.
                     De mi van ha Vulkan-t akarunk?
-                    </para>
-                    <para>
+                </para>
+                <para>
                     A másik probléma, hogy mikor egy sima téglalapot akarunk, akkor is vertexbuffer-ekkel kell szórakoznunk.
                     Ami pedig még rosszabb, hogy ha ezeket a low level dolgokat a játék kódjában is használjuk akkor 
                     maga a játék logikájának is lesz egy dependenciája az OpenGL-re. 
                     A megoldás az, hogy létrehozunk egy magasabb szintű Renderer interface-t, és a játékban ezt fogjuk hívogatni.
-                    </para>
-                    <literallayout>
+                </para>
+                <literallayout>
 interface Renderer{
     void drawDefaultRect();
 }
@@ -486,32 +588,32 @@ class App{
         rend.cleanup();
     }
 }
-                    </literallayout>
-                    <para>
+                </literallayout>
+                <para>
                     A fenti kód magasabb szintű műveletekkel foglalkozik. Például inicializálás, feltakarítás, illetve összetetebb dolgok, például quad-ok rajzolgatásával.
-                    </para>
-                </section>
-                <section>
-                    <title>DRY - Don't Repeat Yourself</title>
-                    <para>
+                </para>
+            </section>
+            <section>
+                <title>DRY - Don't Repeat Yourself</title>
+                <para>
                         Ezzel az elvvel nem lehet vitatkozni. Egy az egyben és szó szerint alkalmazandó.
                         A kód duplikáció rossz a karbantarthatatlanság miatt.
-                    </para>
-                    <para>
+                </para>
+                <para>
                         Vegyünk egy egyszerű példát: ez a docbook.
-                    </para>
-                    <para>
+                </para>
+                <para>
                         Ha a forrásfájlokból a kódrészleteket nem include-olnám, hanem bemásolnám egy literallayout-ba, akkor minden alkalommal mikor hozzányúlok a fájlhoz újra átkéne másolnom a kódrészletet a doksiba.
-                    </para>
-                    <para>
+                </para>
+                <para>
                         Ami viszont még fontosabb, és szerintem nem egyértelmű a DRY-ban, hogy ez nem csak kódról szól.
                         A világunkban a redundancia mindig plusz problémákhoz vezet, emiatt általában csak akkor engedünk teret redundáns rendszereknek, mikor biztonsági szempontból kell egy fallback plan.
-                    </para>
-                    <para>
+                </para>
+                <para>
                         A DRY-t a fentiek mellett azonban lehet arra is használni, hogy könnyen megláthassuk hol lehetne javítani egy mástól örökölt kódot.
                         Ha kód duplikációt látunk akkor nagy valószínűséggel alkalmazhatunk valami mintát a kikerülésére. Sőt ha egyik mintával sem lehet megoldani, akkor gyakran egy elég komoly érv lehet az eredeti design újragondolására.
-                    </para>
-                     <para>
+                </para>
+                <para>
                         Véleményem szerint az egyetlen probléma a DRY alkalmazásával pontosan a sikere: mindenki gyorsan megérti, egyetért vele, és kerüli megsértését minden áron.
                         A a Util class-ok megjelenése és elburjánzása egy codebase-ben szerintem emiatt alakul ki.
                         A Util class-ok alatt azt értem, hogy hozzám hasonló naív junior-ok tudják hogy nem szabad kódot ismételni, ezért bevágják egy BlaBlaUtil class-ba, mert még nincs neki igazi hely ahova tartozzon.
@@ -521,31 +623,31 @@ class App{
                         Ami pedig még fontosabb, hogy mivel főként kis static methodok vannak benne, ezért összevissza mindenki függ ettől a behemótra nőtt BlaBlaUtilClass-tól.
                         Legvégül pedig jön a kérdés, hogy kinek a felelőssége a class karbantartása?
                         Senkinek, hiszen mindenkié és egyszerre senkié sem.
-                    </para>
-                </section>
-                <section>
-                    <title>YAGNI - You Aren't Gonna Need It</title>
-                    <para>
+                </para>
+            </section>
+            <section>
+                <title>YAGNI - You Aren't Gonna Need It</title>
+                <para>
                         Ez az elv, gondolom én, azért szükséges, mert kissé ellensúlyozni kell azt a késztetést, hogy előre megtervezzünk minden részletet, minden lehetséges körülmény fennállásakor, minden igényt és lehetséges jövőbeli igényt kielégítve.
                         A YAGNI sértésére egy <link xlink:href="https://robertsspaceindustries.com/">példa</link>.
                        
-                    </para>
-                    <para>
+                </para>
+                <para>
                      Ez az elv szerintem kicsit rosszul van megfogalmazva. Szerintem sokkal érthetőbb lenne a célja, ha az opportunity cost-al érvelnénk.
                      Szerintem érdemesebb lenne úgy megfogalmazni hogy mikor rászánsz egy órát egy feature-re, egyben el is veszel egy potenciális órát egy másiktól.
-                    </para>
-                </section>
-                <section>
-                    <title>KISS - Keep it simple stupid</title>
-                    <para>Ez az elv annyit jelent, hogy próbáljunk az egyszerűségre törekedni.
+                </para>
+            </section>
+            <section>
+                <title>KISS - Keep it simple stupid</title>
+                <para>Ez az elv annyit jelent, hogy próbáljunk az egyszerűségre törekedni.
                     Akármilyen jól hangzik sokszor ezt nem lehet megtenni (pl.: egy olyan API-val dolgozunk mely megköti kezünket).
                     Az elv szerintem nem azt jelenti, hogy bármi áron törekedjünk az egyszerűségre, sokkal inkább ha létezik több megoldás egy problémára, akkor ne hagyjuk ki a megoldások értékelési szempontjai közül az egyszerűséget.
-                    </para>
-                    <para>
+                </para>
+                <para>
                         Ezt az elvet amiatt tartom problémásnak kicsit, mert nem jól definiálható az hogy mi számít egyszerűnek.
-                    </para>
-                </section>
-               </section>
+                </para>
             </section>
-           
-        </chapter>                
+        </section>
+    </section>
+
+</chapter>                
