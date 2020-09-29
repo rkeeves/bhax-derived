@@ -33,7 +33,7 @@
             </para>
         </xi:fallback>
     </xi:include>
-	
+
 	<xi:include href="prog2-textbook-feladatok2-l02.xml">
         <xi:fallback>
             <para>
@@ -41,7 +41,7 @@
             </para>
         </xi:fallback>
     </xi:include>
-	
+
 	<xi:include href="prog2-textbook-feladatok2-l03.xml">
         <xi:fallback>
             <para>

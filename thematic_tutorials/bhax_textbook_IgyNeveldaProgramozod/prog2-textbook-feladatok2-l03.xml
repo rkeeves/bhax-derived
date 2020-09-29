@@ -68,8 +68,6 @@ Lásd fóliák!
             <para>
                 A feladat megoldásához a gyakvezér által mutatott <link xlink:href="http://app.genmymodel.com">genmymodel</link>-t használtam.
             </para>
-
-            <title>Tantárgy regisztráció UML</title>
             <para>
                     Ezt a feladatot én úgy értettem, hogy a tantárgy felvételhez szükséges adathordozó objektumokat kell tervezni, és azt sem in-depth. 
                     Azért gondolom, mert egy kicsit overkill lenne elvárni az összes service, controller stb. modellezését, főként hogy a feladatot egy heti csokorból egy darab.
@@ -649,5 +647,4 @@ class App{
             </section>
         </section>
     </section>
-
 </chapter>                
