@@ -1,0 +1,545 @@
+<chapter xmlns="http://docbook.org/ns/docbook"
+    xmlns:xlink="http://www.w3.org/1999/xlink"
+    xmlns:xi="http://www.w3.org/2001/XInclude" version="5.0" xml:lang="hu">
+    <info>
+        <title>Helló, Mandelbrot!</title>
+        <keywordset>
+            <keyword/>
+        </keywordset>
+    </info>
+
+    <section>
+        <title>Reverse engineering - UML class diagram</title>
+        <section>
+            <title>Feladat</title>
+            <para>
+            UML osztálydiagram rajzolása az első védési C++ programhoz. Az osztálydiagramot a forrásokból
+generáljuk (pl. Argo UML, Umbrello, Eclipse UML) Mutassunk rá a kompozíció és aggregáció
+kapcsolatára a forráskódban és a diagramon, lásd még: <link xlink:href="https://youtu.be/Td_nlERlEOs">youtube felvétel egy régi előadásról</link> .
+Lásd fóliák!
+            </para>
+        </section>
+    </section>
+    <section>
+        <title>BPMN</title>
+        <section>
+            <title>Feladat</title>
+            <para>
+            Rajzoljunk le egy tevékenységet BPMN-ben!
+                <link xlink:href="https://arato.inf.unideb.hu/batfai.norbert/PROG2/Prog2_7.pdf">(34-47 fólia)</link>.
+            </para>
+        </section>
+    </section>
+    <section>
+        <title>EPAM: Neptun tantárgyfelvétel modellezése UML-ben</title>
+        <section>
+            <title>Feladat</title>
+            <para>
+            Modellezd le a Neptun rendszer tárgyfelvételéhez szükséges objektumokat UML diagram segítségével.
+            </para>
+        </section>
+        <section>
+            <title>Megoldás</title>
+            <para>
+                A feladat megoldásához a gyakvezér által mutatott <link xlink:href="http://app.genmymodel.com">genmymodel</link>-t használtam.
+            </para>
+            <figure>
+                <title>Tantárgy regisztráció UML</title>
+                <mediaobject>
+                    <imageobject>
+                        <imagedata fileref="l03/uml-course-reg/uml-course-reg.png" scale="50" />
+                    </imageobject>
+                    <textobject>
+                        <phrase>Tantárgy regisztráció UML</phrase>
+                    </textobject>
+                </mediaobject>
+            </figure>
+        </section>
+    </section>
+    <section>
+        <title>EPAM: Neptun tantárgyfelvétel UML diagram implementálása</title>
+        <section>
+            <title>Feladat</title>
+            <para>
+           Implementáld le az előző feladatban létrehozott diagrammot egy tetszőleges nyelven.
+            </para>
+        </section>
+    </section>
+    <section>
+        <title>OO modellezés</title>
+        <section>
+            <title>Feladat</title>
+            <para>
+           Írj egy 1 oldalas esszét arról, hogy OO modellezés során milyen elveket tudsz követni (pl.: SOLID, KISS, DRY, YAGNI).
+                <link xlink:href="https://blog.cleancoder.com/uncle-bob/2018/08/28/CraftsmanshipMovement.html">Btw, Uncle Bob took a SOLID dump on the Agile scene way-waaay back.</link>.
+           A témához Jeszenszky Tanár Úr  <link xlink:href="https://arato.inf.unideb.hu/jeszenszky.peter/download/prt/presentations/oo.pdf">egyik hasznos diasorát</link> használtam a sok-sok általa elérhetővé tett közül.
+            </para>
+        </section>
+        <section>
+            <title>SOLID</title>
+            <para>
+            A <literal>SOLID</literal> egy betűszó. Jelentése a következő:
+            </para>
+            <itemizedlist>
+                <listitem>
+                    <para>
+                    S - Single Responsibility Principle
+                    </para>
+                </listitem>
+                <listitem>
+                    <para>
+                    O - Open/Closed Principle
+                    </para>
+                </listitem>
+                <listitem>
+                    <para>
+                    L - Liskov Substitution Principle
+                    </para>
+                </listitem>
+                <listitem>
+                    <para>
+                    I - Interface Segregation Principle
+                    </para>
+                </listitem>
+                <listitem>
+                    <para>
+                    D - Dependency Inversion Principle
+                    </para>
+                </listitem>
+            </itemizedlist>
+            <section>
+                <title>Single Responsibility Principle</title>
+                <para>Ez ez elv annyit takar hogy egy nagy problémát próbáljunk egymástól független részproblémákra osztani, és ezen részproblémákat ha lehetséges egy-egy objektum kezelje.</para>
+                <para>
+                Persze ez nem mindig követhető teljesen, hiszen a valós életben bizonyos üzleti indokok meggátolhatják ezt. 
+                Egy másik nagyon fontos ok arra, hogy megszegjük az az optimalizálás.(avagy mi mindent tud számolni egy vertex shader). 
+                </para>
+                <para>
+                    Sok-sok példát lehet hozni (fogok hozni én is), de egy balta egyszerűségű példa a standard kimenetre írás. 
+                    Azáltal hogy std out-ra írunk mentesülünk a file descriptor problémakörtől stb. a user pedig abba folyatja a kimenetet amibe akarja.
+                </para>
+                <para>
+                    Java esetére szűkítve Objektumokban, Osztályokban gondolkodunk.
+                    Az elvre például lehetne azt hozni use case-ként(direkt egy "buta" dolog), hogy egy Person objektum-nak tudnia kell-e, hogy ma születésnapja van-e az adott Person-nek?
+                </para>
+                <literallayout>
+class Person{
+    String name;
+    Date dob;
+
+    boolean hasBdayToday(){...}
+}
+                    <literallayout>
+                        <para>
+                    Mármint, ha a Person objektum egyetlen felelőssége (a név és többin kívül) a születési idő betárolása, akkor három dolgot is nyerünk:
+                        </para>
+                        <literallayout>
+class Person{
+    String name;
+    Date dob;
+}
+
+
+class AgeService{
+    boolean hasBdayToday(Date dob){
+        ...
+    }
+}
+                        </literallayout>
+                        <para>
+                    1. Ugye kimozgattuk a "születésnapos-e?" számítást, tehát nagy valószínűséggel a date of birth a Person-ból fogjuk venni továbbra is, de maga a Person osztály már csak egy passzív adatstruktúra.
+                        </para>
+                        <para>
+                    2. Mivel "születésnapos-e?" metódust kihoztuk a Person osztályból, mostmár nem kell egy teljes Person példányt létrehozni teszt célból.
+                        </para>
+                        <para>
+                    3. Mivel "születésnapos-e?" metódust kihoztuk a Person osztályból, mostmár ha kell bárminek a születésnaposságát eldönthetjük, hiszen az egyetlen argumentumunk a születési idő.
+                        </para>
+                    </section>
+                    <section>
+                        <title>Open/Closed Principle</title>
+                        <para>
+                    Értsd: nyitott a bővítésre, zárt a módosításra, avagy új funkcionalitás hozzáadását támogató kódot kell írnunk, azonban az eddigi szerződések betartásával.
+                        </para>
+                        <para>
+                            Miért is fontos ez?
+                            A módoításra való zártság amiatt szükséges mert különben úgy járunk mint az Angular 2 hahaha ksözönöm az Oscart.
+                            Viccet félretéve, ha egy létező interface, class, abstract class-ba kénytelenek vagyunk belenyúlni, és ez a módosításunk törlés, akkor ez azzal jár, hogy lehet hogy más kódrészek, melyek ettől függtek idáig, innentől nem fognak működni.
+                        </para>
+                        <para>
+                            Tegyük fel valami <link xlink:href="https://blog.cleancoder.com/uncle-bob/2014/05/12/TheOpenClosedPrinciple.html">plugin</link>-t írunk egy progihoz.
+                            Tegyük fel a fő progi adott, ez induláskor létrehoz gombokat a GUI-n. Ezek a gombok a főprogi alapfunkciói:
+                        </para>
+                        <literallayout>
+class Prog{
+    void start(){
+        buttons.add( new FileButton());
+        buttons.add( new EditButton());
+    }
+}
+                        </literallayout>
+                        <para>
+                            A kérdés most az, hogy akkor hogyan fogják tudni a plugin-ok a saját gombjaikat hozzáadni?
+                            Ugye a következő megoldást nem követhetjük, mert akárhányszor a cégünk előrukkol egy új pluginnal, annyiszor kell a fő progit módosítani:
+                        </para>
+                        <literallayout>
+class Prog{
+    void start(){
+        buttons.add( new FileButton());
+        buttons.add( new EditButton());
+        buttons.add( new PayToWinButton());
+        buttons.add( new LootBoxButton());
+       
+    }
+}
+                        </literallayout>
+                        <para>
+                            Sőt, tegyük fel bizonyos plugin-oknak csak egy speckó licensz esetén szabad elindulniuk:
+                        </para>
+                        <literallayout>
+class Prog{
+    void start(){
+        buttons.add( new FileButton());
+        buttons.add( new EditButton());
+        if(licenses.has("CashGrab")){
+            buttons.add( new PayToWinButton());
+            if(licenses.has("UseLoopholeInUSGamblingRegulations")){
+                buttons.add( new LootBoxButton());
+            }  
+        }
+    }
+}
+                        </literallayout>
+                        <para>
+                            Ajjaj, ez elég rosszul néz ki! 
+                            Mostmár nem csak hogy a főprogi példányosítja a gombokat, de mostmár ő is kezeli a licenszelést.
+                            Akárhányszor van valami új dolog, az magában a főprogiban okoz változást.
+                            Sőt, még rosszabb: Ha valamelyik plugin elszáll startup közben, akkor az egész programnak vége.
+                        </para>
+                        <para>
+                            A megoldásnak valami olyasminek kéne lennie, hogy valamilyen módon el tudjuk érni, hogy újabb gombokat lehessen hozzáadni, anélkül hogy a többi részben kárt okoznánk. 
+                        </para>
+                        <literallayout>
+interface LicenseManager{
+    void has(String featureName);
+}
+
+interface Plugin{
+    List&lt;Button&gt; startup(LicenseManager lm) throws PluginStartupError;
+}
+
+class PayToWinPlugin implements Plugin{
+    List&lt;Button&gt; startup(LicenseManager lm) throws PluginStartupError{
+        List&lt;Button&gt; l = new ArrayList&lt;Button&gt;();
+        if(lm.has("CashGrab")){
+            l.add( new PayToWinButton());
+            if(lm.has("UseLoopholeInUSGamblingRegulations")){
+                l.add( new LootBoxButton());
+            }  
+        }
+    }
+}
+
+class CorePlugin implements Plugin{
+    List&lt;Button&gt; startup(LicenseManager lm) throws PluginStartupError{
+        List&lt;Button&gt; l = new ArrayList&lt;Button&gt;();
+        l.add( new FileButton());
+        l.add( new EditButton());
+    }
+}
+
+class Prog implements LicenseManager{
+    void start(){
+        // load plugin classes from specific dir
+        for(Plugin plugin : plugins){
+            try{
+                buttons.addAll(plugin.startup(this));
+            }catch(...){
+                // handle err
+            }
+        }
+    }
+}
+                        </literallayout>
+                        <para>
+                            A fenti megoldással a plugin-ok annyi gombot regisztrálnak amennyit akarnak, és nem a mi feladatunk a licensz feature-ök check-je, csak a licensz feature-öket tároló objektum vagy service továbbítása a plugin felé.
+                            Egyébként csak azért listában adják vissza a gombokat, mert egyszerűre akartam fogni (és ez a legegyszerűbb módja annak, hoghya mindjuk egy 2 gombot regisztráló plugin elhal a második gomb regisztrációnál akkor rollback-elnünk kell az elsőt. Persze ez csak egy gagyi iskolai példa).
+                        </para>
+                    </section>
+                    <section>
+                        <title>Liskov Substitution Principle</title>
+                    </section>
+                    <para>
+                            A Liskov elveket nem lehet elégszer gyakorolni. Ugyan már más feladatban is foglalkoztunk vele, most nézzünk egy Vehicle példát megcsavarva!
+                    </para>
+                    <literallayout>
+class Vehicle{
+    void takeSeat();
+    void startEngine();
+    void go();
+}
+
+class Car extends Vehicle{
+    void takeSeat(){
+        //...
+    }
+    void startEngine(){
+         //...
+    }
+    void go(){
+        //...
+    }
+}
+
+class Boat extends Vehicle{
+    void takeSeat(){
+        //...
+    }
+    void startEngine(){
+         //...
+    }
+    void go(){
+        //...
+    }
+}
+
+class Roller extends Vehicle{
+    void takeSeat(){
+        throw new NotImplementedError();
+    }
+    void startEngine(){
+        throw new NotImplementedError();
+    }
+    void go(){
+        //...
+    }
+}
+                    </literallayout>
+                    <para>
+                          A fenti kód amiatt problémás, mert ahol lehet használni Vehicle-t ott nem biztos hogy lehet használni Roller-t. 
+                          Innentől kezdve bárhol ahol használjuk Vehicle-t try-catch-elni kell.
+                    </para>
+                </section>
+                <section>
+                    <title>Interface Segregation</title>
+                    <para>
+                    Nagy interface-eket kisebbekké kell tenni ha lehetséges.
+                    De miért is jó ez?
+                    </para>
+                    <para>
+                    Sajnos nem tudom kihagyni a Collections-t mert gyönyörú példa, és szerintem megérthető, hogy nem az interface-ekhez van köze igazából.
+                    Szerintem sokkal inkább arról van szó, hogy csak olyan dolgokat várjunk el, melyekre valóban szükség lesz.
+                    </para>
+                    <para>
+                    Tegyük fel, hogy kapni akarunk egy listát amin egyszer végig fogunk menni, no random access.
+                    Ebben az esetben túl is specifikálhatjuk a dolgot:
+                    </para>
+                    <literallayout>
+interface Foo{
+    void bar(LinkedList&lt;String&gt; l);
+}
+                    </literallayout>
+                    <para>
+                    A bökkenő az, hogy egy ArrayList-et nem fogunk tudni elfogadni, annak ellenére, hogy az pedig képes lenne erre.
+                    (Ha pedig átírjuk ArrayList-re, akkor pedig LinkedList-el lesz baj.)
+                    Írjuk akkor át így:
+                    </para>
+                    <literallayout>
+interface Foo{
+    void bar(List&lt;String&gt; l);
+}
+                    </literallayout>
+                    <para>
+                    Ez már akár jó is lehet, de igazságszerint, még ennél is kevesebbre van szükség.
+                    Például akarjuk a contains methodpt használni? Nem.
+                    Nos, mivel a Collections-t próbálták ezen elvek szerint készíteni mielőtt jött az Orac...mármint mivel ezen elvek szerint készítették, ezért lehetünk még specifikusabbak:
+                    </para>
+                    <literallayout>
+interface Foo{
+    void bar(Iterator&lt;String&gt; l);
+}
+                    </literallayout>
+                    <para>
+                    Ez már akár jó is lehet, de igazságszerint, még ennél is kevesebbre van szükség.
+                    Például akarjuk a contains methodpt használni? Nem.
+                    Nos, mivel a Collections-t próbálták ezen elvek szerint készíteni mielőtt jött az Orac...mármint mivel ezen elvek szerint készítették, ezért lehetünk még specifikusabbak:
+                    </para>
+                    <literallayout>
+public class Main implements Iterator&lt;String&gt;{
+
+	private int current = 0;
+	
+	public static void main(String[] args) {
+		Foo foo = new Foo() {
+			@Override
+			public void bar(Iterator&lt;String&gt; l) {
+				l.forEachRemaining(System.out::println);			
+			}
+			
+		};
+		Iterator&lt;String&gt; it  = Arrays.asList("a","b","c").iterator();
+		foo.bar(it);
+		foo.bar(new Main());
+
+	}
+
+	@Override
+	public boolean hasNext() {
+		return current &lt; 3;
+	}
+
+	@Override
+	public String next() {
+		return ""+current++;
+	}
+
+}
+                    </literallayout>
+                    <para>
+                        A fenti példából látszik, hogy még egy "mock" jellegű iterátort is tudtunk faragni a Main class-ból.
+                        Az egész tanulsága az, hogy ezt csak azért tudtuk megtenni, mert a Collections interface-ei elég granulárisak.
+                        Tudom, hogy ennél fancybb példát is lehetne csinálni, mint pl. a Baeldung-os Zookeeper-ös, de ezen példa amiatt jó, hogy gyakrabban fog előfordulni életünkben mint egy állatkerti dolog.
+                    </para>
+                </section>
+                <section>
+                    <title>Dependency Inversion</title>
+                    <para>
+                    A magasabb szintű komponensek ne függjenek az alacsonyabb szintű komponensektől.
+                    Azaz próbáljunk absztrakciós szinteket létrehozni és lehetőleg ezeken belül maradni.
+                    Tegyük fel valami játékot írunk:
+                    </para>
+                    <literallayout>
+class App{
+    OpenGLRenderer opengl;
+
+    App(){
+        opengl = new OpenGLRenderer();
+        opengl.init();
+    }
+
+    void onRender(){
+       renderDefaultRect();
+    }
+
+    void renderDefaultRect(){
+        float[] vertices = {
+            -0.5f, 0.5f, 0f,
+            -0.5f, -0.5f, 0f,
+            0.5f, -0.5f, 0f,
+            0.5f, -0.5f, 0f,
+            0.5f, 0.5f, 0f,
+            -0.5f, 0.5f, 0f
+        };
+        FloatBuffer verticesBuffer = BufferUtils.createFloatBuffer(vertices.length);
+        verticesBuffer.put(vertices);
+        verticesBuffer.flip();
+        vertexCount = 6;
+        // do more stuff
+    }
+
+    void stop(){
+        opengl.cleanup();
+    }
+}
+                    </literallayout>
+                    <para>
+                    A fenti kód részlet nagyon jól tudna működni.
+                    A probléma az, hogy innentől kezdve OpenGL-el működünk.
+                    Bármit is rajzolunk annak a vége OpenGL lesz.
+                    De mi van ha Vulkan-t akarunk?
+                    </para>
+                    <para>
+                    A másik probléma, hogy mikor egy sima téglalapot akarunk, akkor is vertexbuffer-ekkel kell szórakoznunk.
+                    Ami pedig még rosszabb, hogy ha ezeket a low level dolgokat a játék kódjában is használjuk akkor 
+                    maga a játék logikájának is lesz egy dependenciája az OpenGL-re. 
+                    A megoldás az, hogy létrehozunk egy magasabb szintű Renderer interface-t, és a játékban ezt fogjuk hívogatni.
+                    </para>
+                    <literallayout>
+interface Renderer{
+    void drawDefaultRect();
+}
+
+class App{
+    Renderer rend;
+
+    App(){
+        
+    }
+
+    void init(){
+        if(isVulkan())
+            rend = new VulkanRenderer();
+        else 
+            rend = new OpenGLRenderer();
+        rend.init();
+    }
+
+    void onRender(){
+        rend.drawDefaultRect();
+    }
+
+    void stop(){
+        rend.cleanup();
+    }
+}
+                    </literallayout>
+                    <para>
+                    A fenti kód magasabb szintű műveletekkel foglalkozik. Például inicializálás, feltakarítás, illetve összetetebb dolgok, például quad-ok rajzolgatásával.
+                    </para>
+                </section>
+                <section>
+                    <title>DRY - Don't Repeat Yourself</title>
+                    <para>
+                        Ezzel az elvvel nem lehet vitatkozni. Egy az egyben és szó szerint alkalmazandó.
+                        A kód duplikáció rossz a karbantarthatatlanság miatt.
+                    </para>
+                    <para>
+                        Vegyünk egy egyszerű példát: ez a docbook.
+                    </para>
+                    <para>
+                        Ha a forrásfájlokból a kódrészleteket nem include-olnám, hanem bemásolnám egy literallayout-ba, akkor minden alkalommal mikor hozzányúlok a fájlhoz újra átkéne másolnom a kódrészletet a doksiba.
+                    </para>
+                    <para>
+                        Ami viszont még fontosabb, és szerintem nem egyértelmű a DRY-ban, hogy ez nem csak kódról szól.
+                        A világunkban a redundancia mindig plusz problémákhoz vezet, emiatt általában csak akkor engedünk teret redundáns rendszereknek, mikor biztonsági szempontból kell egy fallback plan.
+                    </para>
+                    <para>
+                        A DRY-t a fentiek mellett azonban lehet arra is használni, hogy könnyen megláthassuk hol lehetne javítani egy mástól örökölt kódot.
+                        Ha kód duplikációt látunk akkor nagy valószínűséggel alkalmazhatunk valami mintát a kikerülésére. Sőt ha egyik mintával sem lehet megoldani, akkor gyakran egy elég komoly érv lehet az eredeti design újragondolására.
+                    </para>
+                     <para>
+                        Véleményem szerint az egyetlen probléma a DRY alkalmazásával pontosan a sikere: mindenki gyorsan megérti, egyetért vele, és kerüli megsértését minden áron.
+                        A a Util class-ok megjelenése és elburjánzása egy codebase-ben szerintem emiatt alakul ki.
+                        A Util class-ok alatt azt értem, hogy hozzám hasonló naív junior-ok tudják hogy nem szabad kódot ismételni, ezért bevágják egy BlaBlaUtil class-ba, mert még nincs neki igazi hely ahova tartozzon.
+                        Utána jön egy másik ember (vagy akár ugyanaz), és mivel már van egy BlaBlaUtil a következő apróságot is berakja oda.
+                        Utána kiszervezik a fejlesztést <link xlink:href="https://en.wikipedia.org/wiki/Pune">valahova</link>, ahol meg már szabálynak veszik, hogy minden ami nem egyből eldöntehető az egyenesen megy a Util class-ba. 
+                        A Util class így a végén rendelkezni fog 1000 sorral, 300 methoddal.
+                        Ami pedig még fontosabb, hogy mivel főként kis static methodok vannak benne, ezért összevissza mindenki függ ettől a behemótra nőtt BlaBlaUtilClass-tól.
+                        Legvégül pedig jön a kérdés, hogy kinek a felelőssége a class karbantartása?
+                        Senkinek, hiszen mindenkié és egyszerre senkié sem.
+                    </para>
+                </section>
+                <section>
+                    <title>YAGNI - You Aren't Gonna Need It</title>
+                    <para>
+                        Ez az elv, gondolom én, azért szükséges, mert kissé ellensúlyozni kell azt a késztetést, hogy előre megtervezzünk minden részletet, minden lehetséges körülmény fennállásakor, minden igényt és lehetséges jövőbeli igényt kielégítve.
+                        A YAGNI sértésére egy <link xlink:href="https://robertsspaceindustries.com/">példa</link>.
+                       
+                    </para>
+                    <para>
+                     Ez az elv szerintem kicsit rosszul van megfogalmazva. Szerintem sokkal érthetőbb lenne a célja, ha az opportunity cost-al érvelnénk.
+                     Szerintem érdemesebb lenne úgy megfogalmazni hogy mikor rászánsz egy órát egy feature-re, egyben el is veszel egy potenciális órát egy másiktól.
+                    </para>
+                </section>
+                <section>
+                    <title>KISS - Keep it simple stupid</title>
+                    <para>Ez az elv annyit jelent, hogy próbáljunk az egyszerűségre törekedni.
+                    Akármilyen jól hangzik sokszor ezt nem lehet megtenni (pl.: egy olyan API-val dolgozunk mely megköti kezünket).
+                    Az elv szerintem nem azt jelenti, hogy bármi áron törekedjünk az egyszerűségre, sokkal inkább ha létezik több megoldás egy problémára, akkor ne hagyjuk ki a megoldások értékelési szempontjai közül az egyszerűséget.
+                    </para>
+                    <para>
+                        Ezt az elvet amiatt tartom problémásnak kicsit, mert nem jól definiálható az hogy mi számít egyszerűnek.
+                    </para>
+                </section>
+            </section>
+        </chapter>                
