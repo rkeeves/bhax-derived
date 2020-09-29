@@ -20,6 +20,7 @@ Lásd fóliák!
             </para>
         </section>
     </section>
+
     <section>
         <title>BPMN</title>
         <section>
@@ -30,6 +31,7 @@ Lásd fóliák!
             </para>
         </section>
     </section>
+   
     <section>
         <title>EPAM: Neptun tantárgyfelvétel modellezése UML-ben</title>
         <section>
@@ -47,7 +49,7 @@ Lásd fóliák!
                 <title>Tantárgy regisztráció UML</title>
                 <mediaobject>
                     <imageobject>
-                        <imagedata fileref="l03/uml-course-reg/uml-course-reg.png" scale="50" />
+                        <imagedata fileref="l03/uml-course-reg/uml-course-reg.png" scale="60" />
                     </imageobject>
                     <textobject>
                         <phrase>Tantárgy regisztráció UML</phrase>
@@ -56,6 +58,7 @@ Lásd fóliák!
             </figure>
         </section>
     </section>
+  
     <section>
         <title>EPAM: Neptun tantárgyfelvétel UML diagram implementálása</title>
         <section>
@@ -65,6 +68,7 @@ Lásd fóliák!
             </para>
         </section>
     </section>
+      
     <section>
         <title>OO modellezés</title>
         <section>
@@ -75,6 +79,7 @@ Lásd fóliák!
            A témához Jeszenszky Tanár Úr  <link xlink:href="https://arato.inf.unideb.hu/jeszenszky.peter/download/prt/presentations/oo.pdf">egyik hasznos diasorát</link> használtam a sok-sok általa elérhetővé tett közül.
             </para>
         </section>
+        
         <section>
             <title>SOLID</title>
             <para>
@@ -129,7 +134,7 @@ class Person{
 
     boolean hasBdayToday(){...}
 }
-                    <literallayout>
+                    </literallayout>
                         <para>
                     Mármint, ha a Person objektum egyetlen felelőssége (a név és többin kívül) a születési idő betárolása, akkor három dolgot is nyerünk:
                         </para>
@@ -267,8 +272,7 @@ class Prog implements LicenseManager{
                         </para>
                     </section>
                     <section>
-                        <title>Liskov Substitution Principle</title>
-                    </section>
+                        <title>L - Liskov Substitution Principle</title>
                     <para>
                             A Liskov elveket nem lehet elégszer gyakorolni. Ugyan már más feladatban is foglalkoztunk vele, most nézzünk egy Vehicle példát megcsavarva!
                     </para>
@@ -541,5 +545,7 @@ class App{
                         Ezt az elvet amiatt tartom problémásnak kicsit, mert nem jól definiálható az hogy mi számít egyszerűnek.
                     </para>
                 </section>
+               </section>
             </section>
+           
         </chapter>                
