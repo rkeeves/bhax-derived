@@ -19,11 +19,144 @@ kapcsolatára a forráskódban és a diagramon, lásd még: <link xlink:href="ht
 Lásd fóliák!
             </para>
         </section>
+        <section>
+            <title>Asszociáció, Aggregáció, Kompozíció</title>
+            <para>
+                Próbáltam általánosságban informálisan felírni.
+                A probléma az hogy doméntől függően (SQL,Java,C++ stb.) más és más módon használják őket.
+            </para>
+            <para>
+                Amit kiakartam fejezni az szerintem érthető lesz annak ellenére, hogy nem vagyok matematikus.
+            </para>
+            <para>
+                Amire a feladat utalni akar az a kompozíció és aggregáció közötti különbség.
+                Mind a kettő egy viszonyt fejez ki.
+                Csináltam egy példát, előre is elnézést kérek a honfoglalós dologért, nem poénkodni akartam, hanem szükségem volt egy olyan doménre, ahol egy entitás elpusztulása egy másik entitás elpusztulását kell hogy kiváltsa, de átruházható ownership-el(mert ugye honfoglaló őseink a lovaikat maguk mellé temették, de egy lovukat el is ajándékozhatták).
+            </para>
+            <figure>
+                <title>Honfoglaló UML</title>
+                <mediaobject>
+                    <imageobject>
+                        <imagedata fileref="l03/uml/agg-comp.png" scale="50" />
+                    </imageobject>
+                    <textobject>
+                        <phrase>Honfoglaló UML</phrase>
+                    </textobject>
+                </mediaobject>
+            </figure>
+            <para>
+                Tiszta asszociáció-ra azért példa a "dad", mert "dad"-re semmilyen kontrollt nem gyakorol egy Person példány, csak tud a létezéséről.
+            </para>
+            <para>
+                Aggregáció-ra azért példa a "horse", mert "horse"-ot el kell pusztítania valakinek, de az elpusztítás felelőssége (hisz ez az ownership valós lényege) átruházható.
+            </para>
+            <para>
+                Kompozíció-ra azért példa a "body", mert a "body" nem átruházható és a birtokos pusztulása magával vonja a "body" pusztulását.
+            </para>
+            <para>
+                Jelen példában nem foglalkozunk azzal, hogy ha A R B relációról van szó és (a,b) a reláció része(a eleme A, b eleme B) - azaz a látja b-t - akkor b látja-e a-t.
+                Ezzel majd úgyis fogunk eleget szenvedni Hibernate esetén :)
+            </para>
+            <para>
+                Sajnos Java-ban a VM miatt ezt nem lehet teljesen egyértelműen átültetni gyakorlatba.
+                A probléma az, hogy minden field-ünk vagy egy primitív típus, vagy egy objektum referencia.
+            </para>
+            <para>
+                Az elpusztítás felelőssége minden körülmények között a VM felelőssége, aminek konkrét megvalósítását ő Garbage Collectorok által végzi el.
+            </para>
+            <para>
+                C++ esetén azonban konkrét kontrollunk van!
+                Nézzünk egy példát kompozícióra:
+            </para>
+            <literallayout>
+class Horse{
+public:
 
+};
+
+class HungarianPerson{
+public:
+
+    Horse h;
+};
+            </literallayout>
+            <para>
+                Ugye látható a fenti ábrából, hogy egy HungarianPerson objektum konkrét bit mintájában lesz egy rész ami a Horse bitmintáját fogja leírni.
+                Ezt értsd úgy, hogy ha rámegyek a memória területre ahol a HungarianPerson példány kezdődik és byte-onként sizeof HungarianPerson-ig olvasom (ugyanis lehet packed és akkor nem törődik a szóhatárral) akkor ott lesz benne valahol a Horse instance összes értéke (jelen esetben azért nem lesz benne, mert egyik osztálynak sincsenek adattároló tagjai).
+            </para>
+            <para>
+                Nézzünk egy aggregációs példát:
+            </para>
+            <literallayout>
+class Horse{
+public:
+
+};
+
+class HungarianPerson{
+public:
+    ~HungarianPerson(){
+        if(h != nullptr){
+            delete h;
+        }
+    }
+    Horse* h;
+};
+            </literallayout>
+            <para>
+                Ugye látható a fenti ábrából, hogy egy HungarianPerson objektum konkrét bit mintájában lesz egy rész ami egy memória cím lesz. Ezen a memória címre ha "elmegyünk" akkor ott fogjuk találni a konkrét Horse instance állapotát leíró bitmintát.
+                Ami még nagyon fontos megjegyezni, hogy HungarianPerson példány halála előtt felszabadítja a Horse példány által lefoglalt memória területet.
+            </para>
+               <literallayout>
+class Horse{
+public:
+
+};
+
+class HungarianPerson{
+public:
+    Horse* h;
+};
+            </literallayout>
+             <para>
+                Utolsó példában pedig egy olyan asszociáció látható, ahol semmilyen életciklus menedzsmentet nem vállal egy HungarianPerson instance.
+                Ami még nagyon fontos megjegyezni, hogy ha HungarianPerson nem szabadítja fel a Horse instance-t (ha létezik), akkor valakinek valahol mégis meg kell ezt tennie.
+            </para>
+            <para>
+                A Java ettől ahogy azt már mondtuk eltér a GC miatt:
+            </para>
+               <literallayout>
+class Horse{
+};
+
+class HungarianPerson{
+    Horse h;
+};
+            </literallayout>
+            <para>
+                A fenti példában a Horse instance akkortól kezdve LEHET HOGY TÖRLŐDIK(felszabadul az általa foglalt hely), amitől kezdve már egyetlen referencia sem mutat rá. 
+                A LEHET HOGY TÖRLŐDIK szó szerint azt jelenti ahogy hangzik. Lehet soha, lehet egyből, a JVM specifikáció nem tartalmaz megkötést a gc konkrét bekövetkezési időpontjáról.
+            </para>
+            <para>
+                A Java-nak ez az egyik nagy előnye az olyan programozási nyelvekhez képest amikkel AAA játékokat csinálnak.
+                Hogy jön ide az AAA játék, mi köze a Java-nak ehhez?
+                A probléma az, hogy egy játék során nagyon nagy mennyiségű memória művelet szükséges, és emiatt nagyon pontos kontrollra van szükség.
+                A GC jó, de általános. Mint minden általános megoldás az esetek 80%-ban frankón működik, viszont azáltal hogy általános pont az optimalizáltsága látja kárát ennek.
+                Persze a Java ettől nem rossz nyelv, csak tudni kell hogy mi az a terület amiben erős és ott kell használni.
+                (Csak hogy példát hozzak: A Java ökoszisztémában nagyon komoly support van dependencia kezelésre, pl. maven stb. C++ esetén...hát...vannak megoldás jellegű dolgok, de valójában egy zabolázatlan vad nyugat az egész.) 
+            </para>
+        </section>
         <section>
             <title>IntelliJ</title>
             <para>
            IntelliJ-vel generált UML alább látható. Jelenleg azon küzdök, hogy használható UML legyen belőle ne csak az alább látható színes de nem szabványos ábra.
+           Plusz azt még mindig nem értem, hogy miért kell a UML-t lerántani ilyen alacsony szintre.
+           Itt most a UML class diagram-ot "from scratch" értem, nem a forrásból generált esetet.
+           Nekem az a benyomásom, hogy a UML class diagram az architekurális terv vázlata, és nem kell tartalmaznia minden utolsó method-ot, mert csökkenti az olvashatóságot.
+           Ugyanúgy, mint a gépészeti rajzokon is a felületi érdességet csak ott jelöljük ahol annak komoly szerepe van, egyébként meg megadunk egy általánosat, abba pedig főként nem folyunk bele, hogy hogyan lesz felkészülékezve mert az a gyártástechnológián dől el.
+           Persze bizonyos esetekben lehet értelme az ilyen tervezésnek is, pl. RationalRose, de ez abszolút nem általános.
+           Ha a method-ok részleteire vagyok kíváncsi az a Javadoc-ban lesz úgyis.
+           Hogy mit értek architekurális terv (vízió) alatt? <link xlink:href="https://support.ptc.com/help/wnc/r11.2.0.0/en/Windchill_Help_Center/images/BasicCustomization-rds.10.222.4.jpg">Például ezt.</link>
             </para>
             <figure>
                 <title>Binfa UML</title>
@@ -41,7 +174,7 @@ Lásd fóliák!
             <title>Egyéb</title>
             <para>
                 A legújabb eclipse-hez még nem készültek jó plugin-ok (persze vannak pénzesek). Jelenleg azután keresgélek, hogy melyik régebbi Eclipse-nél van legalább egy stable dolog, ami nested class-októl nem esik össze...
-           </para>
+            </para>
         </section>
     </section>
 

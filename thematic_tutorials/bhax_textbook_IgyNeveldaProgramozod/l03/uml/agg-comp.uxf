@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<diagram program="umlet" version="14.2">
+  <zoom_level>8</zoom_level>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>232</x>
+      <y>240</y>
+      <w>128</w>
+      <h>96</h>
+    </coordinates>
+    <panel_attributes>HungarianPerson
+--
+-body: Body
+
+-horse: Horse
+
+-dad: HungarianPerson</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>24</x>
+      <y>256</y>
+      <w>64</w>
+      <h>32</h>
+    </coordinates>
+    <panel_attributes>Body
+--
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>80</x>
+      <y>264</y>
+      <w>168</w>
+      <h>32</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;&lt;&lt;-
+m2=body</panel_attributes>
+    <additional_attributes>190.0;10.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>264</x>
+      <y>208</y>
+      <w>208</w>
+      <h>128</h>
+    </coordinates>
+    <panel_attributes>lt=-
+m2=dad</panel_attributes>
+    <additional_attributes>120.0;140.0;240.0;140.0;240.0;10.0;10.0;10.0;10.0;40.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLNote</id>
+    <coordinates>
+      <x>56</x>
+      <y>136</y>
+      <w>192</w>
+      <h>88</h>
+    </coordinates>
+    <panel_attributes>*Kompozíció*
+- átruházható birtoklás? 
+  nem
+- a "mutatott" életciklus kontroll alatt
+  van a "mutató" által?
+  igen</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLNote</id>
+    <coordinates>
+      <x>104</x>
+      <y>384</y>
+      <w>200</w>
+      <h>88</h>
+    </coordinates>
+    <panel_attributes>*Aggregáció*
+- átruházható birtoklás? 
+  igen
+- a "mutatott" életciklus kontroll alatt
+  van a "mutató" által?
+  igen</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>184</x>
+      <y>216</y>
+      <w>24</w>
+      <h>72</h>
+    </coordinates>
+    <panel_attributes>lt=.</panel_attributes>
+    <additional_attributes>10.0;70.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>24</x>
+      <y>296</y>
+      <w>64</w>
+      <h>32</h>
+    </coordinates>
+    <panel_attributes>Horse
+--
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>80</x>
+      <y>288</y>
+      <w>168</w>
+      <h>48</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;&lt;-
+m2=horse</panel_attributes>
+    <additional_attributes>190.0;10.0;100.0;10.0;100.0;30.0;10.0;30.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>136</x>
+      <y>304</y>
+      <w>24</w>
+      <h>96</h>
+    </coordinates>
+    <panel_attributes>lt=.</panel_attributes>
+    <additional_attributes>10.0;100.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLNote</id>
+    <coordinates>
+      <x>328</x>
+      <y>384</y>
+      <w>200</w>
+      <h>88</h>
+    </coordinates>
+    <panel_attributes>*"Tiszta" Asszociáció*
+- átruházható birtoklás? 
+  igen
+- a "mutatott" életciklus kontroll alatt
+  van a "mutató" által?
+  nem</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>408</x>
+      <y>312</y>
+      <w>24</w>
+      <h>88</h>
+    </coordinates>
+    <panel_attributes>lt=.</panel_attributes>
+    <additional_attributes>10.0;90.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLNote</id>
+    <coordinates>
+      <x>272</x>
+      <y>72</y>
+      <w>192</w>
+      <h>120</h>
+    </coordinates>
+    <panel_attributes>*DISCLAIMER*
+a "mutatott" és "mutató" alatt nem
+pointert értek, csak nem tudtam jobb 
+szót kitalálni.
+Ha R a reláció (A R B), akkor ez A és B 
+Descartes szorazatának részhalmaza.
+Minden eleme (a,b), ahol
+"mutató" a, "mutatott" pedig b</panel_attributes>
+    <additional_attributes/>
+  </element>
+</diagram>
