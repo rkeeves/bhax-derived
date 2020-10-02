@@ -107,7 +107,7 @@ public:
                 Ugye látható a fenti ábrából, hogy egy HungarianPerson objektum konkrét bit mintájában lesz egy rész ami egy memória cím lesz. Ezen a memória címre ha "elmegyünk" akkor ott fogjuk találni a konkrét Horse instance állapotát leíró bitmintát.
                 Ami még nagyon fontos megjegyezni, hogy HungarianPerson példány halála előtt felszabadítja a Horse példány által lefoglalt memória területet.
             </para>
-               <literallayout>
+            <literallayout>
 class Horse{
 public:
 
@@ -118,14 +118,14 @@ public:
     Horse* h;
 };
             </literallayout>
-             <para>
+            <para>
                 Utolsó példában pedig egy olyan asszociáció látható, ahol semmilyen életciklus menedzsmentet nem vállal egy HungarianPerson instance.
                 Ami még nagyon fontos megjegyezni, hogy ha HungarianPerson nem szabadítja fel a Horse instance-t (ha létezik), akkor valakinek valahol mégis meg kell ezt tennie.
             </para>
             <para>
                 A Java ettől ahogy azt már mondtuk eltér a GC miatt:
             </para>
-               <literallayout>
+            <literallayout>
 class Horse{
 };
 
@@ -179,11 +179,64 @@ class HungarianPerson{
     </section>
 
     <section>
-        <title>Forward engineering UML osztálydiagram</title>
+        <title>BPMN</title>
         <section>
             <title>Feladat</title>
             <para>
-            UML-ben tervezzünk osztályokat és generáljunk belőle forrást!
+            Rajzoljunk le egy tevékenységet BPMN-ben! 
+            </para>
+        </section>
+        <section>
+            <title>Megoldás</title>
+            <para>
+                Feladatként egy Promotion folyamatot választottam PLM rendszerben.
+            </para>
+            <para>
+                PLM rendszerek főként bináris mérnöki dokumentumok életciklus kezeléséről szólnak. 
+                Ha egy gépész megtervez egy autót CAD-ben az ezeregy alkatrészből, alkatrész előfordulásból, alösszeállításból áll, és mivel gyakran nagyon sok különböző részleg dolgozik közösen, ezért egyfajta verzió követés és változás követés szükséges.
+            </para>
+            <para>
+                A Promotion-nel lehet sok apró változtatást elfogadni és új verzióra léptetni egy terméket.
+                Biztos ismerős lehet a katonai filmekből a dolog.
+                Például Sherman Mark II. Nos, pontosan erről van szó, csak mondjuk Bentley-be való fröccsöntött pohártartókkal (igen, be kell vallanom, nem annyira szexisek mint egy Sherman tank, viszont meglepően sokat fizet értük a Bentley).
+            </para>
+            <para>
+                 A Promotion folyamat erősen testreszabható, én direkt egy egyszerűt választottam.
+            </para>
+            <figure>
+                <title>BPMN Promotion</title>
+                <mediaobject>
+                    <imageobject>
+                        <imagedata fileref="l03/bpmn/promotion.png" scale="60" />
+                    </imageobject>
+                    <textobject>
+                        <phrase>BPMN Promotion</phrase>
+                    </textobject>
+                </mediaobject>
+            </figure>
+            <para>
+                 A Promotion folyamatot user-ek indítják, és effektíve szerver oldalon létezik egy PromotionNotice nevezetű perzisztens objektum.
+                 Ez az objektum tárolja az összes, a folyamat szempontjából szükséges, adatot.
+            </para>
+            <para>
+                A folyamat első lépése annak eldöntése hogy kinek adja ki a rendszer a felülvizsgálat munkáját.
+                Szerver oldalon létezik egy business rule engine, ami long story short egy xml fájlból, vagy UI-on történt settingekből(ne menjünk bele, régi dolog, jsp-t használ), olvassa be a cég business admin-ja által előre megírt szabályokat.
+                Ilyen szabály az is, hogy kik tartoznak lehetséges reviewer csoportba.
+                Ebből a csoportból választ a BusinessRule engine.
+            </para>
+            <para>
+                A user-t visszakapva a workflow engine ad neki egy új task-ot (olyan mint az SAP, tehát a user ha belép a profiljába látja a taskjait stb.).
+                A user a review elvégzi és aztán vissza jelez. Ezzel az ő feladatának vége.
+            </para>
+            <para>
+                Ha minden rendben volt, akkor a PromotionNotice object állapotát megváltozatja a workflow engine. Ezentúl az összes a PromotionNotice-hoz rendelt dolgot magasabb verzióra emeli.
+            </para>
+            <para>
+                Ha a reviewer nem engedi át, akkor ezen példában átállítódik a PromotionNotice státusza majd véget ér a folyamat.
+            </para>
+            <para>
+                A valóságban sok helyen nem így szeretik használni (mert így minden visszadobás után új PromotionNotice képződik), hanem eldobás esetén visszaküldetik a tervezőknek, és mikor a tervezők megoldottak minden problémát amit a reviewer észrevett, akkor ugyanaz a PromotionNotice kerül megint review alá. 
+                Ezt általában úgy érik el, hogy a nem elfogadott ágat visszakötik a folyamatba.
             </para>
         </section>
     </section>
@@ -299,6 +352,51 @@ class HungarianPerson{
             <para>
            Implementáld le az előző feladatban létrehozott diagrammot egy tetszőleges nyelven.
             </para>
+        </section>
+        <section>
+            <title>EPAM alapján</title>
+            <para>
+                    Az EPAM-os modellt megnézve éreztem hogy elég un-YAGNI lett az előző feladat UML-je (mikor csináltam még nem volt meg az EPAM-os referencia), úgyhogy egyszerűsítettem az előző feladatot.
+                    Mindezt azért tettem, hogy egyetlen problémára kiemelve fókuszálhassunk.
+                    Az EPAM-os dologban nem tudom hogy lehet megoldani azt az esetet, amikor egy msc-s tanít is meg tanul is.
+                    Erre egy megoldás kezdemény lehetne az hogy a UserData(pl. name)-ról leválasztjuk a szerepvállalást mint oktatott, vagy oktató. 
+                    Ezután pedig valami junction table-höz hasonló módon oldjuk meg a kapcsolatot.
+                    Alább egy UML bemutatja a dolgot.
+            </para>
+            <figure>
+                <title>Course Reg 2 UML</title>
+                <mediaobject>
+                    <imageobject>
+                        <imagedata fileref="l03/uml-course-reg/uml-course-reg2.png" scale="50" />
+                    </imageobject>
+                    <textobject>
+                        <phrase>Course Reg 2 UML</phrase>
+                    </textobject>
+                </mediaobject>
+            </figure>
+            <para>
+            Ez nem a legjobb megoldás. 
+            Például tovább lehetne bontani a dolgot, létre kéne hozni egy Link class-t mely egy UserData-t köt össze egy Course-al, és a role fajtája egy enum-ból vett érték lehetne.
+            Ennek az a problémája hogy a type system-en kívül kezeli az üzleti logikát, viszont előnye az, hogy így könnyen konfigurálhatóak lennének az üzleti kényszerek.
+            </para>
+            <para>
+            Azaz, például azt a döntést, hogy ki milyen role-t tölthet be akár a konkrét adattárolási szint felé is helyezhetnénk. 
+            Magyarul a persistence layer simán engedné, hogy egy bsc-s órát tartson, csak az Application Layer-ben az adott service nem enegedné, de ezt is configuráció alapján..
+            </para>
+            <para>
+            A Java class-okat a UML-ből generáltam a <link xlink:href="http://app.genmymodel.com">genmymodel</link> segítségével.
+            Annyit el kell mondani, hogy természetesen manuálisan utána kellett munkálni elég sok mindent.
+            De szerintem a feladat célja nem az volt, hogy megmutassa hogy mennyire 100%-osan működik az UML-ből java generálás. 
+            Sokkal inkább szerintem az volt a cél, hogy megismertessen minket a UML legfőbb erősségével a kommunikáció grafikussá tételével.
+            Itt a kommunikáció alatt azt értem, hogy a tervezési szándékot át kell adni, és ezt kommunikálhatjuk szóban, sajtos cetlire írva, vagy UML-el. 
+            A UML ugyan sok időt igényel, de még mindig kevesebbet, mint egy félreértett beszélgetés után a codebase újraíratása.
+            </para>
+            <para>
+            A Java class-okat <link xlink:href="https://github.com/rkeeves/bhax-derived/tree/master/thematic_tutorials/bhax_textbook_IgyNeveldaProgramozod/l03/uml-course-reg">ezen a címen</link> lehet megtalálni.
+            </para>
+
+
+            
         </section>
     </section>
 
