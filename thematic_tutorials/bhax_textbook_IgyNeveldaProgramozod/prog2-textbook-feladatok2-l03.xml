@@ -207,7 +207,7 @@ class HungarianPerson{
                 <title>BPMN Promotion</title>
                 <mediaobject>
                     <imageobject>
-                        <imagedata fileref="l03/bpmn/promotion.png" scale="60" />
+                        <imagedata fileref="l03/bpmn/promotion.png" scale="50" />
                     </imageobject>
                     <textobject>
                         <phrase>BPMN Promotion</phrase>
@@ -367,7 +367,7 @@ class HungarianPerson{
                 <title>Course Reg 2 UML</title>
                 <mediaobject>
                     <imageobject>
-                        <imagedata fileref="l03/uml-course-reg/uml-course-reg2.png" scale="50" />
+                        <imagedata fileref="l03/uml-course-reg/uml-course-reg2.png" scale="80" />
                     </imageobject>
                     <textobject>
                         <phrase>Course Reg 2 UML</phrase>
