@@ -1,18 +1,12 @@
 package com.rkeeves;
 
-import java.lang.reflect.Array;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.Optional;
-import java.util.function.BiPredicate;
-import java.util.function.Function;
-import java.util.function.Predicate;
-
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 
 import java.util.Arrays;
+import java.util.Iterator;
+import java.util.function.BiPredicate;
 
 @EqualsAndHashCode
 @ToString
@@ -64,13 +58,6 @@ public class Vec<T> implements Iterable<T>{
         return arr[idx];
     }
 
-    public T set(int idx, T v) {
-        check_range(idx);
-        T t = arr[idx];
-        arr[idx] = v;
-        return t;
-    }
-
     private void check_range(int idx){
         if(idx >= size || idx < 0){
             throw new IndexOutOfBoundsException("Tried to access index "+ idx+ " of a Vec which had size "+size);
@@ -79,12 +66,10 @@ public class Vec<T> implements Iterable<T>{
 
     public void remove(int idx) {
         check_range(idx);
-        if(idx<size-1){
-            for (int i = idx+1;i<size;++i){
-                arr[i] = arr[i+1];
-            }
+        int count = size-idx-1;
+        if(count > 0){
+            System.arraycopy(arr,idx+1,arr,idx,count);
         }
-
         size--;
     }
 

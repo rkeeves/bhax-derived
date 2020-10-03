@@ -1,10 +1,8 @@
 package com.rkeeves;
 
-import java.lang.reflect.Array;
+
 import java.util.*;
-import java.util.function.BiPredicate;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 /**
  * Custom Map implementation without using Java Collections.
@@ -16,25 +14,19 @@ import java.util.stream.Collectors;
  */
 public class ArrayMap<K, V> implements Map<K, V> {
 
-    private static final int INITIAL_SIZE = 16;
-
-    private Vec<Pair> pairs;
+    private final Vec<Pair> pairs;
 
     public ArrayMap() {
-        pairs = new Vec<Pair>();
+        pairs = new Vec<>();
     }
 
     class Pair implements Entry<K,V>, Cloneable{
-        private K key;
+        private final K key;
         private V value;
 
         public Pair(K key, V value) {
             this.key = key;
             this.value = value;
-        }
-
-        public void setKey(K key) {
-            this.key = key;
         }
 
         @Override
@@ -52,10 +44,6 @@ public class ArrayMap<K, V> implements Map<K, V> {
         @Override
         public V getValue() {
             return value;
-        }
-
-        public Pair copy(){
-            return new Pair(key,value);
         }
     }
 
@@ -118,11 +106,12 @@ public class ArrayMap<K, V> implements Map<K, V> {
     @Override
     public V remove(Object key) {
         int i = pairs.indexOfFirstMatching(key,this::isKeyMatching);
+        V oldValue = null;
         if(i != Vec.END_INDEX){
-            V oldValue = pairs.get(i).getValue();
+            oldValue = pairs.get(i).getValue();
             pairs.remove(i);
         }
-        return null;
+        return oldValue;
     }
 
     @Override
@@ -135,36 +124,25 @@ public class ArrayMap<K, V> implements Map<K, V> {
         pairs.clear();
     }
 
+    private <T, I extends Collection<T>> I collect(Function<Pair,T> mapper, I coll){
+        for (Pair p : pairs)
+            if(p!=null)
+                coll.add(mapper.apply(p));
+        return coll;
+    }
+
     @Override
     public Set<K> keySet() {
-        Set<K> res = new HashSet<>();
-        for (Pair p : pairs) {
-            if(p!=null){
-                res.add(p.getKey());
-            }
-        }
-        return res;
+        return collect(Pair::getKey,new HashSet<>());
     }
 
     @Override
     public Collection<V> values() {
-        List<V> res = new LinkedList<>();
-        for (Pair p : pairs) {
-            if(p!=null){
-                res.add(p.getValue());
-            }
-        }
-        return res;
+        return collect(Pair::getValue,new LinkedList<>());
     }
 
     @Override
     public Set<Entry<K, V>> entrySet() {
-        Set<Entry<K, V>> res = new HashSet<>();
-        for (Pair p : pairs) {
-            if(p!=null){
-                res.add(p);
-            }
-        }
-        return res;
+        return collect(n->n, new HashSet<>());
     }
 }

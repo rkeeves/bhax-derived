@@ -1,0 +1,535 @@
+<chapter xmlns="http://docbook.org/ns/docbook"
+    xmlns:xlink="http://www.w3.org/1999/xlink"
+    xmlns:xi="http://www.w3.org/2001/XInclude" version="5.0" xml:lang="hu">
+    <info>
+        <title>Helló, Chomsky!</title>
+        <keywordset>
+            <keyword/>
+        </keywordset>
+    </info>
+
+    <section>
+        <title>l334d1c46</title>
+        <section>
+            <title>Feladat</title>
+            <para>
+            Írj olyan OO Java vagy C++ osztályt, amely leet cipherként működik, azaz megvalósítja ezt a betű
+    helyettesítést: <link xlink:href="https://simple.wikipedia.org/wiki/Leet">Leet</link>  (Ha ez első részben nem tetted meg, akkor írasd
+    ki és magyarázd meg a használt struktúratömb memóriafoglalását!).
+            </para>
+        </section>
+        <section>
+            <title>Java</title>
+            <para>
+                Előző félévben már a C verzióval foglalkoztam.
+                (Memóriával nem akarok foglalkozni, mert már az előző könyv részletben megtettem, sőt belementem szóhatárba, struct packing-be is stb.)
+                Mivel Java-ban írjuk ezért van egy két trükk a tarsolyunkban.
+            </para>
+            <para>
+                Az egyik úgymond trükk, hogy <literal>HashMap</literal>-et használhatunk a <literal>Collections</literal>-ből.
+                Mivel static a pédány ezért egy static init block-ot használtam (ez ugye akkor fut le, mikor maga az osztály betöltődik VM által).
+                Ez azért kellett, mert a map-et fel kellett tölteni a leetspeak "szótári anyagával".
+            </para>
+            <literallayout>
+ static Map&lt;Character, String[]&gt; ciphers = new HashMap&lt;&gt;();
+    static{
+        ciphers.put('a', ... );
+        ...
+    }
+}
+            </literallayout>
+            <para>
+                Egy másik apróság, hogy a <literal>Random</literal> class-nak létezik egy <literal>nextInt</literal> methodja, melyel megadható limitig generálhatunk természetes számokat (nem negatív).
+                Ezt csak amiatt használtam, mert az eredeti kódban pontosan egy ilyen int-en alapuló else if kód található.
+                Erre a random számra azért van szükség mert egy karakterhez négy lehetséges karakterláncot társítunk.
+                Ezeknek különböző valószínűsége van az előfordulásra.
+                Természetesen arra is kell gondolni, hogy a szótárban nem található kulcsot kapunk (char-t).
+                Ebben az esetben visszaadunk egy String-et, mely egyedül az eredeti char-t tartalmazza.
+            </para>
+            <para>
+                Az egyik úgymond trükk, hogy <literal>HashMap</literal>-et használhatunk a <literal>Collections</literal>-ből.
+                Mivel static a pédány ezért egy static init block-ot használtam (ez ugye akkor fut le, mikor maga az osztály betöltődik VM által).
+                Ez azért kellett, mert a map-et fel kellett tölteni a leetspeak "szótári anyagával".
+            </para>
+            <para>
+                Alább pedig egy példa arra, hogy van lehetőségünk egy int-ekből álló stream generálására:
+            </para>
+            <literallayout>
+public static void main(String[] args) {
+    String s = "leetspeak for the people";
+    IntStream
+        .range(0, 10)
+        .forEach(i -&gt; System.out.println(applyLeet(s)));
+}
+            </literallayout>
+            <para>
+                Ez egyszerűen csak 10-szer újra transzformálja ugyanazt az alapszöveget majd kiírja az eredményt.
+            </para>
+            <figure>
+                <title>Leet</title>
+                <mediaobject>
+                    <imageobject>
+                        <imagedata fileref="prog2java/w4/leet/leet.png" scale="50" />
+                    </imageobject>
+                    <textobject>
+                        <phrase>Leet</phrase>
+                    </textobject>
+                </mediaobject>
+            </figure>
+        </section>
+    </section>
+    <section>
+        <title>Perceptron</title>
+        <section>
+            <title>Feladat</title>
+            <para>
+                A perceptron a háttérben mátrix szorzásokat végez. Alább a C++ majd Java leírás és kód. 
+            </para>
+        </section>
+        <section>
+            <title>Megoldás</title>
+            <para>
+          Ebben a feladatban a double*** handling a lényeg, de mindez cpp-ben, azaz malloc és free helyett new és delete.
+          Tanár Úr kódját fogom használni, de a nem szükséges részeket kivettem (hisz egyébként 900 sor és például backpropagation nem kell...). 
+            </para>
+            <para>
+          Mielőtt nekiugrunk a feladatnak nézzük végig matematikailag mit akart elérni Tanár Úr, és csak ezután nézzük a kódot.
+          Ez így talán megfogja könnyíteni a megértést, hisz például a var arg handling nem a feedforward része, úgyhogy csak azután fogunk kitérni rá, hogy az alap matek megvan.
+          Backproppal most nem fogunk foglalkozni, csak feedforward-al. Tegyük fel egy 3x3as "képből" indulunk ki (nem rgb, csak fekete és fehér).
+          A 3x3-asból előállítunk egy vektort. Ez lesz az input adata a hálónak.
+            </para>
+            <para>
+          Feladat legyen a következő: Kapunk egy 3x3-as fekete képet. Ezt beküldjük egy neurális háló kezdeménybe, és a végén például egy 1 elemű vektort kapunk.
+          A vektor 0. eleme akkor és csak akkor 1 értékű, ha a képen mondjuk 4-es van. Cseresznye a torta tetején: Nincs bias.
+            </para>
+            <para>
+          Első hallásra bonyolult, de valójában egyszerű: 
+            </para>
+            <para>
+          A kép egy 3x3-as mátrix, lapítsuk egy vektorba. Ez lesz az input.
+            </para>
+            <figure>
+                <title>nn input</title>
+                <mediaobject>
+                    <imageobject>
+                        <imagedata fileref="img/nninputs.png" scale="50" />
+                    </imageobject>
+                    <textobject>
+                        <phrase>nn input</phrase>
+                    </textobject>
+                </mediaobject>
+            </figure>
+            <para>
+          A háló hasraütésszerűen (totál mindegy, csak kellettek a konkrét számok, hogy le tudjam rajzolni) 9-5-3-1
+            </para>
+            <figure>
+                <title>nn layers</title>
+                <mediaobject>
+                    <imageobject>
+                        <imagedata fileref="img/nnlayers.png" scale="50" />
+                    </imageobject>
+                    <textobject>
+                        <phrase>nn layers</phrase>
+                    </textobject>
+                </mediaobject>
+            </figure>
+            <para>
+          A háló a következő módon működik: nincs benne feedback, azaz i-edik layeren lévő node csak és kizárólag i-1-edik node-ot használhat inputnak. 
+            </para>
+            <para>
+          Ahelyett, hogy hardcodeoljuk ki kihez kapcsolódik a pagerank-nél látott módon mátrixos formában írjuk fel.
+          Vegyük például a 9 elemű input layer és az 5 elemű layer (ő az eső hidden layer) kapcsolatát leíró mátrixot.
+          A layerek gyakorlatilag vektorok.
+          A lényeg, hogy kell egy M kapcsolati mátrix. A célja annyi, hogyha megszorzom egy 9 elemű-vel, akkor egy 5 eleműt kapjak.
+          A kapcsolati mátrix tehát pl. 5x9-es, hisz M*A=B:
+            </para>
+            <literallayout>
+          | ? |
+          | ? |
+          | ? |
+
+| ? ? ? |       = | ? |
+| ? ? ? |         | ? |
+            </literallayout>
+            <para>Azaz, ha kapok egy inputot, akkor össze szorzom a 9-5 közti trafó mátrixxal, és megkapom az 5 elemű layer értékeit. Utána ezt megszorzom az 5-3 trafóval, majd ezt megszorzom a 3-1 trafóval és kijön a végeredmény:</para>
+            <figure>
+                <title>nnmxmult</title>
+                <mediaobject>
+                    <imageobject>
+                        <imagedata fileref="img/nnmxmult.png" scale="50" />
+                    </imageobject>
+                    <textobject>
+                        <phrase>nnmxmult</phrase>
+                    </textobject>
+                </mediaobject>
+            </figure>
+            <para>
+          Azaz, az egész egy mátrix vektor szorzás lánc (sőt, mivel nincs bias ezért még elméletben sem kell trükközni).
+          Egyetlen egy komoly trükk van. Mikor kijön egy mátrix-vektor szorzás segítségével egy új vektor, akkor minden elemén alkalmazzuk a sigmoid funkciót.
+          Ez egy folytonos jellegű vágó függvény.
+            </para>
+            <figure>
+                <title>sigmoid</title>
+                <mediaobject>
+                    <imageobject>
+                        <imagedata fileref="img/sigmoid.png" scale="50" />
+                    </imageobject>
+                    <textobject>
+                        <phrase>sigmoid</phrase>
+                    </textobject>
+                </mediaobject>
+            </figure>
+            <para>
+            Ez alapján próbáljuk meg meghatározni milyen adatokra lesz szüksége az n layer számú Perceptron-nak. El kell tárolni n darab vektort. El kell tárolni n-1 darab transzformációs mátrixot.
+            Mivel kicsit C-sen fogjuk írni a kódot, ezért nem csak az értékeket, ha nem a tömb méreteket is. Szóval el kell tárolni hogy hány layer van. El kell tárolni, hogy MINDEN vektor hosszát. A trafó mátrixok hosszait nem kell eltárolni, mert ahogy az ábrák is mutatják a vektor hosszakból számolhatóak.
+            </para>
+            <para>
+          Mielőtt belemegyünk a kódba, egy dolgot még tisztáznunk kell: Milyen értékei legyenek a weight mátrixoknak? Nos, teljesen random [-1,1] tartománybeli double.
+            </para>
+            <para>
+          Most nézzük a kódot. Létrehozzuk a Perceptron osztályt. Ctor-ban inicializáljuk
+            </para>
+            <para>
+          A Perceptron ( int nof, ... ) kicsit furcsának tűnhet mert var arg-os, de nem kell megijedni. Simán annit jelent, hogy int nof után véges sok argumentum jöhet.
+            </para>
+            <literallayout>
+va_list vap;
+va_start ( vap, nof );
+            </literallayout>
+            <para>
+        va_list-ből pedig va_arg-gal pedig megpróbálunk egy általunk megadott explicit típusú értéket "kiszedni" a listából.
+        (Ezek makrók nem function call-ok, azaz ezeket a preprocesszor expandálni fogja.)
+            </para>
+            <literallayout>
+n_units[i] = va_arg ( vap, int );
+            </literallayout>
+            <para>
+          Egyből jön a kérdés, hogy itt akkor elméletileg bug-ok keletkezhetnek <link xlink:href="https://en.cppreference.com/w/cpp/language/variadic_arguments">default arg promotion</link> miatt. Igen ez így van de mi ezzel most nem foglalkozunk.
+          Másik kérdés, hogy mi történik akkor, ha nof nem egyezik a megadott argumentumok száma -1-el.
+            </para>
+            <para>
+          Mikor megvagyunk a va_list traversalt illető makró használattal <literal>va_end</literal>-et használunk.
+            </para>
+            <literallayout>
+va_end ( vap );
+            </literallayout>
+            <para>
+        Nézzük a ctor-t pici részekben:
+            </para>
+            <literallayout>
+n_layers = nof;
+    units = new double*[n_layers];
+    n_units = new int[n_layers];
+    va_list vap;
+    va_start ( vap, nof );
+    for ( int i {0}; i &lt; n_layers; ++i ){
+      n_units[i] = va_arg ( vap, int );
+      if ( i ){units[i] = new double [n_units[i]];}
+    }
+    va_end ( vap );
+            </literallayout>
+            <para>
+          A Perceptron osztályt ctor-ban egy int-et kap, azaz a layer számot, illetve var arg-ként int-eket, amik az egyes layer-ekben lévő neuron számokat adják meg (azaz hogy melyik layer hány elemű vektor).
+          Ezt simán átmásoljuk <literal>n_units</literal>-ba, ami egy int-ekből álló tömb. A <literal>units</literal> tárolja a vektorainkat, szóval érthető hogy ez miért is double** (n darab vektor matematikailag).
+          Természetesen egyrészt magát <literal>units</literal>-ot initelni kell, és az általa mutatott double array-ket is. Ugyan értékeket még nem tudunk, de a szükséges hosszakat igen, hisz ezt a user megadta var arg-ban.
+            </para>
+            <para>Annyit vegyünk észre, hogy ha i == 0, akkor nem kérünk helyet egy double array-nek. Ez amiatt van így, mert ez az inputunk, inputot meg nem fogjuk átmásolni, hanem majd <literal>units[0]</literal>-t megadjuk az input címének (hisz ugye units[0] egy double ptr!)</para>
+            <para>A másik nagyon fontos dolog, amit észre kell vennünk az az hogy nem malloc-ot használunk hanem new-t. Méghozzá úgy hogy new-nak nem adunk címet ahova hívja a ctor-t, azaz new MEMÓRIÁT IS FOGLAL és még ráadásul MEG IS HÍVJA a ctor-t. Persze kérhettün volna malloc-cal címet és a ptr-et megadva new-nak nem kért volna memóriát csak a megadott címen meghívta volna a ctor-t.</para>
+            <para>Na de most nézzük a weight mátrixot! Gyors kérdés kód előtt: Mit várunk?</para>
+            <para>Ugye <literal>weights</literal> egy csomó mátrix, tehát weights = mátrix*? Viszont mátrix egy csomó sor, vagy szám n-es, stb., azaz mátrix=sor*. Sor viszont egy csomó double, vektor=double*. Azaz weights double*** lesz.</para>
+            <literallayout>     
+weights = new double**[n_layers-1];
+    std::default_random_engine gen;
+    std::uniform_real_distribution&lt;double&gt; dist ( -1.0, 1.0 );
+    for ( int i {1}; i &lt; n_layers; ++i ){
+      weights[i-1] = new double *[n_units[i]];
+      for ( int j {0}; j &lt; n_units[i]; ++j ){
+        weights[i-1][j] = new double [n_units[i-1]];
+        for ( int k {0}; k &lt; n_units[i-1]; ++k )
+        {
+          weights[i-1][j][k] = dist ( gen );
+        }
+      }
+    }
+            </literallayout>
+            <para>Ahogy fent láthatjuk, kérünk helyet weights-nek (aki egy double***), aztán weights egyes mátrixainak (double**), mátrixok sorainak (double*) majd a sorok értékeinél egy [-1,1] tartománybeli random számot adunk. </para>
+            <para>A sigmoid-ot valamiért a class-ba raktuk(inkább rakjuk majd egy header file-ba inline-olva saját implementációban, hátha kelleni fog máshol is), de nem igényel túl sok magyarázatot.</para>
+            <literallayout>  
+  double sigmoid ( double x ) {
+    return 1.0/ ( 1.0 + exp ( -x ) );
+  }
+            </literallayout>
+            <para>Most pedig jöhet az <literal>operator()</literal> overload. Ő fogja csinálni azt a mátrix vektor szorzási láncot amit fentebb rajzolgattunk.</para>
+            <para>Kicsit álljunk meg, tippeljük meg előre mit fog csinálni!</para>
+            <para>Valószínűleg lesz egy argumentuma, ami egy double* lesz. Ez lesz az input layer bemeneti adata. Ezt KELL hogy assignolja units[0]-ra, hisz units[0]-nak nem kértünk egy új double*-t(és jelenleg ráadásul szuper veszélyes, mert nem állítottuk nullptr-re, hanem mem szemét van rajta, szóval ha most meghívnánk akkor jó esetben segfaultolnánk.)</para>
+            <para>Ezekután pedig végig fogunk iterálni az összes trafón és elvégezzük őket. DE EMLÉKEZZÜNK n darab vektorunk van, amihez n-1 trafó társul, azaz biztosan n-1-ig fogunk iterálni.</para>
+            <para>Egy adott i-edik iterációban pedig i-edik mátrixot i-edik vektorral szorozva i+1-edik vektort fogjuk kapni.</para>
+            <para>Technikailag mielőtt elvégezzük i+1 elem kiszámítását, vaószínűleg 0-ra fogjuk állítani, mert adja magát, hogy += használjunk.</para>
+            <para>Miután kijönnek az értékek vagy egyben a végén, vagy még benn a loopban, az mátrix-vektor szorzatként kapott i+1 vektor értékét átírjuk  a sigmoid által hozzárendelt értékre</para>
+            <para>Nézzük a kódot</para>
+            <literallayout>  
+  double operator() ( double image [] )
+  {
+    units[0] = image;
+    for ( int i {1}; i &lt; n_layers; ++i ){
+      for ( int j = 0; j &lt; n_units[i]; ++j ){
+        units[i][j] = 0.0;
+        for ( int k = 0; k &lt; n_units[i-1]; ++k ){
+          units[i][j] += weights[i-1][j][k] * units[i-1][k];
+        }
+        units[i][j] = sigmoid ( units[i][j] );
+      }
+    }
+    return sigmoid ( units[n_layers - 1][0] );
+  }
+            </literallayout>
+            <para>Az egyetlen váratlan dolog, hogy az ouptput vektor 0. elemének értékéhez a sigmoid által hozzárendelt értéket visszaadjuk.
+    Biztos a nagyobb progi így működött, azaz hogy valami miatt az output vektor 0. eleme fontos volt neki. Persze ez ne tévesszen meg senkit. Egy klasszifikciós probléma lehet olyan lesz, hogy mondjuk 10 output node lesz, és akkor kell felvillania mondjuk az 5-ös indexűnek mikor 5-öst lát, vagy mondjuk valami játékról van szó, és akkor kell felvillania egy 4 elemű vektor 2 elemének, ha keyboard S lenyomást akarunk szimbolizálni (FPS-eknél ez a hátra)
+            </para>
+            <para>
+    Alább az egész kód félig Cpp félig C-ben:
+            </para>
+            <programlisting language="c" linenumbering="numbered">
+                <textobject>
+                    <textdata fileref="Caesar/ql_min.cpp"/>
+                </textobject>
+            </programlisting>
+            <para>
+    Alább az egész kód Java-ban kilapított mátrixokkal. Itt az API-ban annyi változás van, hogy a full output vektort visszaadjuk.
+            </para>
+            <programlisting language="java" linenumbering="numbered">
+                <textobject>
+                    <textdata fileref="Caesar/ql_min.java"/>
+                </textobject>
+            </programlisting>
+            <para>
+    Többszálazással stb. nem foglalkoztam, mert a feladat az array hendlingről szólt. (Backproppal sem, mert explicit ki lett mondva hogy elég a feedforward)
+            </para>
+        </section>
+    </section>
+    <section>
+        <title>EPAM: Order of everything</title>
+        <section>
+            <title>Feladat</title>
+            <para>
+                Collection-ok rendezése esetén jellemzően futási időben derül ki, ha olyan típusú objektumokat
+                próbálunk rendezni, amelyeken az összehasonlítás nem értelmezett (azaz T típus esetén nem
+                implementálják a Comparable<T> interface-t). Pl. ClassCastException a <link xlink:href="https://docs.oracle.com/javase/7/docs/api/java/util/Collections.html#sort(java.util.List)">Collections.sort()</link>
+                esetében, vagy ClassCastException a <link xlink:href="https://docs.oracle.com/javase/8/docs/api/java/util/stream/Stream.html#sorted--">Stream.sorted()</link> esetében.
+            </para>
+        </section>
+        <section>
+            <title>Megoldás</title>
+            <para>
+                Itt nem tudom miről kéne írni, hisz egyértelmű nyelv használati kérdésről van szó. 
+                Ami viszont érdekesebb, hogy az EPAM elég brutálisan megköti szegény user kezét.
+                Arra gondolok, hogy ezt a method-ot, akármilyen frankó is, csak és kizárólag olyan Collection-nel lehet használni, melynek elemei egy olyan osztályba tartoznak mely implementálja a Comparable-t. 
+                Ez szerintem túl durva megkötés ezért csináltam egy másik method-ot is, ami egy másik argumentumként elfogad egy Comparator-t megvalósító osztályba tartozó példányt.
+            </para>
+            <literallayout>
+public static &lt;T&gt; List&lt;T&gt; toAscendingList(Collection&lt;T&gt; coll, Comparator&lt;T&gt; cmp){
+    return coll.stream()
+        .sorted(cmp)
+        .collect(Collectors.toList());
+}
+            </literallayout>
+            <para>
+                Ez amiatt lehet fontos, mert ha olyan elemekkel kell dolgoznunk melyek nem Comparable-ek, mégis legyen egy mód a kód használatára, anélkül, hogy a szóban forgó elemek osztályába kéne beleírni.
+                Ez főként akkor nehézség, ha valamilyen nem általunk írt kóddal dolgozunk.
+                A Comparator-ral nagyon könnyen tudjuk így adaptálni egy egyébként inkompatibilis osztály példányait.
+            </para>
+        </section>
+    </section>
+
+    <section>
+        <title>EPAM: Bináris keresés és Buborék rendezés implementálása</title>
+        <section>
+            <title>Feladat</title>
+            <para>
+            Implementálj egy Java osztályt, amely képes egy előre definiált n darab Integer tárolására. Ennek az osztálynak az alábbi funkcionalitásokkal kell rendelkeznie:
+            </para>
+            <itemizedlist>
+                <listitem>
+                    <para>
+                    Elem hozzáadása a tárolt elemekhez
+                    </para>
+                </listitem>
+                <listitem>
+                    <para>
+                    Egy tetszőleges Integer értékről tudja eldönteni, hogy már tároljuk-e (ehhez egy bináris keresőt implementálj)
+                    </para>
+                </listitem>
+                <listitem>
+                    <para>
+                    A tárolt elemeket az osztályunk be tudja rendezni és a rendezett (pl növekvő sorrend) struktúrával vissza tud térni (ehhez egy buborék rendezőt implementálj)
+                    </para>
+                </listitem>
+            </itemizedlist>
+        </section>
+        <section>
+            <title>Megoldás</title>
+            <para>
+                Az EPAM-os <link xlink:href="https://github.com/epam-deik-cooperation/epam-deik-prog2/tree/master/week-4/integer-collection">referenciában</link> a <literal>sort</literal> és a <literal>search</literal> magába az osztályba került.
+            </para>
+            <para>
+                Én ezt a <literal>Collections</literal>-höz hasonlóan inkább kivittem egy másik osztály static method-jába. Az ötlet az <link xlink:href="https://docs.oracle.com/javase/7/docs/api/java/util/Collections.html#binarySearch(java.util.List,%20T)">Oracle doc</link> alapján az volt, hogy a nem abszolút az osztályra tartozó dolgokat más helyen implementáljuk (Collections esetében ennek azért van létjogosultsága, mert (majdnem) mindenen működik ami a Collection interface-t megvalósítja.).
+            </para>
+            <para>
+                A bubble sort-ot és a binary search-öt átmozgattam egy <literal>IntegerCollections</literal> osztály static method-jába, plusz egy gagyi shell sort-ot is mellé raktam:
+            </para>
+public static void sort_shell(IntegerCollection coll){ if(coll==null)
+        throw new NullPointerException();
+    IntegerCollection steps = new IntegerCollection(new int[]{100,30,8,3,1});
+    for (int k = 0; k &lt;= steps.getSize()-1; k++) {
+        int step = steps.get(k);
+        for (int eltolas = 1; eltolas &lt;= step; eltolas++) {
+            int i = step + eltolas; while(i&lt;=coll.getSize()-1) {
+                int key = coll.get(i);
+                int j = i - step; while(j&gt;=0 &amp;&amp; coll.get(j) &gt; key) {
+                    coll.set(j+step,coll.get(j));
+                    j = j - step;
+                }
+                coll.set(j+step, key);
+                i = i + step;
+            }
+        }
+    }
+}
+            <para>
+                A teszteket is természetesen emiatt módosítani kellett emiatt (plusz a shell sort-ot is tesztelni kellett):
+            </para>
+            <literallayout>
+...
+@Test
+public void testSortShellShouldOrderOneElementCollectionCorrectly() {
+    // Given
+    underTest = new IntegerCollection(new int[]{ 1 });
+    int[] expected = { 1 };
+
+    // When
+    IntegerCollections.sort_shell(underTest);
+
+    // Then
+    assertArrayEquals(expected, underTest.toArray());
+}
+...
+@Test
+public void testBinarySearchShouldReturnInvalidIndexWhenValueIsNotPresent() {
+    // Given
+    underTest = new IntegerCollection(new int[]{1, 2, 3, 4, 5, 6, 7});
+    int expected_index = IntegerCollections.INVALID_INDEX;
+
+    // When
+    int actual_index = IntegerCollections.binary_search(underTest, 8);
+
+    // Then
+    assertEquals(expected_index, actual_index);
+}
+...
+            </literallayout>
+        </section>
+    </section>
+
+    <section>
+        <title>EPAM: Saját HashMap implementáció</title>
+        <section>
+            <title>Feladat</title>
+            <para>
+            Írj egy saját java.util.Map implementációt, mely nem használja a Java Collection API-t.
+            Az implementáció meg kell feleljen az összes megadott unit tesztnek, nem kell tudjon kezelni null
+            értékű kulcsokat és a “keySet”, “values”, “entrySet” metódusok nem kell támogassák az elem
+            törlést.
+            </para>
+        </section>
+        <section>
+            <title>Megoldás</title>
+            <para>
+            Az EPAM-os <link xlink:href="https://github.com/epam-deik-cooperation/epam-deik-prog2/tree/master/week-4/custom-map-implementation">referenciából</link> indultam ki. Ez konkrétan három dolgot jelentett:
+            </para>
+            <itemizedlist>
+                <listitem>
+                    <para>
+                    teszteket egy az egyben átvettem
+                    </para>
+                </listitem>
+                <listitem>
+                    <para>
+                    mivel az EPAM referencia megoldásban csalás van, ezért én is csaltam(azt írták nem szabad Collections használni de a keyset-et, valueset-et, entryset-et mégis Collections-ös HashSet-el adták vissza.)
+                    </para>
+                </listitem>
+                <listitem>
+                    <para>
+                    Átvettem a maven modulozást, huzzah.
+                    </para>
+                </listitem>
+            </itemizedlist>
+            <para>
+                Ha jól vettem észre, az EPAM-os implementáció egyszerűen két array-t tart nyilván.
+                Egyik a kulcsok, másik az értékek. 
+            </para>
+            <para>
+            Mikor a user meghívja az <literal>put</literal>-ot, és még nincs ilyen kulcs, akkor keresnek egy még üres helyet az array-ben ha találnak odaírnak, ha nem akkor duplájára növelik az array méretet. Másoláshoz builtin array copy-t használnak.
+            Ha van ilyen kulcs, akkor csak az ehhez tartozó index helyen módosítják az érték arrayt.
+            </para>
+            <para>
+                Törlésnél egyszerűen null-ra állítják az adott indexen mind a kulcs mind az érték array megfelelő elemét.
+            </para>
+            <para>
+                Úgy gondoltam, hogy a kód egy jó része az array-k babusgatásával foglalkozik. Emiatt úgy döntöttem, hogy a Collection-ös ArrayList, vagy Vector-hoz hasonló adatszerkezetet fogok létrehozni, és az ArrayMap ezt fogja használni a háttérben.
+            </para>
+            <para>
+                Azaz, az én megoldásomban a dinamikus növekedés illetve maga az array ki van szervezve egy <literal>Vec</literal> osztályba.
+            </para>
+            <para>
+                Ezentúl nem szerettem volna két külön <literal>Vec</literal>-et úgyhogy létrehoztam egy <literal>Pair</literal> nevezetű nested class-t. 
+                Ez megörökli a körbevevő <literal>ArrayMap</literal> osztály paramétereit. A másik apróság hogy implementáltam rajta az <literal>Entry</literal> interface-t, hogy egy az egyben vissza lehessen adni entryset kérés esetén. 
+            </para>
+            <para>
+                Az egyetlen trükközés a <literal>Vec</literal> oldalon volt:
+            </para>
+            <literallayout>
+public class Vec&lt;T&gt; implements Iterable&lt;T&gt;{
+
+    ...
+
+    class VecIterator implements Iterator&lt;T&gt;{
+        private int idx = -1;
+
+        @Override
+        public boolean hasNext() ...
+
+        @Override
+        public T next() ...
+    }
+
+    @Override
+    public Iterator&lt;T&gt; iterator() {
+        return new VecIterator();
+    }
+}
+            </literallayout>
+            <para>
+                Ez azért kellett, hogy utána kicsit könnyebb legyen használni iterálására a <literal>Vec</literal>-et, például:
+            </para>
+            <literallayout>
+Vec&lt;Foo&gt; foos = new Vec&lt;&gt;();
+for (Foo foo : foos) {
+    ...
+}
+            </literallayout>
+            <para>
+                Egy másik apróság, aminek ugyan nem a <literal>Vec</literal>-ben lenne a helye(hanem fullban implementálni Collection interface-t Vec-en és Stream kompatibilissé tenni), de ez mér nem tartozott a feladat scope-jába.
+                A lényeg annyi, hogy <literal>item</literal>-et a user megadja <literal>pred</literal> két argumentumú Boolean return type-ú predikátummal együtt, és "imitáljuk" a Stream lazy evaluation-jét azzal, hogy az első találat után visszatérünk a loop-ból.
+            </para>
+            <literallayout>
+public &lt;I&gt;  T findFirstMatching(I item, BiPredicate&lt;I,T&gt; pred){
+    for(T t : this){
+        if(pred.test(item,t))
+            return  t;
+    }
+    return null;
+}
+            </literallayout>
+        </section>
+    </section>
+</chapter>                

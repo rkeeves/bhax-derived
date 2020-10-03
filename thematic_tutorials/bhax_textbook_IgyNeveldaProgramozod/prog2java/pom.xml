@@ -36,6 +36,7 @@
 		<module>w4/int-coll</module>
         <module>w4/ordering</module>
         <module>w4/badmap</module>
+        <module>w4/leet</module>
     </modules>
 
   <dependencyManagement>
