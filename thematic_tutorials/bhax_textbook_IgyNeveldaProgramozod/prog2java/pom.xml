@@ -34,7 +34,9 @@
   
 	<modules>
 		<module>w4/int-coll</module>
-	</modules>
+        <module>w4/ordering</module>
+        <module>w4/badmap</module>
+    </modules>
 
   <dependencyManagement>
     <dependencies>

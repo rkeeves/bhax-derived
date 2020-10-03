@@ -2,11 +2,11 @@ package com.rkeeves;
 
 public class IntegerCollections {
 
-    public static void sort(IntegerCollection coll){
-        sort_bubble(coll);
-    }
+    public static final int INVALID_INDEX = -1;
 
     public static void sort_bubble(IntegerCollection coll){
+        if(coll==null)
+            throw new NullPointerException();
         int i = coll.getSize()-1;
         while(i>0) {
             for (int j = 0; j < i; j++) {
@@ -19,6 +19,8 @@ public class IntegerCollections {
     }
 
     public static void sort_shell(IntegerCollection coll){
+        if(coll==null)
+            throw new NullPointerException();
         IntegerCollection steps = new IntegerCollection(new int[]{100,30,8,3,1});
         for (int k = 0; k <= steps.getSize()-1; k++) {
             int step = steps.get(k);
@@ -36,5 +38,24 @@ public class IntegerCollections {
                 }
             }
         }
+    }
+
+
+    public static int binary_search(IntegerCollection coll, int value){
+        if(coll == null)
+            throw new NullPointerException();
+        int lo = 0;
+        int hi = coll.getSize()-1;
+        while(lo<= hi) {
+            int mi = (lo+hi)/2;
+            if(coll.get(mi) == value) {
+                return mi;
+            }else if(coll.get(mi) > value) {
+                hi = mi - 1;
+            }else {
+                lo = mi + 1;
+            }
+        }
+        return INVALID_INDEX;
     }
 }
