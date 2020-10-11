@@ -1,0 +1,263 @@
+<chapter xmlns="http://docbook.org/ns/docbook"
+    xmlns:xlink="http://www.w3.org/1999/xlink"
+    xmlns:xi="http://www.w3.org/2001/XInclude" version="5.0" xml:lang="hu">
+    <info>
+        <title>Helló, Stroustrup!</title>
+        <keywordset>
+            <keyword/>
+        </keywordset>
+    </info>
+    <section>
+        <title>EPAM: It's gone. Or is it?</title>
+        <section>
+            <title>Feladat</title>
+            <para>Adott a következő osztály:</para>
+            <literallayout>
+public class BugousStuffProducer {
+    private final Writer writer;
+
+    public BugousStuffProducer(String outputFileName) throws IOException {
+        writer = new FileWriter(outputFileName);
+    }
+
+    public void writeStuff() throws IOException {
+        writer.write("Stuff");
+    }
+    
+    @Override
+    public void finalize() throws IOException {
+        writer.close();
+    }
+}
+            </literallayout>
+        </section>
+    </section>
+    <section>
+        <title>EPAM: Kind of equal</title>
+        <section>
+            <title>Feladat</title>
+            <para>Adott az alábbi kódrészlet:</para>
+            <literallayout>
+// Given
+String first = "...";
+String second = "...";
+String third = "...";
+// When
+var firstMatchesSecondWithEquals = first.equals(second);
+var firstMatchesSecondWithEqualToOperator = first == second;
+var firstMatchesThirdWithEquals = first.equals(third);
+var firstMatchesThirdWithEqualToOperator = first == third;
+            </literallayout>
+            <para>Változtasd meg a <literal>String third = "...";</literal> sort úgy, hogy a
+                <literal>firstMatchesSecondWithEquals, firstMatchesSecondWithEqualToOperator,
+firstMatchesThirdWithEquals</literal> értéke <literal>true</literal>, a
+                <literal>firstMatchesThirdWithEqualToOperator</literal> értéke pedig <literal>false</literal> legyen. Magyarázd
+meg, mi történik a háttérben.
+            </para>
+        </section>
+        <section>
+            <title>Megoldás</title>
+            <para>Ezt már az első fejezetben tárgyaltuk. A lényeg hogy a String osztályban van egy cache és ebből adja vissza az objektumokat.</para>
+            <literallayout>
+String first = "...";
+                <para>
+Effektíve a kódunk a következőt hajtja végre:
+                </para>
+                <literallayout>
+String first = new String("...").intern();
+                </literallayout>
+                <para>
+Az intern a String által felügyelt cache-ből ad vissza egy olyan String-et mely egyenlő a "..." String-el, HA létezik ilyen a cache-ben. 
+Ha NEM létezik ilyen, akkor először hozzáadja a cache-hez, majd visszaadja az eredeti string-et.
+                </para>
+                <para>
+    Ez teljesen ugyanaz mint amit az int-ek Integer-rel történő box-olásánál látható volt. Egy apró különbséggel.
+                </para>
+                <para>
+                    A konkrét intern nem a String osztály egy static method-ja ami egy static field-ként definiált cache-ben keresget (mint ahogy az az Integer-nél van), hanem a method egy native call.
+                </para>
+                <para>
+    Java 7 előtt a cache-elt String objektum-ok a Permanent Generation-ben voltak. Ez főként metadatok tárolására szolgál (pl. Class objektumok).
+    Alapvetően Java-ban nem volt PermGen. Az osztály adatok és instance adatok együtt tárolódtak.
+    Mivel nem volt sok szükséges gc munka az osztályokkal, ezért optimalizálás miatt létrehozták a PermGen-t és innentől ide raktá az osztály metaadatokat.
+                    <link xlink:href="https://blogs.oracle.com/jonthecollector/presenting-the-permanent-generation">Itt egy Oracle blog post, ami a változatosság ellenére nem a profitról szól</link>.
+                </para>
+                <para>
+                    Java 7 óta PermGen helyett visszatértek a sima Java heap használatára.
+                </para>
+                <para>
+                    Ennek és a gc-nek érdekes mellékhatása, hogy szenzitív információk (értsd jelszavak) nagyon hosszú ideig memóriában maradhatnak, és egy memory dump-pal "kiszedhetjük" őket.
+                </para>
+                <para>
+                    Mivel a kód effektíve az alábbit jelenti, ezért ahhot hogy a teszt átmenjen elég a third esetén nem meghívni az intern-t:
+                </para>
+                <literallayout>
+ @Test
+public void actuallySameObjectRefsStringsWithInternals() {
+    // Given
+    String first = ("..."); // == new String("...").intern();
+    String second = ("..."); // == new String("...").intern();
+    String third = new String("..."); // we don't call intern
+    // When
+    var firstMatchesSecondWithEquals = first.equals(second);
+    assertTrue(firstMatchesSecondWithEquals);
+    var firstMatchesSecondWithEqualToOperator = first == second;
+    assertTrue(firstMatchesSecondWithEqualToOperator);
+    var firstMatchesThirdWithEquals = first.equals(third);
+    assertTrue(firstMatchesThirdWithEquals);
+    var firstMatchesThirdWithEqualToOperator = first == third;
+    assertFalse(firstMatchesThirdWithEqualToOperator);
+}
+                </literallayout>
+            </section>
+        </section>
+        <section>
+                <title>Java Native Interface</title>
+                <para>
+                    A fenti fejezetben elegánsan átugrottuk azt a kérdést, hogy mi a *** az a <literal>native</literal>. 
+                    Nos, a Java-ban így hívunk library-ket (C, C++).
+                </para>
+                <para>
+                    Csináljunk egy native methodot használó class-t!
+                </para>
+                <figure>
+                    <title>Java class</title>
+                    <mediaobject>
+                        <imageobject>
+                            <imagedata fileref="prog2java/w5/native-troubles/javaclass.png" scale="50" />
+                        </imageobject>
+                        <textobject>
+                            <phrase>Java class</phrase>
+                        </textobject>
+                    </mediaobject>
+                </figure>
+                 <para>
+                 Borzasztóan egyszerű, csak egy hello world...
+                Láthatjuk hogy static block-ban betöltünk egy hello nevű dll-t vagy so-t.
+                (A tankönyvből ugye emlékszünk hogy ez egyszer meghívódik mikor a ClassLoader inicializálja az osztályt /NEM a példányokat/.)
+                    Van egy <literal>sayHello</literal> nevű methodunk. Na ő lesz a C++!
+                </para>
+                <para>
+                    A <literal>javac</literal>-nek ha beadunk egy <literal>-h</literal>-t akkor legenerálja a header-t. 
+                    Lehet terminálról is, de external tool-nak is beállíthatjuk (ebben a csak manuálisan csináltam nem írtam rá build step-et vagy akárminek is hívják intelliij+maven földön).
+                    (Azért javah, mert régen a <literal>javah</literal> programot kellett használni, de mostmár <literal>javac</literal>-vel megy a <literal>javah</literal> pedig deprecated.)
+                </para>
+                <figure>
+                    <title>Intellij javah external tool config</title>
+                    <mediaobject>
+                        <imageobject>
+                            <imagedata fileref="prog2java/w5/native-troubles/intellijjavah.png" scale="50" />
+                        </imageobject>
+                        <textobject>
+                            <phrase>Intellij javah external tool config</phrase>
+                        </textobject>
+                    </mediaobject>
+                </figure>
+                <para>
+                Ha lefuttattuk akkor a sima class mellett generált egy headert:
+                </para>
+                <figure>
+                    <title>Generated Header</title>
+                    <mediaobject>
+                        <imageobject>
+                            <imagedata fileref="prog2java/w5/native-troubles/generated-header.png" scale="50" />
+                        </imageobject>
+                        <textobject>
+                            <phrase>Generated Header</phrase>
+                        </textobject>
+                    </mediaobject>
+                </figure>
+                <para>
+        static block-ban betöltünk egy hello nevű dll-t vagy so-t.
+        Van egy <literal>sayHello</literal> nevű methodunk. Na ő lesz a C++!
+                </para>
+                <para>
+                    Mivel Win-en vagyok ezért VS-t fogok használni. 
+                    Hozzunk létre egy új empty projectet.
+                    Jobb klikk a project-re a solution-ön belül és álíltsuk be hogy dll-t csináljunk.
+                </para>
+                <figure>
+                    <title>Visual Studio DLL Config</title>
+                    <mediaobject>
+                        <imageobject>
+                            <imagedata fileref="prog2java/w5/native-troubles/vs_dll.png" scale="50" />
+                        </imageobject>
+                        <textobject>
+                            <phrase>Visual Studio DLL Config</phrase>
+                        </textobject>
+                    </mediaobject>
+                </figure>
+                <para>
+                    Egyébként lehetőleg Release x64-et buildeljünk majd.
+                </para>
+                <figure>
+                    <title>Release and x64</title>
+                    <mediaobject>
+                        <imageobject>
+                            <imagedata fileref="prog2java/w5/native-troubles/vs_buildtype.png" scale="50" />
+                        </imageobject>
+                        <textobject>
+                            <phrase>Release and x64</phrase>
+                        </textobject>
+                    </mediaobject>
+                </figure>
+                <para>
+                    Csináljunk egy cpp fájlt. Include-olni kell a jni-t. Emiatt sírni fog a VS, mert nem találja.
+                    Emiatt be kell állítani, hogy ha meg kell keresni egy header-t akkor a VS a megfelelő jdk include dir-jében is keressen.
+                    (child dir-je is kell)
+                </para>
+                <figure>
+                    <title>Include Dirs</title>
+                    <mediaobject>
+                        <imageobject>
+                            <imagedata fileref="prog2java/w5/native-troubles/vs_include.png" scale="50" />
+                        </imageobject>
+                        <textobject>
+                            <phrase>Include Dirs</phrase>
+                        </textobject>
+                    </mediaobject>
+                </figure>
+                <para>
+                    Ha minden ok, nyomjunk egy build-et. Az elkészült dll-t pedig én személyszerint az eredeti maven modul egy third-party nevű dirjébe raktam.
+                    Persze a VM ezt nem tudja, és ha most elindítanánk a main-t, akkor elhasalna, mert a System.load beakarná tölteni hello.dll-t de nem találná. 
+                    Szóval a run configuration-t módosítani kell Intellij-ben.
+                </para>
+                <figure>
+                    <title>Intellij Run Config</title>
+                    <mediaobject>
+                        <imageobject>
+                            <imagedata fileref="prog2java/w5/native-troubles/intellij_config.png" scale="50" />
+                        </imageobject>
+                        <textobject>
+                            <phrase>Intellij Run Config</phrase>
+                        </textobject>
+                    </mediaobject>
+                </figure>
+                <para>
+                    Ha mindezzel kész vagyunk akkor már mehet is a futtatás!
+                </para>
+                <figure>
+                    <title>Run</title>
+                    <mediaobject>
+                        <imageobject>
+                            <imagedata fileref="prog2java/w5/native-troubles/run.png" scale="50" />
+                        </imageobject>
+                        <textobject>
+                            <phrase>Run</phrase>
+                        </textobject>
+                    </mediaobject>
+                </figure>
+                <para>
+                    Ugyan ez egy egyszerű példa, de technikailag megnyitotta a kaput afelé, hogy C++ kódot ágyazhassunk osztályaink működésébe!
+                    <link xlink:href="https://youtu.be/YedqV4Gl_us?t=93">Hurrá!</link>
+                </para>
+            </section>
+        <section>
+            <title>EPAM: Java GC</title>
+            <section>
+                <title>Feladat</title>
+                <para>Mutasd be nagy vonalakban hogyan működik Java-ban a GC (Garbage Collector). 
+            Lehetséges az OutOfMemoryError kezelése, ha igen milyen esetekben?</para>
+                </section>
+            </section>
+        </chapter>                

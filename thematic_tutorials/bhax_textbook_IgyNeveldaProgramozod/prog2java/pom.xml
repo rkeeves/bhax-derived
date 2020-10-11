@@ -37,6 +37,9 @@
         <module>w4/ordering</module>
         <module>w4/badmap</module>
         <module>w4/leet</module>
+        <module>w5/io-troubles</module>
+        <module>w5/string-troubles</module>
+        <module>w5/native-troubles</module>
     </modules>
 
   <dependencyManagement>
