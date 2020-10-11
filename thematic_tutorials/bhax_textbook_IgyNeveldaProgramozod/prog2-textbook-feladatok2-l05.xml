@@ -60,39 +60,39 @@ meg, mi történik a háttérben.
             <para>Ezt már az első fejezetben tárgyaltuk. A lényeg hogy a String osztályban van egy cache és ebből adja vissza az objektumokat.</para>
             <literallayout>
 String first = "...";
-						</literallayout>
-                <para>
+            </literallayout>
+            <para>
 Effektíve a kódunk a következőt hajtja végre:
-                </para>
-                <literallayout>
+            </para>
+            <literallayout>
 String first = new String("...").intern();
-                </literallayout>
-                <para>
+            </literallayout>
+            <para>
 Az intern a String által felügyelt cache-ből ad vissza egy olyan String-et mely egyenlő a "..." String-el, HA létezik ilyen a cache-ben. 
 Ha NEM létezik ilyen, akkor először hozzáadja a cache-hez, majd visszaadja az eredeti string-et.
-                </para>
-                <para>
+            </para>
+            <para>
     Ez teljesen ugyanaz mint amit az int-ek Integer-rel történő box-olásánál látható volt. Egy apró különbséggel.
-                </para>
-                <para>
+            </para>
+            <para>
                     A konkrét intern nem a String osztály egy static method-ja ami egy static field-ként definiált cache-ben keresget (mint ahogy az az Integer-nél van), hanem a method egy native call.
-                </para>
-                <para>
+            </para>
+            <para>
     Java 7 előtt a cache-elt String objektum-ok a Permanent Generation-ben voltak. Ez főként metadatok tárolására szolgál (pl. Class objektumok).
     Alapvetően Java-ban nem volt PermGen. Az osztály adatok és instance adatok együtt tárolódtak.
     Mivel nem volt sok szükséges gc munka az osztályokkal, ezért optimalizálás miatt létrehozták a PermGen-t és innentől ide raktá az osztály metaadatokat.
-                    <link xlink:href="https://blogs.oracle.com/jonthecollector/presenting-the-permanent-generation">Itt egy Oracle blog post, ami a változatosság ellenére nem a profitról szól</link>.
-                </para>
-                <para>
+                <link xlink:href="https://blogs.oracle.com/jonthecollector/presenting-the-permanent-generation">Itt egy Oracle blog post, ami a változatosság ellenére nem a profitról szól</link>.
+            </para>
+            <para>
                     Java 7 óta PermGen helyett visszatértek a sima Java heap használatára.
-                </para>
-                <para>
+            </para>
+            <para>
                     Ennek és a gc-nek érdekes mellékhatása, hogy szenzitív információk (értsd jelszavak) nagyon hosszú ideig memóriában maradhatnak, és egy memory dump-pal "kiszedhetjük" őket.
-                </para>
-                <para>
+            </para>
+            <para>
                     Mivel a kód effektíve az alábbit jelenti, ezért ahhot hogy a teszt átmenjen elég a third esetén nem meghívni az intern-t:
-                </para>
-                <literallayout>
+            </para>
+            <literallayout>
  @Test
 public void actuallySameObjectRefsStringsWithInternals() {
     // Given
@@ -109,156 +109,515 @@ public void actuallySameObjectRefsStringsWithInternals() {
     var firstMatchesThirdWithEqualToOperator = first == third;
     assertFalse(firstMatchesThirdWithEqualToOperator);
 }
-                </literallayout>
-            </section>
+            </literallayout>
         </section>
-        <section>
-                <title>Java Native Interface</title>
-                <para>
+    </section>
+    <section>
+        <title>Java Native Interface</title>
+        <para>
                     A fenti fejezetben elegánsan átugrottuk azt a kérdést, hogy mi a *** az a <literal>native</literal>. 
                     Nos, a Java-ban így hívunk library-ket (C, C++).
-                </para>
-                <para>
+        </para>
+        <para>
                     Csináljunk egy native methodot használó class-t!
-                </para>
-                <figure>
-                    <title>Java class</title>
-                    <mediaobject>
-                        <imageobject>
-                            <imagedata fileref="prog2java/w5/native-troubles/javaclass.png" scale="80" />
-                        </imageobject>
-                        <textobject>
-                            <phrase>Java class</phrase>
-                        </textobject>
-                    </mediaobject>
-                </figure>
-                 <para>
+        </para>
+        <figure>
+            <title>Java class</title>
+            <mediaobject>
+                <imageobject>
+                    <imagedata fileref="prog2java/w5/native-troubles/javaclass.png" scale="80" />
+                </imageobject>
+                <textobject>
+                    <phrase>Java class</phrase>
+                </textobject>
+            </mediaobject>
+        </figure>
+        <para>
                  Borzasztóan egyszerű, csak egy hello world...
                 Láthatjuk hogy static block-ban betöltünk egy hello nevű dll-t vagy so-t.
                 (A tankönyvből ugye emlékszünk hogy ez egyszer meghívódik mikor a ClassLoader inicializálja az osztályt /NEM a példányokat/.)
                     Van egy <literal>sayHello</literal> nevű methodunk. Na ő lesz a C++!
-                </para>
-                <para>
+        </para>
+        <para>
                     A <literal>javac</literal>-nek ha beadunk egy <literal>-h</literal>-t akkor legenerálja a header-t. 
                     Lehet terminálról is, de external tool-nak is beállíthatjuk (ebben a csak manuálisan csináltam nem írtam rá build step-et vagy akárminek is hívják intelliij+maven földön).
                     (Azért javah, mert régen a <literal>javah</literal> programot kellett használni, de mostmár <literal>javac</literal>-vel megy a <literal>javah</literal> pedig deprecated.)
-                </para>
-                <figure>
-                    <title>Intellij javah external tool config</title>
-                    <mediaobject>
-                        <imageobject>
-                            <imagedata fileref="prog2java/w5/native-troubles/intellijjavah.png" scale="40" />
-                        </imageobject>
-                        <textobject>
-                            <phrase>Intellij javah external tool config</phrase>
-                        </textobject>
-                    </mediaobject>
-                </figure>
-                <para>
+        </para>
+        <figure>
+            <title>Intellij javah external tool config</title>
+            <mediaobject>
+                <imageobject>
+                    <imagedata fileref="prog2java/w5/native-troubles/intellijjavah.png" scale="40" />
+                </imageobject>
+                <textobject>
+                    <phrase>Intellij javah external tool config</phrase>
+                </textobject>
+            </mediaobject>
+        </figure>
+        <para>
                 Ha lefuttattuk akkor a sima class mellett generált egy headert:
-                </para>
-                <figure>
-                    <title>Generated Header</title>
-                    <mediaobject>
-                        <imageobject>
-                            <imagedata fileref="prog2java/w5/native-troubles/generated-header.png" scale="70" />
-                        </imageobject>
-                        <textobject>
-                            <phrase>Generated Header</phrase>
-                        </textobject>
-                    </mediaobject>
-                </figure>
-                <para>
+        </para>
+        <figure>
+            <title>Generated Header</title>
+            <mediaobject>
+                <imageobject>
+                    <imagedata fileref="prog2java/w5/native-troubles/generated-header.png" scale="70" />
+                </imageobject>
+                <textobject>
+                    <phrase>Generated Header</phrase>
+                </textobject>
+            </mediaobject>
+        </figure>
+        <para>
         static block-ban betöltünk egy hello nevű dll-t vagy so-t.
         Van egy <literal>sayHello</literal> nevű methodunk. Na ő lesz a C++!
-                </para>
-                <para>
+        </para>
+        <para>
                     Mivel Win-en vagyok ezért VS-t fogok használni. 
                     Hozzunk létre egy új empty projectet.
                     Jobb klikk a project-re a solution-ön belül és álíltsuk be hogy dll-t csináljunk.
-                </para>
-                <figure>
-                    <title>Visual Studio DLL Config</title>
-                    <mediaobject>
-                        <imageobject>
-                            <imagedata fileref="prog2java/w5/native-troubles/vs_dll.png" scale="60" />
-                        </imageobject>
-                        <textobject>
-                            <phrase>Visual Studio DLL Config</phrase>
-                        </textobject>
-                    </mediaobject>
-                </figure>
-                <para>
+        </para>
+        <figure>
+            <title>Visual Studio DLL Config</title>
+            <mediaobject>
+                <imageobject>
+                    <imagedata fileref="prog2java/w5/native-troubles/vs_dll.png" scale="60" />
+                </imageobject>
+                <textobject>
+                    <phrase>Visual Studio DLL Config</phrase>
+                </textobject>
+            </mediaobject>
+        </figure>
+        <para>
                     Egyébként lehetőleg Release x64-et buildeljünk majd.
-                </para>
-                <figure>
-                    <title>Release and x64</title>
-                    <mediaobject>
-                        <imageobject>
-                            <imagedata fileref="prog2java/w5/native-troubles/vs_buildtype.png" scale="60" />
-                        </imageobject>
-                        <textobject>
-                            <phrase>Release and x64</phrase>
-                        </textobject>
-                    </mediaobject>
-                </figure>
-                <para>
+        </para>
+        <figure>
+            <title>Release and x64</title>
+            <mediaobject>
+                <imageobject>
+                    <imagedata fileref="prog2java/w5/native-troubles/vs_buildtype.png" scale="60" />
+                </imageobject>
+                <textobject>
+                    <phrase>Release and x64</phrase>
+                </textobject>
+            </mediaobject>
+        </figure>
+        <para>
                     Csináljunk egy cpp fájlt. Include-olni kell a jni-t. Emiatt sírni fog a VS, mert nem találja.
                     Emiatt be kell állítani, hogy ha meg kell keresni egy header-t akkor a VS a megfelelő jdk include dir-jében is keressen.
                     (child dir-je is kell)
-                </para>
-                <figure>
-                    <title>Include Dirs</title>
-                    <mediaobject>
-                        <imageobject>
-                            <imagedata fileref="prog2java/w5/native-troubles/vs_include.png" scale="70" />
-                        </imageobject>
-                        <textobject>
-                            <phrase>Include Dirs</phrase>
-                        </textobject>
-                    </mediaobject>
-                </figure>
-                <para>
+        </para>
+        <figure>
+            <title>Include Dirs</title>
+            <mediaobject>
+                <imageobject>
+                    <imagedata fileref="prog2java/w5/native-troubles/vs_include.png" scale="70" />
+                </imageobject>
+                <textobject>
+                    <phrase>Include Dirs</phrase>
+                </textobject>
+            </mediaobject>
+        </figure>
+        <para>
                     Ha minden ok, nyomjunk egy build-et. Az elkészült dll-t pedig én személyszerint az eredeti maven modul egy third-party nevű dirjébe raktam.
                     Persze a VM ezt nem tudja, és ha most elindítanánk a main-t, akkor elhasalna, mert a System.load beakarná tölteni hello.dll-t de nem találná. 
                     Szóval a run configuration-t módosítani kell Intellij-ben.
-                </para>
-                <figure>
-                    <title>Intellij Run Config</title>
-                    <mediaobject>
-                        <imageobject>
-                            <imagedata fileref="prog2java/w5/native-troubles/intellij_config.png" scale="80" />
-                        </imageobject>
-                        <textobject>
-                            <phrase>Intellij Run Config</phrase>
-                        </textobject>
-                    </mediaobject>
-                </figure>
-                <para>
+        </para>
+        <figure>
+            <title>Intellij Run Config</title>
+            <mediaobject>
+                <imageobject>
+                    <imagedata fileref="prog2java/w5/native-troubles/intellij_config.png" scale="80" />
+                </imageobject>
+                <textobject>
+                    <phrase>Intellij Run Config</phrase>
+                </textobject>
+            </mediaobject>
+        </figure>
+        <para>
                     Ha mindezzel kész vagyunk akkor már mehet is a futtatás!
-                </para>
-                <figure>
-                    <title>Run</title>
-                    <mediaobject>
-                        <imageobject>
-                            <imagedata fileref="prog2java/w5/native-troubles/run.png" scale="80" />
-                        </imageobject>
-                        <textobject>
-                            <phrase>Run</phrase>
-                        </textobject>
-                    </mediaobject>
-                </figure>
-                <para>
+        </para>
+        <figure>
+            <title>Run</title>
+            <mediaobject>
+                <imageobject>
+                    <imagedata fileref="prog2java/w5/native-troubles/run.png" scale="80" />
+                </imageobject>
+                <textobject>
+                    <phrase>Run</phrase>
+                </textobject>
+            </mediaobject>
+        </figure>
+        <para>
                     Ugyan ez egy egyszerű példa, de technikailag megnyitotta a kaput afelé, hogy C++ kódot ágyazhassunk osztályaink működésébe!
-                    <link xlink:href="https://youtu.be/YedqV4Gl_us?t=93">Hurrá!</link>
-                </para>
-            </section>
+            <link xlink:href="https://youtu.be/YedqV4Gl_us?t=93">Hurrá!</link>
+        </para>
+    </section>
+    <section>
+        <title>EPAM: Java GC</title>
         <section>
-            <title>EPAM: Java GC</title>
-            <section>
-                <title>Feladat</title>
-                <para>Mutasd be nagy vonalakban hogyan működik Java-ban a GC (Garbage Collector). 
+            <title>Feladat</title>
+            <para>Mutasd be nagy vonalakban hogyan működik Java-ban a GC (Garbage Collector). 
             Lehetséges az OutOfMemoryError kezelése, ha igen milyen esetekben?</para>
-                </section>
-            </section>
-        </chapter>                
+        </section>
+    </section>
+    <section>
+        <title>Alapok</title>
+        <para>A Java programokat egy virtuális gép futtatja. Mikor new-al létrehozunk egy új objektumot, akkor az a heap-en allokálódik és mi csak egy referenciát fogunk visszakapni.</para>
+        <para>A Java objektumok két gépi szót foglalnak minimum (ennek semmi köze a field-jeikhez, simán 64bit-es VM implementáció ilyen), azaz tárhely méretileg nem mindegy hogy egy Integer[5][5] vagy Integer[25]-ről beszélünk-e, ugyanis az első esetben egy olyan min 2 szót foglaló array-ről van szó, aminek elemei min 2 szót foglaló array-k, melyek elemei min 2 szót foglaló Integer-ek.</para>
+        <para>Az objektum referenciák nagyon jók, mert leveszik a program válláról a felszabadítás felelősségét.</para>
+        <para>Viszont ha a mi programunk nem takarít maga után, akkor mi végzi?</para>
+        <para>A felszabadítást a VM a GarbageCollectorokkal valósítja meg.</para>
+        <para>Egy garbage collector-nak három feladata van:</para>
+        <itemizedlist>
+            <listitem>
+                <para>
+                    Objektumok felszabadíthatóságának eldöntése (pl. mark)
+                </para>
+            </listitem>
+            <listitem>
+                <para>
+                    Felszabadítás (pl. sweep)
+                </para>
+            </listitem>
+            <listitem>
+                <para>
+                    Kompaktálás (fragmentált memóriában a még használt területek újrarendezése, hogy növeljük az egyben allokálható szegmens méretet)
+                </para>
+            </listitem>
+        </itemizedlist>
+        <para>
+            A következő alfejezetekben ezen folyamatok általános leírásával fogunk foglalkozni.
+        </para>
+        <para>
+            Ezenkívül több fajta Garbage Collector is létezik, mindegyik más logikával. (Sőt egyesek logika nélkül lásd Epsilon :).
+            Ezekről is a következő alfejezetekben fogunk foglalkozni.
+        </para>
+    </section>
+    <section>
+        <title>Mikor szabadítható fel egy objektum?</title>
+        <para>Egy objektum akkor felszabadítható, ha </para>
+        <itemizedlist>
+            <listitem>
+                <para>
+                    Az eddig az objektumra mutató összes referencia null (avagy nem mutat már rá senki)
+                </para>
+            </listitem>
+            <listitem>
+                <para>
+                    Objektum-ra kizárólag egy block-ban volt referencia, és végrehajtás során elhagyjuk ezen block-ot.
+                </para>
+            </listitem>
+            <listitem>
+                <para>
+                    Az objektum-ra mutató referenciákat már felszabadíhatónak jelölt objektumok birtokolják.
+                    (Pl. gyökér felszabadítható, akkor a node-jai is, attól függetlenül, hogy gyökér referenciát tesz a gyermekeire)
+                </para>
+            </listitem>
+            <listitem>
+                <para>
+                    <link xlink:href="https://www.baeldung.com/java-soft-references">SoftReference</link>-ek mutatnak az objektum-ra, azonban egyetlen strong reference sem.  
+                </para>
+            </listitem>
+            <listitem>
+                <para>
+                    Csak <link xlink:href="https://www.baeldung.com/java-weak-reference">WeakReference</link>-ek mutatnak az objektum-ra, egyetlen strong vagy soft sem.  
+                </para>
+            </listitem>
+        </itemizedlist>
+        <para>
+            A lényeg a fenti informális listából az, hogy az elérhetőség egy gráf bejárási probléma.
+        </para>
+        <itemizedlist>
+            <listitem>
+                <para>
+                    Az eddig az objektumra mutató összes referencia null (avagy nem mutat már rá senki)
+                </para>
+            </listitem>
+            <listitem>
+                <para>
+                    Objektum-ra kizárólag egy block-ban volt referencia, és végrehajtás során elhagyjuk ezen block-ot.
+                </para>
+            </listitem>
+            <listitem>
+                <para>
+                    Az objektum-ra mutató referenciákat már felszabadíhatónak jelölt objektumok birtokolják.
+                    (Pl. gyökér felszabadítható, akkor a node-jai is, attól függetlenül, hogy gyökér referenciát tesz a gyermekeire)
+                </para>
+            </listitem>
+            <listitem>
+                <para>
+                    <link xlink:href="https://www.baeldung.com/java-soft-references">SoftReference</link>-ek mutatnak az objektum-ra, azonban egyetlen strong reference sem.  
+                </para>
+            </listitem>
+            <listitem>
+                <para>
+                    Csak <link xlink:href="https://www.baeldung.com/java-weak-reference">WeakReference</link>-ek mutatnak az objektum-ra, egyetlen strong vagy soft sem.  
+                </para>
+            </listitem>
+        </itemizedlist>
+        <para>
+            Ez egész jól hangzik de van vele több probléma.
+            Nézzük meg az alábbi példát:
+        </para>
+        <figure>
+            <title>nodes</title>
+            <mediaobject>
+                <imageobject>
+                    <imagedata fileref="img/roots_graph.png" scale="50" />
+                </imageobject>
+                <textobject>
+                    <phrase>nodes</phrase>
+                </textobject>
+            </mediaobject>
+        </figure>
+        <para>
+            Egy pár csomópont és él. Melyik csomópontok takaríthatóak fel?
+        </para>
+        <para>
+            Mi lenne, ha azt számolnánk kire hány referencia mutat?
+            Alább látható, hogy ez sajnos ciklikus esetben nem működik (mindegyik egymásra mutat így ők nem hagyják egymást törölni annak ellenére hogy egyikre sincs szükség, pontosan úgy mint Madonna, a lemezkiadója és a menedzsere.).
+        </para>
+        <figure>
+            <title>Reference counting</title>
+            <mediaobject>
+                <imageobject>
+                    <imagedata fileref="img/ref_counting.png" scale="50" />
+                </imageobject>
+                <textobject>
+                    <phrase>Reference counting</phrase>
+                </textobject>
+            </mediaobject>
+        </figure>
+        <para>
+        Egy másik megoldás, hogy meghatározzuk valamilyen módon a biztosan nem felszabadítható node-okat, és utána végig haladunk a gráfon tranzitíven alkalmazva a felszabadíthatósági szabályt.
+        </para>
+        <para>
+        tehát megjelöljük az elérhető gyökereket.
+        </para>
+        <figure>
+            <title>GC roots 0</title>
+            <mediaobject>
+                <imageobject>
+                    <imagedata fileref="img/gc_roots.png" scale="50" />
+                </imageobject>
+                <textobject>
+                    <phrase>GC roots 0</phrase>
+                </textobject>
+            </mediaobject>
+        </figure>
+        <para>
+            Aztán végighaladunk.
+        </para>
+        <figure>
+            <title>GC roots 1</title>
+            <mediaobject>
+                <imageobject>
+                    <imagedata fileref="img/gc_roots2.png" scale="50" />
+                </imageobject>
+                <textobject>
+                    <phrase>GC roots 1</phrase>
+                </textobject>
+            </mediaobject>
+        </figure>
+        <para>
+        A "gyökereket" GC root-oknak nevezzük.
+        A GC root-ok:
+        </para>
+        <itemizedlist>
+            <listitem>
+                <para>Lokális változók</para>
+            </listitem>
+            <listitem>
+                <para>Aktív szálak</para>
+            </listitem>
+            <listitem>
+                <para>Statikus field-ek</para>
+            </listitem>
+            <listitem>
+                <para>JNI referenciák</para>
+            </listitem>
+        </itemizedlist>
+        <para>
+            A <literal>Mark</literal> a jelölést jelenti, míg <literal>Sweep</literal> a valamely gc root-ról nem elérhető objektumok által foglalt memória szabddá tétele.
+        </para>
+        <para>
+            A fenti gráf bejárásos algoritmus csak akkor működik, ha a gráf az algoritmus futása közben nem változik.
+            Emiatt a VM gc miatt megállíthatja a program futását <literal>Stop the world pause</literal>.
+            Ellenkező esetben alább egy példa (gc közben hagyjuk futni a programot ami egy referenciát null-ra állít, így egy valójában már nem kellő objektum mégis túlélő lenne).
+        </para>
+        <figure>
+            <title>GC with No Stop the world pause</title>
+            <mediaobject>
+                <imageobject>
+                    <imagedata fileref="img/gc_roots3.png" scale="50" />
+                </imageobject>
+                <textobject>
+                    <phrase>GC with No Stop the world pause</phrase>
+                </textobject>
+            </mediaobject>
+        </figure>
+    </section>
+    <section>
+        <title>Heap Generation Spaces</title>
+        <para>
+            Egy applikáció életében sok objektum rövid életű. De mihez képest?
+            Vegyünk egy egyszerű példát: egy swing számológép applikáció
+        </para>
+        <para>
+            Ebben az esetben beláthatjuk, hogy a JFrame hosszabb életű lesz, mint pl. a számítás során használt temporary Integer változó.
+        </para>
+        <para>
+            Ezen szignifikáns differencia a két élethossz között a gc optimalizálásánál is fontos.
+            Emiatt általában az obejktumokat különböző generációkba szokták sorolni.
+            Ezek a következők:
+        </para>
+        <itemizedlist>
+            <listitem>
+                <para>
+                    eden
+                </para>
+            </listitem>
+            <listitem>
+                <para>
+                    survivor1 (from)
+                </para>
+            </listitem>
+            <listitem>
+                <para>
+                    survivor2 (to)
+                </para>
+            </listitem>
+            <listitem>
+                <para>
+                    old vagy <link xlink:href="https://www.baeldung.com/java-soft-references">tenured</link>
+                </para>
+            </listitem>
+            <listitem>
+                <para>
+                    permgen
+                </para>
+            </listitem>
+        </itemizedlist>
+        <para>
+            Az objektumok az eden-ben kezdik életüket.
+            Ha túlélik az első GC-t akkor mozdulnak a survivor place-ekre.
+            <link xlink:href="https://plumbr.io/handbook/garbage-collection-in-java/memory-pools/survivor-spaces">tenured</link>
+            Mindez egyébként amiatt "jó", mert az eden-ben nagyon nagy a "mozgás", viszont az itteni felszabadítás valószínűleg nem jár nagy munkával (hisz rövid életű objektumok, és nagy valószínűséggel az ő felszabadítása nem fogja sok más objektum felszabadítását maga után vonni).
+        </para>
+        <para>
+            Minor GC-nek hívjuk, mikor Eden kifogy a helyből és a young space-ben új hely kell.
+            Ilyenkor az old generationből youngba mutató referenciák a GC root-ok. 
+            Az old space-en ilyenkor nem hajtódik végre gc.
+        </para>
+        <para>
+            Major GC-nek hívjuk, mikor az old space-t próbájuk gc-zni.
+        </para>
+    </section>
+    <section>
+        <title>Algoritmusok nagyvonalakban</title>
+        <para>
+            Mark Sweep esetén a nem felszabadítható objektumokat békényhagyjuk, a felszabadíthatóakat pedig egyszerűen felszabadítjuk.
+            Problémája, ahogy az az alábbi ábrán is látszik, hogy a legnagyobb allokálható méret problémáját nem kezeljük, és ahogy fragmentálódik a memória,
+            lehet lenne elég hely, de mégsem tudunk allokálni, mert a szabad hely szét van "forgácsolódva".
+        </para>
+        <figure>
+            <title>Mark Sweep</title>
+            <mediaobject>
+                <imageobject>
+                    <imagedata fileref="img/mark_sweep.png" scale="50" />
+                </imageobject>
+                <textobject>
+                    <phrase>Mark Sweep</phrase>
+                </textobject>
+            </mediaobject>
+        </figure>
+        <para>
+            Mark Sweep Compact esetén a felszabadítható objektumokat egyszerűen felszabadítjuk.
+            Ezekután a nem felszabadíthatóakat át mozgatjuk, hogy a lehető legnagyobb egybefüggő nem foglalt részt nyerjük.
+            Problémája, hogy mostmár nem csak a felszabadítással nyújtjuk a pause time-ot hanem a másolással is.
+        </para>
+        <figure>
+            <title>Mark Sweep Compact</title>
+            <mediaobject>
+                <imageobject>
+                    <imagedata fileref="img/mark_sweep_compact.png" scale="50" />
+                </imageobject>
+                <textobject>
+                    <phrase>Mark Sweep Compact</phrase>
+                </textobject>
+            </mediaobject>
+        </figure>
+        <para>
+            Mark Sweep Copy kicsit hasonló mint a Mark Sweep Compact, de ebben ez esetben egy új régióra kerülnek a megtartandó objektumok.
+            Ez amiatt előnyös, mert már mark-nál át lehet őket másolni, és akár egy másik szálon, hiszen a mi szempontunkból Region B write only.
+            Negatívuma, hogy sok memóriába kerül, hiszen egy teljesen üres régióra van szükség.
+        </para>
+        <figure>
+            <title>Mark Sweep Copy</title>
+            <mediaobject>
+                <imageobject>
+                    <imagedata fileref="img/mark_sweep_copy.png" scale="50" />
+                </imageobject>
+                <textobject>
+                    <phrase>Mark Sweep Copy</phrase>
+                </textobject>
+            </mediaobject>
+        </figure>
+    </section>
+    <section>
+        <title>Garbage Collectorok</title>
+        <para>
+        Serial GC, egyetlen thread-et használ, ezért nehéz vele kihasználni a modern gépeket.
+        Mark-copy-t használ a young generation-höz, és mark-sweep-compact-ot a tenured-höz.
+        Ha valakit érdekel a konkrét log értelmezése, és bővebb információ látogasson el <link xlink:href="https://plumbr.io/handbook/garbage-collection-algorithms-implementations#serial-gc">erre</link> a lapra.
+        </para>
+        <para>
+            Én csak azt emelném ki, hogy az alábbi log-ok megértése során nagyon fontos, hogy a gc nem biztos hogy fizikailag felszabadít, ugye, elég ha az eden-ben elég helyet hagy azáltal hogy átmozgat survivorba, vagy később tenured-be objektumokat.
+        </para>
+<literallayout>
+2015-05-26T14:45:37.987-0200: 151.126: [GC (Allocation Failure) 151.126: [DefNew: 629119K->69888K(629120K), 0.0584157 secs] 1619346K->1273247K(2027264K), 0.0585007 secs] [Times: user=0.06 sys=0.00, real=0.06 secs]
+2015-05-26T14:45:59.690-0200: 172.829: [GC (Allocation Failure) 172.829: [DefNew: 629120K->629120K(629120K), 0.0000372 secs]172.829: [Tenured: 1203359K->755802K(1398144K), 0.1855567 secs] 1832479K->755802K(2027264K), [Metaspace: 6741K->6741K(1056768K)], 0.1856954 secs] [Times: user=0.18 sys=0.00, real=0.18 secs]
+</literallayout>
+        <para>
+            Ezenkívül talán még fontos lehet, hogy mindkét collector stop-the-world-öt okoz.
+        </para>
+        <para>
+            A Parallel GC, a Serial-hoz hasonló mark-copy young és mark-sweep-compact-ot a tenured-höz.
+            Ugyanúgy mint Serial GC ez is stop-the-world-öt okoz.
+            Egy szignifikáns különbség a gc által használt thread-ek száma, ami default-ban az adott hardveren elérhető magok száma.
+        </para>
+        <para>
+            A CMS(Mostly Concurrent Mark Sweep) GC, a young gen-hez mark-copy-t, míg a tenured-höz concurrent mark-sweep-et használ.
+            Young gen esetén ez is stop-the-world-öt okoz, azonban tenured esetén az applikációval konkurrensen fut.
+            Azaz nem állítja meg csak maximum "eleszi" a számítási kapacitást a programunk elől.
+        </para>
+        <para>
+            A G1(Garbage First) GC. Ezen esetben a memóriát sok kisebb eden, survivor és old space-re osztják.
+            Egy gc során ezen apróbb space-ek összességének egy részhalmazán végez munkát csak, ezt a részhalmazt collection set-nek nevezik.
+            A collection set-be el kell dönteni mikor melyik régió kerül be. Ezt a döntést pedig az alapján hozza, hogy melyekben van a legtöbb felszabadítható. 
+            Emiatt is hívják Garbage First-nek: Szimplán annyit tesz, hogy ha egy régióban relatíve az átlagnál nagyobb a felszabadítható terület, akkor az átlagnál ez a régió nagyobb valószínűséggel kerül a Colelction Set-be.
+            Ez a GC is okoz stop-the-world eventet (Evacuation és Remark Phase), azonban a várható max időtartam megadható (konfigurálható).
+        </para>
+    </section>
+    
+    <section>
+        <title>Parallel</title>
+    </section>
+    <section>
+        <title>CMS</title>
+    </section>
+    <section>
+        <title>G1</title>
+    </section>
+    <section>
+        <title>Epsilon</title>
+    </section>
+    <section>
+        <title>Z</title>
+    </section>
+    <section>
+        <title>Shenandoah</title>
+    </section>
+</section>
+</chapter>                
