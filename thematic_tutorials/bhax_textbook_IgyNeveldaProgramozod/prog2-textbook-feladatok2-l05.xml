@@ -253,18 +253,22 @@ public void actuallySameObjectRefsStringsWithInternals() {
             <link xlink:href="https://youtu.be/YedqV4Gl_us?t=93">Hurrá!</link>
         </para>
     </section>
+
     <section>
         <title>EPAM: Java GC</title>
+              
         <section>
             <title>Feladat</title>
             <para>Mutasd be nagy vonalakban hogyan működik Java-ban a GC (Garbage Collector). 
             Lehetséges az OutOfMemoryError kezelése, ha igen milyen esetekben?</para>
         </section>
-    </section>
+        
     <section>
         <title>Alapok</title>
+  
         <para>A Java programokat egy virtuális gép futtatja. Mikor new-al létrehozunk egy új objektumot, akkor az a heap-en allokálódik és mi csak egy referenciát fogunk visszakapni.</para>
         <para>A Java objektumok két gépi szót foglalnak minimum (ennek semmi köze a field-jeikhez, simán 64bit-es VM implementáció ilyen), azaz tárhely méretileg nem mindegy hogy egy Integer[5][5] vagy Integer[25]-ről beszélünk-e, ugyanis az első esetben egy olyan min 2 szót foglaló array-ről van szó, aminek elemei min 2 szót foglaló array-k, melyek elemei min 2 szót foglaló Integer-ek.</para>
+
         <para>Az objektum referenciák nagyon jók, mert leveszik a program válláról a felszabadítás felelősségét.</para>
         <para>Viszont ha a mi programunk nem takarít maga után, akkor mi végzi?</para>
         <para>A felszabadítást a VM a GarbageCollectorokkal valósítja meg.</para>
@@ -293,10 +297,13 @@ public void actuallySameObjectRefsStringsWithInternals() {
             Ezenkívül több fajta Garbage Collector is létezik, mindegyik más logikával. (Sőt egyesek logika nélkül lásd Epsilon :).
             Ezekről is a következő alfejezetekben fogunk foglalkozni.
         </para>
+        
     </section>
+            
     <section>
         <title>Mikor szabadítható fel egy objektum?</title>
         <para>Egy objektum akkor felszabadítható, ha </para>
+   
         <itemizedlist>
             <listitem>
                 <para>
@@ -325,6 +332,7 @@ public void actuallySameObjectRefsStringsWithInternals() {
                 </para>
             </listitem>
         </itemizedlist>
+
         <para>
             A lényeg a fenti informális listából az, hogy az elérhetőség egy gráf bejárási probléma.
         </para>
@@ -356,6 +364,7 @@ public void actuallySameObjectRefsStringsWithInternals() {
                 </para>
             </listitem>
         </itemizedlist>
+     
         <para>
             Ez egész jól hangzik de van vele több probléma.
             Nézzük meg az alábbi példát:
@@ -364,7 +373,7 @@ public void actuallySameObjectRefsStringsWithInternals() {
             <title>nodes</title>
             <mediaobject>
                 <imageobject>
-                    <imagedata fileref="img/roots_graph.png" scale="50" />
+                    <imagedata fileref="img/roots_graph.png" scale="90" />
                 </imageobject>
                 <textobject>
                     <phrase>nodes</phrase>
@@ -382,7 +391,7 @@ public void actuallySameObjectRefsStringsWithInternals() {
             <title>Reference counting</title>
             <mediaobject>
                 <imageobject>
-                    <imagedata fileref="img/ref_counting.png" scale="50" />
+                    <imagedata fileref="img/ref_counting.png" scale="90" />
                 </imageobject>
                 <textobject>
                     <phrase>Reference counting</phrase>
@@ -395,11 +404,12 @@ public void actuallySameObjectRefsStringsWithInternals() {
         <para>
         tehát megjelöljük az elérhető gyökereket.
         </para>
+            
         <figure>
             <title>GC roots 0</title>
             <mediaobject>
                 <imageobject>
-                    <imagedata fileref="img/gc_roots.png" scale="50" />
+                    <imagedata fileref="img/gc_roots.png" scale="90" />
                 </imageobject>
                 <textobject>
                     <phrase>GC roots 0</phrase>
@@ -413,7 +423,7 @@ public void actuallySameObjectRefsStringsWithInternals() {
             <title>GC roots 1</title>
             <mediaobject>
                 <imageobject>
-                    <imagedata fileref="img/gc_roots2.png" scale="50" />
+                    <imagedata fileref="img/gc_roots2.png" scale="90" />
                 </imageobject>
                 <textobject>
                     <phrase>GC roots 1</phrase>
@@ -450,7 +460,7 @@ public void actuallySameObjectRefsStringsWithInternals() {
             <title>GC with No Stop the world pause</title>
             <mediaobject>
                 <imageobject>
-                    <imagedata fileref="img/gc_roots3.png" scale="50" />
+                    <imagedata fileref="img/gc_roots3.png" scale="90" />
                 </imageobject>
                 <textobject>
                     <phrase>GC with No Stop the world pause</phrase>
@@ -499,6 +509,7 @@ public void actuallySameObjectRefsStringsWithInternals() {
                 </para>
             </listitem>
         </itemizedlist>
+  
         <para>
             Az objektumok az eden-ben kezdik életüket.
             Ha túlélik az első GC-t akkor mozdulnak a survivor place-ekre.
@@ -525,7 +536,7 @@ public void actuallySameObjectRefsStringsWithInternals() {
             <title>Mark Sweep</title>
             <mediaobject>
                 <imageobject>
-                    <imagedata fileref="img/mark_sweep.png" scale="50" />
+                    <imagedata fileref="img/mark_sweep.png" scale="90" />
                 </imageobject>
                 <textobject>
                     <phrase>Mark Sweep</phrase>
@@ -541,7 +552,7 @@ public void actuallySameObjectRefsStringsWithInternals() {
             <title>Mark Sweep Compact</title>
             <mediaobject>
                 <imageobject>
-                    <imagedata fileref="img/mark_sweep_compact.png" scale="50" />
+                    <imagedata fileref="img/mark_sweep_compact.png" scale="90" />
                 </imageobject>
                 <textobject>
                     <phrase>Mark Sweep Compact</phrase>
@@ -557,7 +568,7 @@ public void actuallySameObjectRefsStringsWithInternals() {
             <title>Mark Sweep Copy</title>
             <mediaobject>
                 <imageobject>
-                    <imagedata fileref="img/mark_sweep_copy.png" scale="50" />
+                    <imagedata fileref="img/mark_sweep_copy.png" scale="90" />
                 </imageobject>
                 <textobject>
                     <phrase>Mark Sweep Copy</phrase>
@@ -575,13 +586,16 @@ public void actuallySameObjectRefsStringsWithInternals() {
         <para>
             Én csak azt emelném ki, hogy az alábbi log-ok megértése során nagyon fontos, hogy a gc nem biztos hogy fizikailag felszabadít, ugye, elég ha az eden-ben elég helyet hagy azáltal hogy átmozgat survivorba, vagy később tenured-be objektumokat.
         </para>
-<literallayout>
+<programlisting>
+<![CDATA[
 2015-05-26T14:45:37.987-0200: 151.126: [GC (Allocation Failure) 151.126: [DefNew: 629119K->69888K(629120K), 0.0584157 secs] 1619346K->1273247K(2027264K), 0.0585007 secs] [Times: user=0.06 sys=0.00, real=0.06 secs]
 2015-05-26T14:45:59.690-0200: 172.829: [GC (Allocation Failure) 172.829: [DefNew: 629120K->629120K(629120K), 0.0000372 secs]172.829: [Tenured: 1203359K->755802K(1398144K), 0.1855567 secs] 1832479K->755802K(2027264K), [Metaspace: 6741K->6741K(1056768K)], 0.1856954 secs] [Times: user=0.18 sys=0.00, real=0.18 secs]
-</literallayout>
+]]>
+</programlisting>
         <para>
             Ezenkívül talán még fontos lehet, hogy mindkét collector stop-the-world-öt okoz.
         </para>
+
         <para>
             A Parallel GC, a Serial-hoz hasonló mark-copy young és mark-sweep-compact-ot a tenured-höz.
             Ugyanúgy mint Serial GC ez is stop-the-world-öt okoz.
@@ -599,25 +613,8 @@ public void actuallySameObjectRefsStringsWithInternals() {
             Emiatt is hívják Garbage First-nek: Szimplán annyit tesz, hogy ha egy régióban relatíve az átlagnál nagyobb a felszabadítható terület, akkor az átlagnál ez a régió nagyobb valószínűséggel kerül a Colelction Set-be.
             Ez a GC is okoz stop-the-world eventet (Evacuation és Remark Phase), azonban a várható max időtartam megadható (konfigurálható).
         </para>
+
     </section>
-    
-    <section>
-        <title>Parallel</title>
-    </section>
-    <section>
-        <title>CMS</title>
-    </section>
-    <section>
-        <title>G1</title>
-    </section>
-    <section>
-        <title>Epsilon</title>
-    </section>
-    <section>
-        <title>Z</title>
-    </section>
-    <section>
-        <title>Shenandoah</title>
-    </section>
-</section>
+
+</section> 
 </chapter>                
