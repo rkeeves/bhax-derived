@@ -60,6 +60,7 @@ meg, mi történik a háttérben.
             <para>Ezt már az első fejezetben tárgyaltuk. A lényeg hogy a String osztályban van egy cache és ebből adja vissza az objektumokat.</para>
             <literallayout>
 String first = "...";
+						</literallayout>
                 <para>
 Effektíve a kódunk a következőt hajtja végre:
                 </para>
@@ -124,7 +125,7 @@ public void actuallySameObjectRefsStringsWithInternals() {
                     <title>Java class</title>
                     <mediaobject>
                         <imageobject>
-                            <imagedata fileref="prog2java/w5/native-troubles/javaclass.png" scale="50" />
+                            <imagedata fileref="prog2java/w5/native-troubles/javaclass.png" scale="80" />
                         </imageobject>
                         <textobject>
                             <phrase>Java class</phrase>
@@ -146,7 +147,7 @@ public void actuallySameObjectRefsStringsWithInternals() {
                     <title>Intellij javah external tool config</title>
                     <mediaobject>
                         <imageobject>
-                            <imagedata fileref="prog2java/w5/native-troubles/intellijjavah.png" scale="50" />
+                            <imagedata fileref="prog2java/w5/native-troubles/intellijjavah.png" scale="40" />
                         </imageobject>
                         <textobject>
                             <phrase>Intellij javah external tool config</phrase>
@@ -160,7 +161,7 @@ public void actuallySameObjectRefsStringsWithInternals() {
                     <title>Generated Header</title>
                     <mediaobject>
                         <imageobject>
-                            <imagedata fileref="prog2java/w5/native-troubles/generated-header.png" scale="50" />
+                            <imagedata fileref="prog2java/w5/native-troubles/generated-header.png" scale="70" />
                         </imageobject>
                         <textobject>
                             <phrase>Generated Header</phrase>
@@ -180,7 +181,7 @@ public void actuallySameObjectRefsStringsWithInternals() {
                     <title>Visual Studio DLL Config</title>
                     <mediaobject>
                         <imageobject>
-                            <imagedata fileref="prog2java/w5/native-troubles/vs_dll.png" scale="50" />
+                            <imagedata fileref="prog2java/w5/native-troubles/vs_dll.png" scale="60" />
                         </imageobject>
                         <textobject>
                             <phrase>Visual Studio DLL Config</phrase>
@@ -194,7 +195,7 @@ public void actuallySameObjectRefsStringsWithInternals() {
                     <title>Release and x64</title>
                     <mediaobject>
                         <imageobject>
-                            <imagedata fileref="prog2java/w5/native-troubles/vs_buildtype.png" scale="50" />
+                            <imagedata fileref="prog2java/w5/native-troubles/vs_buildtype.png" scale="60" />
                         </imageobject>
                         <textobject>
                             <phrase>Release and x64</phrase>
@@ -210,7 +211,7 @@ public void actuallySameObjectRefsStringsWithInternals() {
                     <title>Include Dirs</title>
                     <mediaobject>
                         <imageobject>
-                            <imagedata fileref="prog2java/w5/native-troubles/vs_include.png" scale="50" />
+                            <imagedata fileref="prog2java/w5/native-troubles/vs_include.png" scale="70" />
                         </imageobject>
                         <textobject>
                             <phrase>Include Dirs</phrase>
@@ -226,7 +227,7 @@ public void actuallySameObjectRefsStringsWithInternals() {
                     <title>Intellij Run Config</title>
                     <mediaobject>
                         <imageobject>
-                            <imagedata fileref="prog2java/w5/native-troubles/intellij_config.png" scale="50" />
+                            <imagedata fileref="prog2java/w5/native-troubles/intellij_config.png" scale="80" />
                         </imageobject>
                         <textobject>
                             <phrase>Intellij Run Config</phrase>
@@ -240,7 +241,7 @@ public void actuallySameObjectRefsStringsWithInternals() {
                     <title>Run</title>
                     <mediaobject>
                         <imageobject>
-                            <imagedata fileref="prog2java/w5/native-troubles/run.png" scale="50" />
+                            <imagedata fileref="prog2java/w5/native-troubles/run.png" scale="80" />
                         </imageobject>
                         <textobject>
                             <phrase>Run</phrase>
