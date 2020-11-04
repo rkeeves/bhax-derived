@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class MatrixMultiplicationTest {
+public class MatrixForMultiplicationTest {
 
     Matrix matrixA = new BasicMatrix(new int[][] {
             {1, 5},
@@ -19,14 +19,8 @@ public class MatrixMultiplicationTest {
             {36, 16, 59, 14}});
 
     @Test
-    void testForLoopBased() {
+    void multiply_EPAMDataSet() {
         Matrix result = MatrixForMultiplication.multiply(matrixA,matrixB);
-        assertEquals(expected, result);
-    }
-
-    @Test
-    void testStreamBased() {
-        Matrix result = MatrixStreamMultiplication.multiply(matrixA,matrixB);
         assertEquals(expected, result);
     }
 }
