@@ -40,6 +40,10 @@
         <module>w5/io-troubles</module>
         <module>w5/string-troubles</module>
         <module>w5/native-troubles</module>
+        <module>w6/refactoring</module>
+      <module>w6/matrix-multiplication</module>
+      <module>w6/arraylist-vs-linkedlist</module>
+      <module>w6/tabella</module>
     </modules>
 
   <dependencyManagement>
