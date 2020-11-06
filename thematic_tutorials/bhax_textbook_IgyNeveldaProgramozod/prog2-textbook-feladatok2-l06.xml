@@ -64,7 +64,7 @@ méréseket is. (mit csinál az ArrayList amikor megtelik)</para>
             <para>Először is kezdjük azzal, hogy mi is a LinkedList és mi az ArrayList.</para>
             <para>LinkedList esetén szépen megnyitjuk a jdk-s forrást és meg is találjuk benne a Node-ot</para>
             <programlisting>
-                <![CDATA[
+<![CDATA[
 private static class Node<E> {
     E item;
     Node<E> next;
