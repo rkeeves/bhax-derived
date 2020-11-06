@@ -44,7 +44,7 @@ int[][] res =
 			A következő példában bemutatjuk hogy pusztán lambdákkal leírható a Pair (egyébként a példa egy Lisp-es tankönyvből van). 
             Az egyetlen trükk, hogy mivel nem kimondottan dinanmikus a típusrendszer, emiatt az Oracle-ös clunky interface-ekkel kell típusosságot kikényszeríteni a lambda kalkulusból.
 		</para>
-            <programlisting language="c++" linenumbering="numbered">
+            <programlisting language="java" linenumbering="numbered">
                 <textobject>
                     <textdata fileref="prog2java/w6/matrix-multiplication/src/test/java/com/rkeeves/ScopeTest.java" />
                 </textobject>
