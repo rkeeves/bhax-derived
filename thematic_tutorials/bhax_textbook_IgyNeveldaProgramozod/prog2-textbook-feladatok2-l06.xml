@@ -562,13 +562,16 @@ void test(){
                 <title>Lisp Lambda Lista Implementáció(Racket)</title>
                 <mediaobject>
                     <imageobject>
-                        <imagedata fileref="img/racket.png" scale="80" />
+                        <imagedata fileref="img/racket.png" scale="50" />
                     </imageobject>
                     <textobject>
                         <phrase>Lisp Lambda Lista Implementáció(Racket)</phrase>
                     </textobject>
                 </mediaobject>
             </figure>
+            <para>
+             Egyébként ha valakit érdekel <link xlink:href="https://github.com/rkeeves/sicp">itt egy repom</link> Lisp-es példákkal.
+            </para>
         </section>
     </section>
 </chapter>                
