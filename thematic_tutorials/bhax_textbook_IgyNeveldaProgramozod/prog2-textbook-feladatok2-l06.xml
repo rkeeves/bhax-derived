@@ -1,0 +1,574 @@
+<chapter xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xi="http://www.w3.org/2001/XInclude" version="5.0" xml:lang="hu">
+    <info>
+        <title>Helló, Gödel!</title>
+        <keywordset>
+            <keyword />
+        </keywordset>
+    </info>
+    <section>
+        <title>EPAM: Mátrix szorzás Stream API-val</title>
+        <section>
+            <title>Feladat</title>
+            <para>Implementáld le a mátrix szorzást Java-ban for és while ciklusok használata nélkül.</para>
+        </section>
+        <section>
+            <title>Megoldás</title>
+            <para>Sikerült a ritka olyan esetek egyikét megkérdezni, ahol a for loop-al átláthatóbb kódot lehet gyártani.
+			Mindenesetre alább egy lehetséges megoldás.</para>
+            <literallayout>
+int[][] res =
+                IntStream.range(0, resultRowCount)
+                        .mapToObj(i -> IntStream.range(0, resultColumnCount)
+                                .map(j -> IntStream.range(0, multipliedColumnCount)
+                                        .reduce(0,(accu,k)-> accu + multiplied[i][k] * multiplier[k][j])).toArray())
+                        .toArray(int[][]::new);
+		</literallayout>
+            <para>A lényege a következő: Az eredmény mátrix effektíve egy reláció ami (int X int)->	int képez.</para>
+            <para>Magyarul minden (i,j) párhoz rendel egy int-et</para>
+            <para>Mi az eredmény int? Nos az egy szumma, k=0...n a(i,k) * b(k,j).</para>
+            <para>A megoldás a következő lesz:</para>
+            <para>Generáljuk i indexek sorát, ezek az eredmény mátrix sor indexei</para>
+            <para>Generáljuk j indexek sorát, ezek az eredmény mátrix oszlop indexei</para>
+            <para>Minden j-re szummázzuk k futóindex-el a  a(i,k) * b(k,j), ezt ugye a reduce-al érjük el. 
+		A reduce első paramétere nulla hiszen két oldali identitás addícióra (0+x=x x+0=x). 
+		Az EPAM-osok is így csinálták, csak ők nem egy lépésben csinálták reduce-al (ami egyébként hajaz a Lisp-es nyelvcsaládok lista foldl-jére), hanem először legenerálták az elemeket, aztán szummázták őket.</para>
+            <para>Kijött egy Instream ami pl (0,1,4,577,78) alakú. De nekünk nem Instream kell, hanem int[] ezért ezt a toArray-el átalakítjuk array-é.</para>
+            <para>Itt a végén jön egy kis trükközés részemről, mert ugye int[]-ek Stream-jét fogjuk kapni. Ha Intstream map-jét használnám akkor jogosan elkezdene sírni a typusrendszer, hogy map-el ezt nem lehet megcsinálni mert nem IntStream->IntStream leképezést csináltunk.
+		Szóval inkább a mapToObj method-ot használtam.</para>
+            <para>Mostmár a feladat végén vagyunk, egy probléma van: Van egy int[] Stream-ünk amiből kéne egy int[][] array. Ehhez a toArray egy overload-ját használtam amiben egy generátort, azaz esetünkben az int[][] new methodjának referenciáját adtam át.</para>
+            <para>
+			A feladat igazi trükk része inkább az hogy a scope-ot elég erősen használtam. Azaz a lambdákon kívül kötött változókat is használtam. Mégis miről beszélek?
+		</para>
+            <para>
+			Alább egy példa arra, hogy a scope-al magunkkal cipelt dolgokat elég vad dolgokra is lehet használni.
+			A következő példában bemutatjuk hogy pusztán lambdákkal leírható a Pair (egyébként a példa egy Lisp-es tankönyvből van). 
+            Az egyetlen trükk, hogy mivel nem kimondottan dinanmikus a típusrendszer, emiatt az Oracle-ös clunky interface-ekkel kell típusosságot kikényszeríteni a lambda kalkulusból.
+		</para>
+            <programlisting language="c++" linenumbering="numbered">
+                <textobject>
+                    <textdata fileref="prog2java/w6/matrix-multiplication/src/test/java/com/rkeeves/ScopeTest.java" />
+                </textobject>
+            </programlisting>
+        </section>
+    </section>
+    <section>
+        <title>EPAM: LinkedList vs ArrayList</title>
+        <section>
+            <title>Feladat</title>
+            <para>Mutass rá konkrét esetekre amikor a Java-beli LinkedList és ArrayList rosszabb performanciát
+eredményezhet a másikhoz képest. (Lásd még LinkedList és ArrayList forráskódja). Végezz
+méréseket is. (mit csinál az ArrayList amikor megtelik)</para>
+        </section>
+        <section>
+            <title>Megoldás</title>
+            <para>Először is kezdjük azzal, hogy mi is a LinkedList és mi az ArrayList.</para>
+            <para>LinkedList esetén szépen megnyitjuk a jdk-s forrást és meg is találjuk benne a Node-ot</para>
+            <programlisting>
+                <![CDATA[
+private static class Node<E> {
+    E item;
+    Node<E> next;
+    Node<E> prev;
+
+    Node(Node<E> prev, E element, Node<E> next) {
+        this.item = element;
+        this.next = next;
+        this.prev = prev;
+    }
+}
+]]>
+            </programlisting>
+            <para>Úgy látszik egy doubly linked list-el van dolgunk, azaz az előző és a követketkező Node-ra mutat minden Node.</para>
+            <figure>
+                <title>LinkedList</title>
+                <mediaobject>
+                    <imageobject>
+                        <imagedata fileref="img/linkedlist.png" scale="80" />
+                    </imageobject>
+                    <textobject>
+                        <phrase>LinkedList</phrase>
+                    </textobject>
+                </mediaobject>
+            </figure>
+            <para>A fenti ábrán látható hogy maga a Lista simán csak tárol két Node példányra mutató referenciát a fejet és a farkat.</para>
+            <para>Ha új Node-ot akarunk berakni mondjuk a lista elejére az egész alacsony költségű, hisz legrosszabb esetben is csak létre kell hozni egy Node-ot úgy hogy head legyen a next, az eddigi head Node prev-jével rá kell mutatni az új node-ra, plusz magának a lista példány head változóját kell.</para>
+            <para>Ha a lista elejét akarjuk törölni az is egész alacsony költségű, hisz legrosszabb esetben is csak törölni kell az eddigi head-et, illetve a Lista head változóját átállítani a törlendő Node next-jére.</para>
+            <para>A random elérés azonban elég költséges, hiszen legrosszabb esetben végig kell mennünk az egész listán mire elugrálunk a keresett elemhez.</para>
+            <para>Másik probléma, hogy minden egyes adat mellé (pl. Integer) két másik változó (next,prev) fog társulni, azaz több memóriát fog foglalni mint az ArrayList.</para>
+            <para>Előnye hogy csak annyi memóriát foglal amennyi kell.</para>
+            <para>Másik előnye hogy nem szükséges nagy folytonos memória terület, azaz bárhova lehet szórni a memóriában.</para>
+            <para>A helyzet ArrayList-nél kicsit más, ugyanis egy nagy folytonos array-be pakolunk mindent.</para>
+            <figure>
+                <title>ArrayList</title>
+                <mediaobject>
+                    <imageobject>
+                        <imagedata fileref="img/arraylist.png" scale="80" />
+                    </imageobject>
+                    <textobject>
+                        <phrase>ArrayList</phrase>
+                    </textobject>
+                </mediaobject>
+            </figure>
+            <para>A fenti ábrán látszik, hogy a lista hossza, és az array kapacitása eltérhet ezért ezt adminisztálja saját változókkal az implementáció.</para>
+            <para>Ha új Node-ot akarunk berakni mondjuk a lista elejére az egész nagy költségű, 
+            hisz ha nem is kell még allokálni új array-t, akkor is az összes elemet "feljebb" kell másolni eggyel.</para>
+            <para>Ha a lista elejét akarjuk törölni az is egész komoly költségű, hisz az összes elemet "lejjebb" kell másolni eggyel.</para>
+            <para>A random elérés azonban nagyon könnyű, hiszen folytonos memória miatt index alapján pontosan kiszámítható a keresett elem címe.</para>
+            <para>Előnye, hogy nem kell minden egyes adat mellé (pl. Integer) nem kell semmi bónusz adminisztratív adat, azaz kevesebb memóriát fog foglalni mint a LinkedList.</para>
+            <para>Hátránya hogy ha nincs betelve, akkor olyan memóriát foglal amit nem használ.</para>
+            <para>Másik hátránya hogy szükséges nagy folytonos memória terület, azaz lehet van elég memóriánk, de ha nagyon fragmentált akkor nem lesz neki megfelelő méretű szabad "lyuk".</para>
+            <para>Én inkább Unit Test-eket írtam ahol a System nanotime alapú assert-ek voltak.</para>
+            <para>Direkt nem bonyolítottam túl (ala EPAM), egyszerűen a Unit Test része három method amik a listákon operációkat végeznek:</para>
+            <programlisting>
+                <![CDATA[
+private <T> void insertFront(List<T> list, T element, int n){
+    for (int i = 0; i < n; i++) {
+        list.add(0, element);
+    }
+}
+
+private <T> void removeFirst(List<T> list){
+    while(!list.isEmpty()){
+        list.remove(0);
+    }
+}
+
+private <T> void accessAll(List<T> list){
+    for (T v : list)
+}
+]]>
+            </programlisting>
+            <para>Egy adott teszt eset például így néz ki:</para>
+            <programlisting>
+                <![CDATA[
+@Test
+void insertFront_LinkedListFaster(){
+    int number_of_insertions = 1000;
+    Clock clock = new Clock();
+
+    List<Integer> list = new ArrayList<>();
+    clock.elapsedSinceLast();
+    insertFront(list, 0,number_of_insertions);
+    long arrayListInsertionTime = clock.elapsedSinceLast();
+
+    list = new LinkedList<>();
+    clock.elapsedSinceLast();
+    insertFront(list, 0,number_of_insertions);
+    long linkedListInsertionTime = clock.elapsedSinceLast();
+
+    assertTrue(arrayListInsertionTime > linkedListInsertionTime);
+}
+]]>
+            </programlisting>
+            <para>Természetesen valós esetben ez nem lenne elegendő unit tesztelésre, de most csak a gondolatmenetem bizonyítása volt a lényeg, a JUnit csak eszköz volt ebben.</para>
+            <figure>
+                <title>List Unit Tests</title>
+                <mediaobject>
+                    <imageobject>
+                        <imagedata fileref="img/listtests.png" scale="80" />
+                    </imageobject>
+                    <textobject>
+                        <phrase>List Unit Tests</phrase>
+                    </textobject>
+                </mediaobject>
+            </figure>
+        </section>
+    </section>
+    <section>
+        <title>EPAM: Refactoring</title>
+        <section>
+            <title>Feladat</title>
+            <para>
+				Adott egy “legacy” kód mely tartalmaz anonymus interface implementációkat, ciklusokat és
+				feltételes kifejezések. Ebben a feladatban ezt a “legacy” kódot szeretnénk átírni lambda kifejezések
+				segítségével (metódus referencia használata előnyt jelent!)
+			</para>
+        </section>
+        <section>
+            <title>Megoldás</title>
+            <para>
+                Az EPAM által szolgálatatott legacy kód, csak legacy, de egyébként teljesen korrekten van megírva. 
+                Nem a cégnél az előző programozó 1368 soros Swing-es class-a, amiben 16 inner class és még egy NashornEngine is bele van építve, plusz mindez megspékelve manuális xml parse-al, ja és mindez egy C program API-jait hívogatja.
+                Milyen érdekes hogy mennyire konkrét a példával jött elő ez a hallgató...
+                <link xlink:href="https://youtu.be/s6gNo4-1r6k">Lehet esetleg megtörtént vele a múltban?!</link>
+            </para>
+            <para>
+                A feladat lényege annyi, hogy Functional Interface-ek kiválthatóak lambda expression-ökkel. Ezt gyakorolgatjuk több egyre bonyolultabb use case-en. 
+            </para>
+            <para>
+                Mielőtt beleugrunk egy dolog a lambdásítható interface-ek lélektanáról.
+            </para>
+            <para>
+                Nagyon fontos, hogy egyetlen abstract method-ot tartalmazhat az interface amit lambdásítunk.
+                Ennek van egy pozitív oldala! Nézzük az alábbi interface-t:
+            </para>
+            <programlisting>
+                <![CDATA[
+public interface Foo {
+
+    String getHello();
+
+    default String getWorld() {
+        return "world";
+    }
+}
+]]>
+            </programlisting>
+            <para>
+                Ennek ugye egy abstract method-ja van, szóval lambdásítható:
+            </para>
+            <programlisting>
+                <![CDATA[
+Foo foo = ()->"Hello";
+]]>
+            </programlisting>
+            <para>Nézzük a legacy kód átírást. A triviális részekkel nem fogok foglalkozni.</para>
+            <para>Alábbi kódban effektíve egy listát áttranszformálunk egy másik listába.</para>
+            <programlisting>
+                <![CDATA[
+List<Integer> inputNumbers = Arrays.asList(1, null, 3, null, 5);
+List<Integer> resultNumbers = new ArrayList<>();
+for (Integer number : inputNumbers) {
+    if (number != null) {
+        Integer calculationResult = calculator.calculate(number);
+        resultNumbers.add(calculationResult);
+    }
+}
+]]>
+            </programlisting>
+            <para>Ha funkcionálisan Stream-ekkel akarjuk megfogalmazni akkor:</para>
+            <itemizedlist>
+                <listitem>
+                    <para> Generáljunk inputNumbers alapján egy Stream-et </para>
+                </listitem>
+                <listitem>
+                    <para>Válasszuk ki a nem null-okat</para>
+                </listitem>
+                <listitem>
+                    <para> Minden x elemet transzformáljuk egy Calculator interface-t megvalósító objektum calculate methodjával.</para>
+                </listitem>
+                <listitem>
+                    <para>Gyűjtsük össze az egészet egy listába.</para>
+                </listitem>
+            </itemizedlist>
+            <programlisting>
+                <![CDATA[
+List<Integer> resultNumbers = inputNumbers
+    .stream()
+    .filter(Objects::nonNull)
+    .map(calculator::calculate)
+    .collect(Collectors.toList());
+]]>
+            </programlisting>
+            <para>Mostmár csak az a kérdés, hogy a calculator-t is áttudjuk-e írni?</para>
+            <programlisting>
+                <![CDATA[
+Calculator calculator = new Calculator() {
+    @Override
+    public Integer calculate(Integer number) {
+        return number * number;
+    }
+};
+]]>
+            </programlisting>
+            <para>Csak egy szorzást végez, ezért elegánsan áttudjuk írni az alábbi formába (ahol x lenne ugye vanilla Java-ban az 'x' nevű method param)</para>
+            <programlisting>
+                <![CDATA[
+Calculator calculator = (x) -> x * x;
+]]>
+            </programlisting>
+            <para>A következő példa az egyetlen ami tetszett az EPAM-os példa refactoring-ok közül mert van benne egy szerintem totál szép megoldás.</para>
+            <para>Adott a következő kód:</para>
+            <programlisting>
+                <![CDATA[
+Formatter formatter = new Formatter() {
+    @Override
+    public String format(List<Integer> numbers) {
+        StringBuilder sb = new StringBuilder();
+        for (Integer number : numbers) {
+            String stringValueOfNumber = String.valueOf(number);
+            sb.append(stringValueOfNumber);
+        }
+        return sb.toString();
+    }
+};
+System.out.println("Formatted numbers: " + formatter.format(resultNumbers));
+]]>
+            </programlisting>
+            <para>Ha funkcionálisan Stream-ekkel akarjuk megfogalmazni akkor:</para>
+            <itemizedlist>
+                <listitem>
+                    <para>Generáljunk resultNumbers alapján egy Stream-et </para>
+                </listitem>
+                <listitem>
+                    <para>Valahogy "akkumuláljuk" össze az összes int->String transzformáció eredményét (we outsourced this responsibility to a Formatter implementation)</para>
+                </listitem>
+                <listitem>
+                    <para>Írassuk ki a képernyőre az eredményt</para>
+                </listitem>
+            </itemizedlist>
+            <para>Hát ez idáig borzasztóan egyszerűnek tűnik!</para>
+            <programlisting>
+                <![CDATA[
+System.out.println("Formatted numbers: " + formatter.format(resultNumbers));
+]]>
+            </programlisting>
+            <para>De... hogy működjön a Formatter lambdásítva?! Na ez az a rész ami miatt érdekes a feladat!</para>
+            <programlisting>
+                <![CDATA[
+Formatter formatter = (ints) -> ints
+                .stream()
+                .map(String::valueOf)
+                .collect(Collectors.joining());
+]]>
+            </programlisting>
+            <para>A fenti kódban ugye:</para>
+            <itemizedlist>
+                <listitem>
+                    <para>Generáljunk resultNumbers alapján egy Stream-et </para>
+                </listitem>
+                <listitem>
+                    <para>Transzformáljuk minden egyes Integer-t megfelelő String-é</para>
+                </listitem>
+                <listitem>
+                    <para>Konkatenáljuk az összes String-et egy String-é</para>
+                </listitem>
+            </itemizedlist>
+            <para>
+                Ami nekem nagyon tetszett as a built-in
+                <link xlink:href="https://docs.oracle.com/javase/8/docs/api/java/util/stream/Collectors.html#joining--">Collectors.joining</link>
+                használata volt. (Egyébként reduce egyik overloadjával StringBuilder-be is akkumulálhatnánk.)
+            </para>
+            <para>
+        Az EPAM-os feladatok érdekesek voltak, de elég kertvárosiak, hiszen véges hosszú Collection-ökből ment a munka.
+        Mi lenne ha az lenne a kérdés, hogy találjuk meg az első 10 000-nél nagyobb olyan természetes számot ami osztható 1289-el maradék nélkül.
+    </para>
+            <para>
+        Itt például nincs értelme létrehozni listát stb. Én csak a példa kedvéért létrehoztam egy iterable-t, mely ugye vissza ad egy iterator-t.
+    </para>
+            <programlisting>
+                <![CDATA[
+public class NatSet implements Iterable<Integer>{
+
+    private static final class NatIterator implements Iterator<Integer>{
+
+        private int n = 0;
+        @Override
+        public boolean hasNext() {
+            return true;
+        }
+
+        @Override
+        public Integer next() {
+            return n++;
+        }
+    }
+
+    @Override
+    public Iterator<Integer> iterator() {
+        return new NatIterator();
+    }
+}
+]]>
+            </programlisting>
+            <para>Ezekután pedig a megszokott módon használhatjuk, és ugye findFirst miatt nem fogjuk magunkat végtelen ciklusban találni.</para>
+            <programlisting>
+                <![CDATA[
+@Test
+void testLazy() {
+    Optional<Integer> expected = Optional.ofNullable(10312);
+    var result = StreamSupport.stream(new NatSet().spliterator(), false)
+            .filter(x -> x % 1289 == 0 && x >= 10000)
+            .findFirst();
+    assertEquals(expected, result);
+}
+]]>
+            </programlisting>
+        </section>
+    </section>
+    <section>
+        <title>Alternatív Tabella rendezése</title>
+        <section>
+            <title>Feladat</title>
+            <para>
+                Mutassuk be a
+                <link xlink:href="https://progpater.blog.hu/2011/03/11/alternativ_tabella">a példa programban</link>
+                a java.lang Interface Comparable&lt;T&gt; szerepét!
+            </para>
+        </section>
+        <section>
+            <title>Megoldás</title>
+            <para>Én kicsit átszabtam a feladatot. Nem a példa programot futtatom, hanem Unit Test-et írtam, mert az egyszerre validálja is, és nem kell hozzá humán interakció.</para>
+            <programlisting>
+                <![CDATA[
+@Data
+public class Team implements Comparable<Team>{
+
+    private final String name;
+
+    private final double value;
+
+    @Override
+    public int compareTo(Team o) {
+        if (this.value < o.value) {
+            return -1;
+        } else if (this.value > o.value) {
+            return 1;
+        } else {
+            return 0;
+        }
+    }
+}
+]]>
+            </programlisting>
+            <para>A Comparable&lt;T&gt; generikus interface effektíve egy szerződés hogy az adott osztály példányai szolgáltatnak egy metódust a külvilág számára, amely összehasonlítást végez egy T típusú objektummal.</para>
+            <para>Magyarul Comparable&lt;Team&gt; helyett egyébként bármit beírhatunk, csak jelen példa miatt kellett az önmagunkkal való összehasonlíthatóság.</para>
+            <para>
+                Azáltal egyébként hogy Team Comparable&lt;Team&gt; azáltal effektíve a Team halmazon egy rendezést valósítunk meg. (
+                <link xlink:href="https://en.wikipedia.org/wiki/Order_theory">Mármint erre gondolok</link>
+                )
+            </para>
+            <para>
+                Természetesen ez az egész kikerülehető lett volna operator overload-dal, dehát egy teljesen új, korszakalkotó és merész módon álmodták meg a Java
+                <link xlink:href="https://youtu.be/eFITCMvSvXs ">működését</link>
+                .
+            </para>
+            <para>Személyes érzéseket félretéve a lényeg az, hogy vissza kell adni egy int-et:</para>
+            <itemizedlist>
+                <listitem>
+                    <para>negatív - ha 'this' kisebb mint a paraméter</para>
+                </listitem>
+                <listitem>
+                    <para>nulla - ha 'this' egyenlő a paraméterrel</para>
+                </listitem>
+                <listitem>
+                    <para>pozitív - ha 'this' nagyobb mint paraméter</para>
+                </listitem>
+            </itemizedlist>
+            <para>Ami igazén érdekes az az, hogy ezt stream-nél ki tudjuk használni. (Mármint az hogy Team halmazon van rendezés)</para>
+            <programlisting>
+                <![CDATA[
+@Test
+void test(){
+    // given
+    List<Team> teamsExpected = IntStream
+            .range(0,teamNamesBeforeSort.size())
+            .mapToObj(i->new Team(teamNamesAfterSort.get(i),teamValuesAfterSort.get(i)))
+            .collect(Collectors.toList());
+    // when
+    List<Team> teams = IntStream
+            .range(0, teamNamesBeforeSort.size())
+            .mapToObj(i -> new Team(teamNamesBeforeSort.get(i), teamValuesBeforeSort.get(i)))
+            .sorted()
+            .collect(Collectors.toList());
+    // then
+    assertEquals(teams,teamsExpected);
+}
+]]>
+            </programlisting>
+            <para>
+        A lényeg a 'sorted'. A sorted át cast-olja Comparable-é a stream elemeit. (Ezért is dobhat egyébként ClassCastException-t)
+        </para>
+            <para>
+                Egyébként maga a sort nem annyira egyszerű dolog, mert maga a Stream pipeline szerű, erről bővebben
+                <link xlink:href="https://developer.ibm.com/languages/java/articles/j-java-streams-3-brian-goetz/">itt lehet olvasni</link>
+                .
+            </para>
+            <para>
+                Maga a sort algoritmus pedig implementáció függő, de általában objektumokra
+                <link xlink:href="https://en.wikipedia.org/wiki/Timsort">Timsort</link>
+                , míg primitív típusokra
+                <link xlink:href="https://www.geeksforgeeks.org/dual-pivot-quicksort/">dual pivot quicksort</link>
+                .
+            </para>
+        </section>
+    </section>
+    <section>
+        <title>LISP (Gimp Scheme)</title>
+        <section>
+            <title>Feladat</title>
+            <para>
+				Ha az előző félévben nem dolgoztad fel a témát (például a mandalás vagy a króm szöveges dobozosat) akkor itt az alkalom!
+			</para>
+        </section>
+        <section>
+            <title>Megoldás</title>
+            <para>Én előző félévben feldolgoztam a témát, mivel vizsgakérdés volt. A GIMP-es dolog pedig unalmas, úgyhogy valami funkybb dolgot fogunk csinálni.</para>
+            <para>TLDR: Racket-ben fogunk lambdával implementálni listát.</para>
+            <para>Az ötlet Alonzo Church-ig vezethető vissza(Fun side story: Gödel ugye lesokkolt mindenkit, 
+                aztán Church írt neki egy levelet, hogy pont ugyanaz az eredmény kijött neki teljesen más irányból megközelítve, ez volt a lambda kalkulus. 
+                 Gödel cinikusan annyit válaszolt: "Nos, ha Ön is kitudta számolni az én eredményemet, 
+                 kedves Uram, az egyetlen dolgot jelent: valószínűleg tévedtem.". 
+                 Btw, nem tévedett egyikük sem, sőt Turing egy harmadik modellel ugyanerre jutott. 
+                 Sajnos nem sokkal később a Thyssen-Krupp, IBM, Volkswagen, Hugo Boss, Rolls-Royce és még jó pár más közismert 
+                 dinamikusan fejlődő, innovatív, 'social responsible' cég támogatásával az emberiség úgy döntött hogy
+                 lángba borítja a világot. Manapaság nagy szerencsénkre ezen cégek sokat változtak azóta.
+                 Ma már nem városokat akarnak tönkretenni, inkább a légkört, óceánokat, a saját dolgozóikat, vásárlóikat stb. szóval legalább a globális fegyveres konfliktusról leszoktak.). 
+                </para>
+            <para>
+                Ami a mi szempontunkból releváns lehet most az például hogy akár a természetes számokat is fel lehet írni lambda kalkulussal
+                <link xlink:href="https://en.wikipedia.org/wiki/Church_encoding">így</link>
+                .
+            </para>
+            <para>Először is definiáljunk constructor-okat. Persze nem az OOP értelemben. 
+                Constructor alatt absztrakt értelemben azt értjük, hogy egy olyan funkció mely n dolgot összecsomagol és vissza adja ezt a csomagot.
+            </para>
+            <programlisting>
+                <![CDATA[
+(define my-empty #f)
+
+(define (my-cons a b)
+    (λ (op) (op a b)))
+]]>
+            </programlisting>
+            <para>Ezután definiáljunk selectorokat, amelyek a csomag egyes elemeit adják vissza.</para>
+            <programlisting>
+<![CDATA[
+(define (my-car ls)
+(ls (λ (a b) a)))
+
+(define (my-cdr ls)
+(ls (λ (a b) b)))
+]]>
+            </programlisting>
+            <para>Ha ezek meg vannak, akkor innentől kezdve tetszőleges operációkat definiálhatunk. Két egyszerű példa: üres-e, illetve milyen hosszú:</para>
+            <programlisting>
+<![CDATA[
+(define (my-empty? ls)
+  (equal? my-empty ls))
+
+(define (my-length ls)
+  (if (my-empty? ls) 0 (+ 1 (my-length (my-cdr ls)))))
+]]>
+            </programlisting>
+            <para>Itt van például egy nagyon egyszerű map implementáció.</para>
+            <programlisting>
+<![CDATA[
+(define (my-map proc ls)
+            (let helper ([ls ls])
+              (if (my-empty? ls)
+                  ls
+                  (my-cons (proc (my-car ls)) (helper (my-cdr ls))))))
+]]>
+            </programlisting>
+            <para>A client által szolgáltatott ls lista elemein proc paraméter procedure-t fogjuk hívogatni.</para>
+            <para>A trükk itt annyi, hogy a nevesített let-et használtunk rekurzióra.</para>
+            <para>A rekurzió bot egyszerű: amíg nem üres a lista, addig levesszük a fejet, proc-al transzformáljuk, majd belőle és a maradék map-jéből készült listát visszaadjuk.</para>
+            <para>Ha üres a lista akkor vissza adjuk az üres listát(mivel a lista üres ezért egyszerűen önnön magát.)</para>
+            <para>
+                Nem akarom untatni az olvasót, a többi operációval (pl. rev, for-each, foldl). Alábbi képernyőképen egy teszt az összes operációról lambda-based listákon.
+            </para>
+            <figure>
+                <title>Lisp Lambda Lista Implementáció(Racket)</title>
+                <mediaobject>
+                    <imageobject>
+                        <imagedata fileref="img/racket.png" scale="80" />
+                    </imageobject>
+                    <textobject>
+                        <phrase>Lisp Lambda Lista Implementáció(Racket)</phrase>
+                    </textobject>
+                </mediaobject>
+            </figure>
+        </section>
+    </section>
+</chapter>                

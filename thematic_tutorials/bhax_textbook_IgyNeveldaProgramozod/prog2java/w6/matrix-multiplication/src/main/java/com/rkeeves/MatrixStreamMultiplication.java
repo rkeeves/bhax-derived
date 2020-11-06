@@ -38,8 +38,8 @@ public class MatrixStreamMultiplication {
                 IntStream.range(0, resultRowCount)
                         .mapToObj(i -> IntStream.range(0, resultColumnCount)
                                 .map(j -> IntStream.range(0, multipliedColumnCount)
-                                        .map(k -> multiplied[i][k] * multiplier[k][j])
-                                        .sum()).toArray()).toArray(int[][]::new);
+                                        .reduce(0,(accu,k)-> accu + multiplied[i][k] * multiplier[k][j])).toArray())
+                        .toArray(int[][]::new);
         return res;
     }
 }
