@@ -30,6 +30,15 @@
                 </plugin>
             </plugins>
         </pluginManagement>
+
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <includes>
+                    <include>**/*</include>
+                </includes>
+            </resource>
+        </resources>
     </build>
 
     <modules>
@@ -51,6 +60,7 @@
         <module>w7/caesar</module>
         <module>w5/jdk-troubles</module>
         <module>w5/asm-troubles</module>
+        <module>w7/streetmap</module>
     </modules>
 
     <dependencyManagement>
@@ -150,6 +160,11 @@
                 <groupId>org.ow2.asm</groupId>
                 <artifactId>asm-util</artifactId>
                 <version>9.0</version>
+            </dependency>
+            <dependency>
+                <groupId>org.jxmapviewer</groupId>
+                <artifactId>jxmapviewer2</artifactId>
+                <version>2.5</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

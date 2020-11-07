@@ -1,0 +1,263 @@
+<chapter xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xi="http://www.w3.org/2001/XInclude" version="5.0" xml:lang="hu">
+    <info>
+        <title>Adatfolyamok kezelése, streamek, IO</title>
+        <keywordset>
+            <keyword />
+        </keywordset>
+    </info>
+    <section>
+        <title>EPAM: XML feldolgozás</title>
+        <section>
+            <title>Feladat</title>
+            <para>Adott egy koordinátákat és államokat tartalmazó XML (kb 210ezer sor), ezt az XML-t feldolgozva
+                szeretnék létrehozni egy SVG fájlt, melyben minden város megjelenik egy pont formájában az adott
+                koordináták alapján (tetszőleges színnel)</para>
+        </section>
+        <section>
+            <title>Megoldás</title>
+            <para>...</para>
+        </section>
+    </section>
+    <section>
+        <title>EPAM: ASCII Art</title>
+        <section>
+            <title>Feladat</title>
+            <para>ASCII Art in Java! Implementálj egy Java parancssori programot, ami beolvas egy képet és kirajzolja
+                azt a parancssorba és / vagy egy szöveges fájlba is ASCII karakterekkel.</para>
+        </section>
+        <section>
+            <title>Megoldás</title>
+            <para>...</para>
+        </section>
+    </section>
+    <section>
+        <title>EPAM: Titkos üzenet, száll a gépben!</title>
+        <section>
+            <title>Feladat</title>
+            <para>Implementájl egy olyan parancssori alkalmazást, amely a billentyűzetről olvas soronként ASCII
+                karakterekből álló sorokat, és a beolvasott szöveget Caesar kódolással egy txt fájlba írja soronként.</para>
+        </section>
+        <section>
+            <title>Megoldás</title>
+            <para>...</para>
+        </section>
+    </section>
+    <section>
+        <title>BrainB</title>
+        <section>
+            <title>Feladat</title>
+            <para>Mutassuk be a Qt slot-signal mechanizmust </para>
+        </section>
+        <section>
+            <title>Megoldás</title>
+            <para>A BrainB-t már múlt félévben is bátnani kellett a Myrmecologist-al együtt. Akkor nem tudom hogy leírtam-e hogy 430-as opnecv dependencia miatt mingw-vel újra kellett compile-olni a full opencv lib-et source-ből.</para>
+            <para>A másik apróság, hogy a Myrmecologist és ez is QT-t használ ami manapságra, hát nem is tudom. Olyan lett mintha egy csapat marketinges megölte volna az eredeti fejlesztő csapatot és átvették volna az uralmat. Mármint a honlapon az 'Akarsz-e QT-s bögrét vásárolni?'-tól egészen a 'Tudjuk hogy OpenSource verziót akarsz, de előtte itt van 10 popup arról hogy nem akarod-e megvenni mégis'-ig bezárólag minden típusú marketing szárnycsapkodás látható. Such a shame.</para>
+            <para>Mielőtt belemegyünk a signal-slot-ba először a high-level use case-t írom le.</para>
+            <para>Az app egy ablakba rajzolgat mozgó sprite-okat. A sprite-ok mozgását egy belső logika írja le (Nehézségi szinttől függően gyorsabban mozognak).</para>
+            <para>A játékos célja rajta tartani a mozgó dolgokon az egerét.</para>
+            <figure>
+                <title>BrainB random kép</title>
+                <mediaobject>
+                    <imageobject>
+                        <imagedata fileref="img/brainb_once_again.png" scale="50" />
+                    </imageobject>
+                    <textobject>
+                        <phrase>BrainB random kép</phrase>
+                    </textobject>
+                </mediaobject>
+            </figure>
+            <para>Az egész kommunikáció a MainWindow és az ő WorkerThread-je között megy.</para>
+            <para>Két "történés" lehet:</para>
+            <itemizedlist>
+                <listitem>
+                    <para>Model megváltozott (MVC értelemben, azaz a Model annyira megváltozott hogy redraw kell)</para>
+                </listitem>
+                <listitem>
+                    <para>Véget ért a szimuláció</para>
+                </listitem>
+            </itemizedlist>
+            <para>Ennek megfelelően két signal-t találunk a BrainBThread-ben</para>
+            <programlisting>
+                <![CDATA[
+...
+signals:
+void heroesChanged ( const QImage &image, const int &x, const int &y );
+void endAndStats ( const int &t );
+...
+]]>
+            </programlisting>
+            <para>Ennek megfelelően kelleni fog a MainWindow oldalán valami sink/receiver/listener stb. Ezek a slot-ok:</para>
+            <programlisting>
+                <![CDATA[
+...
+public slots :
+void updateHeroes ( const QImage &image, const int &x, const int &y );
+void endAndStats ( const int &t );
+...
+]]>
+            </programlisting>
+            <para>Azaz az egész singal-slot dolog annyira fog kelleni hogy:</para>
+            <itemizedlist>
+                <listitem>
+                    <para>Worker szólhasson Window-nak hogy redraw kell</para>
+                </listitem>
+                <listitem>
+                    <para>Worker szólhasson Window-nak hogy végeredmény megjelenítés kell</para>
+                </listitem>
+            </itemizedlist>
+            <para>Most hogy tisztáztuk mit akarunk, jöhet a kérdés, hogy hogyan.</para>
+            <para>Az egész singal slot mechanizmus egy erős csaláson alapszik (QT metaobject model), de erről majd később.</para>
+            <para>Signal effektíve egy QObject subclass member function-e.</para>
+            <para>Signal-t emit-el indíthatunk:</para>
+            <programlisting>
+                <![CDATA[
+...
+void BrainBThread::run(){
+    while ( time < endTime ) {
+            QThread::msleep ( delay );
+            if ( !paused ) {
+                    ++time;
+                    devel();
+            }
+            draw();
+    }
+    emit endAndStats ( endTime );
+}
+...
+]]>
+            </programlisting>
+            <para>Átlagos esetben (no queueing is needed) az emit hívása után a hívottak kerülnek végrehajtásra. A végrehajtás csak akkor kerül vissza az emitter-hez mikor minden hívott végzett. </para>
+            <para>Queued esetben logikusan az emit egyből visszatér, a hívottak később kerülnek hívásra.</para>
+            <para>A Slot-ok azok amelyek fogadják a különböző event-eket.</para>
+            <para>A Slot-ok teljesen normális member function-ök, simán csak olyan specifikus member function-ök amikre Signal-okat lehet kötni.</para>
+            <para>Egy Slot-ra bármennyi Signal-t rá lehet kötni egyedül csak típusban kell megfelelni (mármint a küldött és fogadott argumentumok).</para>
+            <para>Ami hiányzik az a slot-ok és signal-ok összekötése.</para>
+            <para>Ez a QObject egy funkciójával történik. A játékban erre példa:</para>
+            <programlisting>
+                <![CDATA[
+...
+BrainBWin::BrainBWin ( int w, int h, QWidget *parent ) : QMainWindow ( parent )
+{
+        statDir = appName + " " + appVersion + " - " + QDate::currentDate().toString() + QString::number ( QDateTime::currentMSecsSinceEpoch() );
+        brainBThread = new BrainBThread ( w, h - yshift );
+        brainBThread->start();
+        connect ( brainBThread, SIGNAL ( heroesChanged ( QImage, int, int ) ),
+                  this, SLOT ( updateHeroes ( QImage, int, int ) ) );
+        connect ( brainBThread, SIGNAL ( endAndStats ( int ) ),
+                  this, SLOT ( endAndStats ( int ) ) );
+}
+...
+]]>
+            </programlisting>
+            <para>Ez ugyan működik, de function pointerekkel lehet jobban néz ki, plusz így compile time type check is végbemegy, ami SIGNAL és SLOT makró esetén nem:</para>
+            <programlisting>
+                <![CDATA[
+...
+BrainBWin::BrainBWin ( int w, int h, QWidget *parent ) : QMainWindow ( parent )
+{
+        statDir = appName + " " + appVersion + " - " + QDate::currentDate().toString() + QString::number ( QDateTime::currentMSecsSinceEpoch() );
+        brainBThread = new BrainBThread ( w, h - yshift );
+        brainBThread->start();
+        connect (brainBThread, &BrainBThread::heroesChanged, this, &BrainBWin::updateHeroes);
+        connect (brainBThread, &BrainBThread::endAndStats, this  &BrainBWin::endAndStats);
+}
+...
+]]>
+            </programlisting>
+            <para>A másik érdekesség a fenti kóddal kapcsolatban az az, hogy BrainBThread subclass-olja QThread-et, onnan a start method.</para>
+            <para>Azaz mikor brainBThread start-ját meghívjuk akkor ő vígan elkezd futni parallel, mi viszont csak később connect-eljük össze a slot-ot a signal-al.</para>
+            <para>A másik trükkös pont az a lifetime. Mármint a jelenlegi állapotban szerintem leakel.</para>
+            <para>Nem értek a QT-hoz, de szerintem ezzel elméletileg </para>
+            <programlisting>
+                <![CDATA[
+...
+BrainBWin::BrainBWin ( int w, int h, QWidget *parent ) : QMainWindow ( parent )
+{
+        statDir = appName + " " + appVersion + " - " + QDate::currentDate().toString() + QString::number ( QDateTime::currentMSecsSinceEpoch() );
+        brainBThread = new BrainBThread ( w, h - yshift );
+        connect(brainBThread, &BrainBThread::finished, brainBThread, &QObject::deleteLater);
+        connect(brainBThread, &BrainBThread::heroesChanged, this, &BrainBWin::updateHeroes);
+        connect(brainBThread, &BrainBThread::endAndStats, this  &BrainBWin::endAndStats);
+        brainBThread->start();
+}
+...
+]]>
+            </programlisting>
+        </section>
+    </section>
+    <section>
+        <title>OSM térképre rajzolása</title>
+        <section>
+            <title>Feladat</title>
+            <para>Debrecen térképre dobjunk rá cuccokat.</para>
+        </section>
+        <section>
+            <title>Megoldás</title>
+            <para>A megoldáshoz jxmapviewer2-t használtam plusz Swing-et.</para>
+            <para>A packagelésnél azt a példát követtem amit a gyak vezér mutatott. Azaz MVC esetén próbáljuk egy kicsit elszeparálni package szinten is dolgokat.</para>
+            <figure>
+                <title>Project structure</title>
+                <mediaobject>
+                    <imageobject>
+                        <imagedata fileref="img/streetmapproj.png" scale="100" />
+                    </imageobject>
+                    <textobject>
+                        <phrase>Project structure</phrase>
+                    </textobject>
+                </mediaobject>
+            </figure>
+            <para>Összességében annyiról van szó hogy: létrehoztam egy Place class-t mely egy helyzet és egy String nevet tartalmazott adatként.</para>
+            <itemizedlist>
+                <listitem>
+                    <para>graphics - Util jellegű IconLoader class</para>
+                </listitem>
+                <listitem>
+                    <para>model - Place POJO-k, illetve ezek repository-jai, factory-jai</para>
+                </listitem>
+                <listitem>
+                    <para>view - OpenStreetMap és Swing adapterek a Place POJO köré</para>
+                </listitem>
+            </itemizedlist>
+            <para>Mivel dolgokat kell felrakni a térképre, ezért egyszerű egy elég POJO tisztán az adatok reprezentálására.</para>
+            <programlisting language="java" linenumbering="numbered">
+                <textobject>
+                    <textdata fileref="prog2java/w7/streetmap/src/main/java/com/rkeeves/model/Place.java" />
+                </textobject>
+            </programlisting>
+            <para>A repository hozzá, csak egy hashmap-ben tárolja a Place-eket. Semmi különös.</para>
+            <para>Az első adapter jellegű dolog azért kell, hogy a jxmapviewer számára értelmezhető WayPointokká alakítsuk a POJO-kat.</para>
+            <para>Ehhez én subclassoltam a library DefaultWaypoint-ját. A Place POJO az egyik field, a másik pedig egy JLabel, mert nem akartam manuálisan renderelni a swing-ben.</para>
+            <programlisting language="java" linenumbering="numbered">
+                <textobject>
+                    <textdata fileref="prog2java/w7/streetmap/src/main/java/com/rkeeves/model/PlaceWaypoint.java" />
+                </textobject>
+            </programlisting>
+            <para>Az utolsó trükk az, hogy ugye a JLabel-ek pozícióját update-elni kell attól függően hogy hogyan pan-eli/zoom-olja a user a map-et.</para>
+            <programlisting language="java" linenumbering="numbered">
+                <textobject>
+                    <textdata fileref="prog2java/w7/streetmap/src/main/java/com/rkeeves/model/PlaceWaypointPainter.java" />
+                </textobject>
+            </programlisting>
+            <para>Itt ami fontos, hogy a library szolgáltat egy geoToPixel method-ot amivel képesek vagyunk a jelenlegi map állásból visszaszámolni a pixeleket (mármint hogy a geo pont milyen képernyő pontra képződik le).</para>
+            <para>A másik hogy a jelenlegi nézetünk határait leíró téglalpot is letudjuk kérni.</para>
+            <para>Ha nem számolnánk át a koordinátákat mi történne?</para>
+            <para>Nos, akkor a label-ek (mint valami HUD vagy menü elemek) ugyanabban a pozícióban maradnának.</para>
+            <para>Ez mondjuk gombok esetén jól jön, de most pont az lenne a frankó, ha a nézettel együtt mozognának.</para>
+            <para>Mi is az x meg az y? Nos ezek szimplán a geo képernyő pont és a nézet tégalalpunk sarka közti távolságok.</para>
+            <para>A Jlabel-t pont ide akarjuk rakni, azaz pont a geopontra (hisz a viewport felső bal sarka a képernyőnk széle is egyben)</para>
+            <para>Annyi trükközés van, hogy a Jlabel pozíciója a felső bal saroktól van mérve, mi pedig ehelyett a közepét szeretnénk rátenni a pontra emiatt a mínusz fél szélesség és magasság.</para>
+            <para>Ezek alapján már lehet a zoomolható pan-elhető map-et élvezni:</para>
+            <figure>
+                <title>Egyetem és két campus</title>
+                <mediaobject>
+                    <imageobject>
+                        <imagedata fileref="img/streetmap.png" scale="100" />
+                    </imageobject>
+                    <textobject>
+                        <phrase>Egyetem és két campus</phrase>
+                    </textobject>
+                </mediaobject>
+            </figure>
+        </section>
+    </section>
+</chapter>                

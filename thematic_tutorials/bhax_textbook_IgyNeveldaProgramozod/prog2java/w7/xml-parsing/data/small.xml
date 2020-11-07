@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <cities>
-    <city>
+    <place>
         <coordinateX>190.77674000000002</coordinateX>
         <coordinateY>673.62922</coordinateY>
         <state>A</state>
-    </city>
-    <city>
+    </place>
+    <place>
         <coordinateX>190.77674000000002</coordinateX>
         <coordinateY>673.62922</coordinateY>
         <state>B</state>
-    </city>
+    </place>
 </cities>
