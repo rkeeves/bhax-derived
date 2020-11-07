@@ -229,13 +229,13 @@ BrainBWin::BrainBWin ( int w, int h, QWidget *parent ) : QMainWindow ( parent )
             <para>Ehhez én subclassoltam a library DefaultWaypoint-ját. A Place POJO az egyik field, a másik pedig egy JLabel, mert nem akartam manuálisan renderelni a swing-ben.</para>
             <programlisting language="java" linenumbering="numbered">
                 <textobject>
-                    <textdata fileref="prog2java/w7/streetmap/src/main/java/com/rkeeves/model/PlaceWaypoint.java" />
+                    <textdata fileref="prog2java/w7/streetmap/src/main/java/com/rkeeves/view/PlaceWaypoint.java" />
                 </textobject>
             </programlisting>
             <para>Az utolsó trükk az, hogy ugye a JLabel-ek pozícióját update-elni kell attól függően hogy hogyan pan-eli/zoom-olja a user a map-et.</para>
             <programlisting language="java" linenumbering="numbered">
                 <textobject>
-                    <textdata fileref="prog2java/w7/streetmap/src/main/java/com/rkeeves/model/PlaceWaypointPainter.java" />
+                    <textdata fileref="prog2java/w7/streetmap/src/main/java/com/rkeeves/view/PlaceWaypointPainter.java" />
                 </textobject>
             </programlisting>
             <para>Itt ami fontos, hogy a library szolgáltat egy geoToPixel method-ot amivel képesek vagyunk a jelenlegi map állásból visszaszámolni a pixeleket (mármint hogy a geo pont milyen képernyő pontra képződik le).</para>
