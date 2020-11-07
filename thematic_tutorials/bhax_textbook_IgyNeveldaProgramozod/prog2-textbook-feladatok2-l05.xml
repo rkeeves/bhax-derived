@@ -6,6 +6,207 @@
         </keywordset>
     </info>
     <section>
+        <title>JDK Osztályok (JavaParser, Google Reflections és ASM librarykkal)</title>
+        <section>
+            <title>Feladat</title>
+            <para>Bátfai Tanár Úr boost filesystem-et akart bemutatni. Feladat az volt hogy JDK osztályokat kell kilistázni.</para>
+        </section>
+        <section>
+            <title>Megoldás</title>
+            <para>Ha jól értem a feladatot, és a fénykard cpp-t, akkor az nem képes a probléma megoldására.</para>
+            <para>Mármint arra gondolok, hogy csak a JDK compilation unit-jait listázzák ki, az inner class-okat pl. nem.</para>
+            <para>Például vegyük a java.util.concurrent.locks.ReentrantLock compilation unit-ot.</para>
+            <literallayout>
+public class ReentrantLock implements Lock, java.io.Serializable {
+    ...
+    abstract static class Sync extends AbstractQueuedSynchronizer {
+        ... 
+    }
+}
+            </literallayout>
+            <para>Fenti példában Sync JDK osztály de a naív source file name gyűjtéssel nem fogjuk megtalálni.</para>
+            <para>Én meg megakartam oldani a problémát. A gyakorlatvezetőm félév elején szóba hozta az ArchUnit-ot, és az adott egy ötletet.</para>
+
+            <para>A fájl rendszerben való rekurzív utazgatás most nem lényeg. 
+                Az egyetlen lényeg, hogy úgy írtam meg a progit, hogy bead neki a user egy root-ot amitől vizsgáljuk, utána pedig először végig megyünk a sima fájlokon (class végződésre filterezve), majd a child dir-eket egy stack-re dobom.</para>
+            <para>Alább látható, hogy valóban nem lett túlbonyolítva, hiszen most más volt a lényeg:</para>
+            <programlisting language="java">
+                <![CDATA[
+public void startVisit(){
+    while(!directories.isEmpty()){
+        this.onDirectory(directories.pop());
+    }
+ }
+
+ private void onFile(File srcFile) throws FileNotFoundException {
+     CompilationUnit compilationUnit = StaticJavaParser.parse(srcFile);
+     syntaxTreeVisitor.setCurrentFile(srcFile);
+     compilationUnit.accept(syntaxTreeVisitor,null);
+ }
+
+ private void onDirectory(File directory){
+     File[] javaFiles = directory.listFiles((file,name)->name.endsWith(".java"));
+     for (File javaFile : javaFiles) {
+         try {
+             onFile(javaFile);
+         } catch (FileNotFoundException e) {
+             logger.info("READ ERROR :{}", javaFile.toString());
+         }
+     }
+     File[] subDirs = directory.listFiles(File::isDirectory);
+     Arrays.stream(subDirs).forEach(directories::add);
+ }
+]]>
+            </programlisting>
+            <para>A másik apróság hogy elkezdtem a Simple Logging Facade For Java-t használni. :)</para>
+            <para>A megoldás érdekében kellett egy mód, ahogyan eltudom kapni az abstract syntax tree-t.</para>
+            <para>
+                A
+                <link xlink:href="https://javaparser.org/">Java Parser</link>
+                -re esett a választásom.
+            </para>
+            <para>
+                Az API viszonylag egyszerű és <link xlink:href="https://refactoring.guru/design-patterns/visitor">Visitor Pattern</link>-re épül.
+            </para>
+            <para>Nagyon röviden: A mi esetünkben csak logolni akarunk, szóval a VoidVisitorAdapter&lt;Void&gt; class-t subclassoljuk.</para>
+            <para>Ennek több method-ja van melyek akkor hívódnak meg, mikor egy specifikus Node-hoz érünk az AST-ben</para>
+            <para>Mivel mi csak típus deklarációkra vagyunk kíváncsiak, ezért ezt az egyetlen method-ot override-oltuk:</para>
+            <programlisting language="java" linenumbering="numbered">
+                <textobject>
+                    <textdata fileref="prog2java/w5/jdk-troubles/src/main/java/com/rkeeves/SyntaxTreeVisitor.java" />
+                </textobject>
+            </programlisting>
+            <para>A fenti példában látszik hogy slf4j-vel egyszerűbb a formázás, de String.format-ot is használhattam volna, csak úgy voltam vele, hog ha az EPAM hazsnálja akkor én miért ne ugorjak a kútba.</para>
+            <para>Alább egy példa a futtatás eredményéről.</para>
+            <figure>
+                <title>Reentrant Lock Sync Inner Class AST-ből</title>
+                <mediaobject>
+                    <imageobject>
+                        <imagedata fileref="img/ast.png" scale="80" />
+                    </imageobject>
+                    <textobject>
+                        <phrase>Reentrant Lock Sync Inner Class AST-ből</phrase>
+                    </textobject>
+                </mediaobject>
+            </figure>
+            <para>Szerintem látszik jól, hogy sokkal több JDK class van mint compilation unit :)</para>
+            <figure>
+                <title>JDK Compilation Units</title>
+                <mediaobject>
+                    <imageobject>
+                        <imagedata fileref="img/jdkcompunits.png" scale="80" />
+                    </imageobject>
+                    <textobject>
+                        <phrase>JDK Compilation Units</phrase>
+                    </textobject>
+                </mediaobject>
+            </figure>
+            <para>Mielőtt szó éri a ház elejét tetszőleges helyről indulva rekurzívan lefut, pusztán szűkíteni akartam a dolgot, hogy emberi szemmel is összevethetően alacsony darabszámú compilation unit-ot érintsünk.</para>
+            <figure>
+                <title>Concurrent.locks dir</title>
+                <mediaobject>
+                    <imageobject>
+                        <imagedata fileref="img/args.png" scale="80" />
+                    </imageobject>
+                    <textobject>
+                        <phrase>Concurrent.locks dir</phrase>
+                    </textobject>
+                </mediaobject>
+            </figure>
+            <para>
+                Persze felvetődik a probléma, hogy: "Nos Csaba, ok, hogy a JDK class-ait ki tudod listázni, de a valóságban inkább magunkat akarjuk DI miatt elemezni."
+            </para>
+            <para>Mármint pl.: Az összes olyan class-t initeld ami Service annotációval van ellátva.</para>
+            <para>Ez egy elég trükkös kérdés, ugyanis, ha még az Applikációnk entry-point Class-át töltötte be a ClassLoader akkor honnan tudjuk hogy mondjuk a foo.bar package-ben van egy annotált class?</para>
+            <para>Magyarul Reflection-nel nem tudjuk az eddig nem értintett class-okat betölteni, csak betöltött class-okat elemezni.</para>
+            <para>Az ilyen problémák megoldására van a Reflections (nem összekeverendő a Reflection-nek)</para>
+            <para>Alább egy képes példa egy teszt projektről.</para>
+            <figure>
+                <title>Teszt projekt</title>
+                <mediaobject>
+                    <imageobject>
+                        <imagedata fileref="img/testpackage.png" scale="100" />
+                    </imageobject>
+                    <textobject>
+                        <phrase>Teszt projekt</phrase>
+                    </textobject>
+                </mediaobject>
+            </figure>
+            <para>Szeretném, ha már main-ben kitudnám listázni az összes class-omat com.rkeeves alól (rekurzív) illetve az összes olyan interface-t mely FunctionalInterface annotációval rendelkezik.</para>
+            <para>Ezt viszonylag egyszerűen megtehetjük. Pusztán meg kell adnunk a gyökér package-et, illetve előzetesen a felhasznált scannereket amiket a compilation unit-okra kellene engedni (Mi ugye subtype-os és annotációs keresést akarunk).</para>
+            <para>Ezt az alábbi egyszeráű módon eltudjuk végezni:</para>
+            <programlisting language="java" linenumbering="numbered">
+                <textobject>
+                    <textdata fileref="prog2java/w5/runtime-info/src/main/java/com/rkeeves/App.java" />
+                </textobject>
+            </programlisting>
+            <para>A fenti kód az alábbi kimenetet produkálja.</para>
+            <figure>
+                <title>Reflections eredmény</title>
+                <mediaobject>
+                    <imageobject>
+                        <imagedata fileref="img/reflectionsresult.png" scale="100" />
+                    </imageobject>
+                    <textobject>
+                        <phrase>Reflections eredmény</phrase>
+                    </textobject>
+                </mediaobject>
+            </figure>
+            <para>Vegyük észre, hogy ez runtime történik, azaz itt NEM forrás fájlból AST parse-olás történik.</para>
+            <para>Hogy lehet ez? A Reflections is csak egy higher level dolog.</para>
+            <para>Az igazi lib amivel tényleg a machine code közelébe juthatunk az az ASM.</para>
+            <para>Ez is Visitor pattern-t használ, viszont elég low level. Sőt nem csak olvasási, hanem írási lehetőség is van (Azaz pl. random fieldet, method-ot interface hozzáadhatunk egy létező class-hoz, nested class-t hozhatunk létre stb. Például Lombok módra belenyúlhatunk a generált gépikódba.).</para>
+            <para>A Visitor-ra egy borzasztóan egyszerű példa, mely csak kilogolja a type declaration-öket</para>
+            <programlisting language="java" linenumbering="numbered">
+                <textobject>
+                    <textdata fileref="prog2java/w5/asm-troubles/src/main/java/com/rkeeves/ClassPrinter.java" />
+                </textobject>
+            </programlisting>
+            <para>Itt azért el kell mondanom, hogy az ASM verziók nagyon fontosak. Mármint nem mindegy hogy milyen Java Verziójú compiler-rel készült kódot olvasunk be milyen verziójú ASM-el.</para>
+            <para>A futtatás viszonylag egyszerű, csak annyit jegyeznék meg, hogy egyenesen byte[]-ot vagy InputStream-et is átadhatunk a ClassReader-nek, hasonló módon a ClassWriter-nek is.</para>
+            <programlisting language="java" linenumbering="numbered">
+                <textobject>
+                    <textdata fileref="prog2java/w5/asm-troubles/src/main/java/com/rkeeves/AsmApp.java" />
+                </textobject>
+            </programlisting>
+            <para>Alábbi példán látható, hogy ráengedjük a com.rkeeves.demo package-ben található Foo osztályra:</para>
+            <figure>
+                <title>ASM teszthez használt package struktúra</title>
+                <mediaobject>
+                    <imageobject>
+                        <imagedata fileref="img/asmpackage.png" scale="100" />
+                    </imageobject>
+                    <textobject>
+                        <phrase>ASM teszthez használt package struktúra</phrase>
+                    </textobject>
+                </mediaobject>
+            </figure>
+            <figure>
+                <title>ASM teszthez használt Foo class</title>
+                <mediaobject>
+                    <imageobject>
+                        <imagedata fileref="img/foosrc.png" scale="100" />
+                    </imageobject>
+                    <textobject>
+                        <phrase>ASM teszthez használt Foo class</phrase>
+                    </textobject>
+                </mediaobject>
+            </figure>
+            <para>Futtatáskor pedig a következő kimenettel találkozunk (Azaz Bar Inner class-t megtaláltuk Foo-ban):</para>
+            <figure>
+                <title>ASM eredmény</title>
+                <mediaobject>
+                    <imageobject>
+                        <imagedata fileref="img/asmresult.png" scale="100" />
+                    </imageobject>
+                    <textobject>
+                        <phrase>ASM eredmény</phrase>
+                    </textobject>
+                </mediaobject>
+            </figure>
+        </section>
+    </section>
+    <section>
         <title>EPAM: It's gone. Or is it?</title>
         <section>
             <title>Feladat</title>
@@ -40,7 +241,7 @@ Magyarázd meg, miért. Mutass alternatívát.
             <para>Simán annyiról van szó, hogy finalize-ban nem érdemes resource-okkal bánni, sőt, igazság szerint semmit nem érdemes benne csinálni.</para>
             <para>Mégegyszer akkor ismétlésként: try with resources-t lehet használni de implementálni Closeable-t...</para>
             <programlisting>
-<![CDATA[
+                <![CDATA[
 public static void main(String[] args) {
     try(FooStuffProducer bsp = new FooStuffProducer()){
         bsp.writeStuff();

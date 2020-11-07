@@ -46,6 +46,11 @@
         <module>w6/tabella</module>
         <module>w5/runtime-info</module>
         <module>w5/encrypt-decrypt</module>
+        <module>w7/xml-parsing</module>
+        <module>w7/ascii</module>
+        <module>w7/caesar</module>
+        <module>w5/jdk-troubles</module>
+        <module>w5/asm-troubles</module>
     </modules>
 
     <dependencyManagement>
@@ -115,6 +120,36 @@
                 <groupId>net.oneandone.reflections8</groupId>
                 <artifactId>reflections8</artifactId>
                 <version>0.11.5</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.xmlgraphics</groupId>
+                <artifactId>batik-anim</artifactId>
+                <version>1.10</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.xmlgraphics</groupId>
+                <artifactId>batik-svggen</artifactId>
+                <version>1.10</version>
+            </dependency>
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-databind</artifactId>
+                <version>2.11.2</version>
+            </dependency>
+            <dependency>
+                <groupId>com.github.javaparser</groupId>
+                <artifactId>javaparser-symbol-solver-core</artifactId>
+                <version>3.16.2</version>
+            </dependency>
+            <dependency>
+                <groupId>org.ow2.asm</groupId>
+                <artifactId>asm</artifactId>
+                <version>9.0</version>
+            </dependency>
+            <dependency>
+                <groupId>org.ow2.asm</groupId>
+                <artifactId>asm-util</artifactId>
+                <version>9.0</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

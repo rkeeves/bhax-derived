@@ -1,0 +1,4 @@
+Implement a console application, which reads input line by line.
+The input consists of ascii characters.
+The application should transform this string by applying Caesar cipher.
+As a last step, the application must write the result into a file.
