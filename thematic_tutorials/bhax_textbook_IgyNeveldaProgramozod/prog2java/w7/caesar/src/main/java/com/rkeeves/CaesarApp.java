@@ -1,42 +1,48 @@
 package com.rkeeves;
 
-import java.io.*;
-import java.util.HashSet;
-import java.util.Scanner;
-import java.util.Set;
+import com.rkeeves.api.Chain;
+import com.rkeeves.api.ChainBuilder;
+import com.rkeeves.impl.Terminator;
+import com.rkeeves.impl.*;
+
+import java.io.FileNotFoundException;
+import java.io.IOException;
 
 public class CaesarApp {
 
     public static void main(String[] args) {
-        Scanner scanner = new Scanner(System.in);
-        PrintStream printStream = null;
-        Transformer transformer = null;
-        if(args.length == 2){
-            try {
-                transformer = new CaesarEncryptor(Integer.parseInt(args[1]));
-                printStream = new PrintStream(new FileOutputStream(new File(args[0])));
-            } catch (FileNotFoundException fne) {
-                System.out.println("Problem during opening files");
-                return;
-            } catch (NumberFormatException nfe){
-                System.out.println("Second argument must be a valid integer in the range of [1,127]");
-                return;
-            }
-        }else{
+        if(args.length != 2){
             System.out.println("You must provide two arguments <outputfile> <encryptionoffset>");
             System.out.println("  outputfile       - name or path of the output file");
             System.out.println("  encryptionoffset - int in the range of [1,127]");
             return;
         }
-        Set<String> consoleFinishLoopUponReadingTheseStrings = new HashSet<>();
-        consoleFinishLoopUponReadingTheseStrings.add("exit");
-        try(TransformationChain transformationChain = new TransformationChain(scanner,transformer,printStream,consoleFinishLoopUponReadingTheseStrings)) {
-            transformationChain.run();
+        String outputFileName = args[0];
+        int encryptionOffset;
+        try {
+            encryptionOffset = Integer.parseInt(args[1]);
+        }catch (NumberFormatException e){
+            System.out.println("Second argument must be a valid int in the range of [1,127]");
+            return;
+        }
+        try(Chain chain = ChainBuilder
+                .builder()
+                .messageGenerator(new ConsoleMessageGenerator())
+                .chain(new Terminator("exit"))
+                .chain(new CaesarEncryptor(encryptionOffset))
+                .chain(new ConsolePrinter())
+                .chain(new FilePrinter(outputFileName))
+                .build()
+                .get())
+        {
+            chain.run();
             System.out.println("Done");
-        } catch (Exception e) {
+        } catch (FileNotFoundException fne) {
+            System.out.println("Problem during opening files");
+            fne.printStackTrace();
+        } catch (IOException e) {
             System.out.println("Problem during operation");
             e.printStackTrace();
-            return;
         }
     }
 }

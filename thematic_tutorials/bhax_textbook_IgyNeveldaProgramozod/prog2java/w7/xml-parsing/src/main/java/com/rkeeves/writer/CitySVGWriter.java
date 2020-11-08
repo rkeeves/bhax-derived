@@ -24,7 +24,6 @@ public class CitySVGWriter implements Closeable {
 
     private final FileOutputStream fileOutputStream;
 
-
     private Map<String, String> createColorsOfStates(Set<String> stateCodes) {
         var rnd = new Random();
         return stateCodes.stream()

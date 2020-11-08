@@ -1,10 +1,13 @@
-package com.rkeeves;
+package com.rkeeves.impl;
 
+import com.rkeeves.api.MessageHandler;
+
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 
-public class LeetEncryptor implements Transformer {
+public class LeetEncryptor implements MessageHandler {
 
     static Map<Character, String[]> ciphers = new HashMap<>();
     static{
@@ -68,12 +71,27 @@ public class LeetEncryptor implements Transformer {
     }
 
     @Override
-    public String transform(String s) {
+    public void start() throws IOException {
+
+    }
+
+    @Override
+    public boolean shouldTerminate(String message) {
+        return false;
+    }
+
+    @Override
+    public String handle(String s) {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < s.length(); i++) {
             char c = s.charAt(i);
             sb.append(fetchCipherByChar(c));
         }
         return sb.toString();
+    }
+
+    @Override
+    public void close() throws IOException {
+
     }
 }

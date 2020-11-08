@@ -3,6 +3,11 @@ package com.rkeeves.reader;
 import com.rkeeves.model.City;
 import lombok.RequiredArgsConstructor;
 
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBElement;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
+import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import java.util.function.Consumer;
@@ -14,28 +19,22 @@ public class CityDataXMLReader {
 
     private final Consumer<City> cityConsumer;
 
-    public void run() throws XMLStreamException {
-        var builder = City.builder();
-        while(xmlStreamReader.hasNext()){
-            int actual = xmlStreamReader.next();
-            if (isStartElement(actual, "coordinateX")) {
-                builder.x(xmlStreamReader.getElementText());
-            } else if (isStartElement(actual, "coordinateY")) {
-                builder.y(xmlStreamReader.getElementText());
-            } else if (isStartElement(actual, "state")) {
-                builder.stateCode(xmlStreamReader.getElementText());
-            } else if (isEndElement(actual, "city")) {
-                offerCity(builder.build());
+    public void run() throws XMLStreamException, JAXBException {
+        JAXBContext context = JAXBContext.newInstance(City.class);
+        Unmarshaller unmarshaller = context.createUnmarshaller();
+        while (xmlStreamReader.hasNext()){
+            switch (xmlStreamReader.next()){
+                case XMLStreamConstants.END_DOCUMENT:
+                    xmlStreamReader.close();
+                    break;
+                case XMLStreamConstants.START_ELEMENT:
+                    if (xmlStreamReader.getLocalName().equals("city")){
+                        JAXBElement<City> unmarshalledObj = unmarshaller.unmarshal(xmlStreamReader, City.class);
+                        offerCity(unmarshalledObj.getValue());
+                    }
+                    break;
             }
         }
-    }
-
-    private boolean isStartElement(int actual, String tagName) {
-        return actual == XMLStreamReader.START_ELEMENT && tagName.equals(xmlStreamReader.getLocalName());
-    }
-
-    private boolean isEndElement(int actual, String tagName) {
-        return actual == XMLStreamReader.END_ELEMENT && tagName.equals(xmlStreamReader.getLocalName());
     }
 
     private boolean offerCity(City city){

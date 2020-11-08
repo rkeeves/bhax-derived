@@ -4,6 +4,7 @@ import com.rkeeves.model.CityRepository;
 import com.rkeeves.reader.CityDataXMLReader;
 import com.rkeeves.writer.CitySVGWriter;
 
+import javax.xml.bind.JAXBException;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
@@ -16,7 +17,7 @@ public class XmlToSVGApp {
 
     CityRepository cityRepository = new CityRepository();
 
-    public void read() throws IOException, XMLStreamException {
+    public void read() throws IOException, XMLStreamException, JAXBException {
         try(FileInputStream inputStream = new FileInputStream("./data/input.xml")){
             XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
             XMLStreamReader reader = xmlInputFactory.createXMLStreamReader(inputStream);

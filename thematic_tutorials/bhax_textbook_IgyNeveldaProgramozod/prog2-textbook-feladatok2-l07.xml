@@ -15,7 +15,119 @@
         </section>
         <section>
             <title>Megoldás</title>
-            <para>...</para>
+            <para>A lényege a feladatnak hogy egy xml-t svg-be transzformáljunk.</para>
+            <programlisting>
+                <![CDATA[
+<?xml version="1.0" encoding="UTF-8"?>
+<cities>
+    <city>
+        <coordinateX>190.77674000000002</coordinateX>
+        <coordinateY>673.62922</coordinateY>
+        <state>NY</state>
+    </city>
+...
+]]>
+            </programlisting>
+            <para>A forrás xml cities root element alatt city elementeket tartalmaz, x,y és state code attribútumokkal.</para>
+            <para>Mivel az Oracle greedy ezért a modern Java verziókból kivették a JAXB-t, sigh.</para>
+            <para>Próbáltam valami rendszert vinni a package structure-be:</para>
+            <figure>
+                <title>SVG map</title>
+                <mediaobject>
+                    <imageobject>
+                        <imagedata fileref="img/svgproj.png" scale="70" />
+                    </imageobject>
+                    <textobject>
+                        <phrase>SVG map</phrase>
+                    </textobject>
+                </mediaobject>
+            </figure>
+            <para>Röviden a cél: Reader olvasás közben nyomja a city-ket egy repository-ba.</para>
+            <para>Ha a reader végzett, akkor a writer ugyancsak megkapja repository-t és végigiterál a city-ken és közben populál egy xml Document-et.</para>
+            <para>
+                A parse egyszerűen XmlStreamReader-rel megy. A JAXB-t használva az annotált POJO alapján megy a parse:
+            </para>
+            <programlisting language="java" linenumbering="numbered">
+                <textobject>
+                    <textdata fileref="prog2java/w7/xml-parsing/src/main/java/com/rkeeves/model/City.java" />
+                </textobject>
+            </programlisting>
+            <para>Mivel getter, setter lombok által generált ezért XmlAccessType.FIELD-et kell hozzáadni.</para>
+            <para>A parse-olás a következő módon megy:</para>
+            <itemizedlist>
+                <listitem>
+                    <para>End document Eventre kilépünk a loop-ból</para>
+                </listitem>
+                <listitem>
+                    <para>Start Element Eventre, ha city nevű elementhez értünk akkor parseoljuk a City-t JAXB-vel.</para>
+                </listitem>
+                <listitem>
+                    <para>Minden más esetben ignoráljuk a jelen Event-et.</para>
+                </listitem>
+            </itemizedlist>
+            <programlisting language="java" linenumbering="numbered">
+                <textobject>
+                    <textdata fileref="prog2java/w7/xml-parsing/src/main/java/com/rkeeves/reader/CityDataXMLReader.java" />
+                </textobject>
+            </programlisting>
+            <para>Az egész város csoportosítást a repository végzi azáltal, hogy egy listákat tartalmazó hashmap-be szórjuk a City-ket stateCode alapján.</para>
+            <programlisting language="java" linenumbering="numbered">
+                <textobject>
+                    <textdata fileref="prog2java/w7/xml-parsing/src/main/java/com/rkeeves/model/CityRepository.java" />
+                </textobject>
+            </programlisting>
+            <para>Szerintem az egyetlen érdekes dolog az a computeIfAbsent, amit a prog2-rpg DI-jében is használtam.</para>
+            <para>Simán annyiról van szó, hogy visszaadjuk a map megfelelő Value-ját, illetve ha nincs a kulcshoz Value, akkor generálunk egyet, berakjuk a map-be, majd utána adjuk vissza. Pretty neat!</para>
+            <para>Az SVG kimenet nem teljesen tisztázott.</para>
+            <para>Nem teljesen értettem a csoportosítást. Mármint "szemantikailag" SVG-ben ha jól tudom g-vel kell grouping-ot csinálni. A state code-ot, meg gondolom alá rakni desc-el.</para>
+            <para>Azaz valami ilyesmire gondolok:</para>
+            <programlisting>
+                <![CDATA[
+<?xml version="1.0" encoding="UTF-8"?>
+<svg ... >
+<g>
+	<desc>HI</desc>
+	<circle fill="#588349" r="1" cx="-179.27828999999997" cy="386.0935"/>
+	...
+</g>
+]]>
+            </programlisting>
+            <para>Maga az SVG írásban semmi különös nincs.</para>
+            <para>Csak azt emelném ki, hogy mivel Repository számon tartja a keyset-et (stateCode-ok halmaza) és stateCode alapon kérhetünk le City lsitákat, ezért funkcionálisan le lehet írni a dolgot röviden:</para>
+            <programlisting>
+                <![CDATA[
+cityRepository
+    .getStates()
+    .forEach(stateCode -> processState(document,
+            root,
+            stateCode,
+            colorsOfStates.get(stateCode),
+            cityRepository.getCitiesForState(stateCode)));
+]]>
+            </programlisting>
+            <para>A processState method (State itt államot jelent) is funckionálissá tehető.</para>
+            <programlisting>
+                <![CDATA[
+private Document processState(Document document, Element root, String stateCode, String stateColor, List<City> cityList) {
+    Element stateElement = createStateElement(document, stateCode);
+    cityList.forEach(city -> createCityElement(document, stateElement, city, stateColor));
+    root.appendChild(stateElement);
+    return document;
+}
+]]>
+            </programlisting>
+            <para>A kimenet valami ilyesmi lesz (svg pretty printtel nem foglalkoztam).</para>
+            <figure>
+                <title>SVG map</title>
+                <mediaobject>
+                    <imageobject>
+                        <imagedata fileref="img/svgmap.png" scale="70" />
+                    </imageobject>
+                    <textobject>
+                        <phrase>SVG map</phrase>
+                    </textobject>
+                </mediaobject>
+            </figure>
         </section>
     </section>
     <section>
@@ -27,7 +139,67 @@
         </section>
         <section>
             <title>Megoldás</title>
-            <para>...</para>
+            <para>Ennél a feladatnál a legnagyobb probléma az volt, hgoy mi alapján döntsem el mi milyen karakter legyen.</para>
+            <para>Végülis a következő gagyi megoldást használtam:</para>
+            <programlisting language="java" linenumbering="numbered">
+                <textobject>
+                    <textdata fileref="prog2java/w7/ascii/src/main/java/com/rkeeves/ColorToAsciiConverter.java" />
+                </textobject>
+            </programlisting>
+            <para>Ami talán magyarázatra szorul az az argb to greyscale.</para>
+            <para>Az argb egy int ami a következő módon épül fel bitenként AAAA AAAA RRRR RRRR GGGG GGGG BBBB BBBB.</para>
+            <para>Blue-t megkapjuk, ha össze bitwise and-eljük az int-et egy 0000 0000 0000 0000 0000 0000 1111 1111 számmal.</para>
+            <para>Az 1111 szám ugye 8+4+2+1, hexadecimálisban F, avagy 0xff.</para>
+            <para>Red és Green esetén kicsit trükközni kell, ugyanis 16 illetve 8-al el kéne őket tolni.</para>
+            <para>Erre a bitwise shift-et használtuk.</para>
+            <para>A végén a Red, Blue illetve Green értékeket kiátlagoljuk és így kapunk egy csaló grayscale-t (ami ugye 0-255, hisz 1111 1111).</para>
+            <para>Maga az írásra létrehoztam egy Renderer class-t.</para>
+            <programlisting language="java" linenumbering="numbered">
+                <textobject>
+                    <textdata fileref="prog2java/w7/ascii/src/main/java/com/rkeeves/Renderer.java" />
+                </textobject>
+            </programlisting>
+            <para>Azért printstream-el dolgoztam, mert akár sout-ra akár fájlba írunk, kellenek majd új sorok, illetve biztos hogy ascii karaktereket fogunk írni nem raw binary-t.</para>
+            <para>Azért nem egy PrintStream-et fogadunk be mert a feladat szerint két helyre kell írni.</para>
+            <para>Ezekután az algoritmus simán a következő:</para>
+            <itemizedlist>
+                <listitem>
+                    <para>Végig iterálunk pixelenként az eredeti képen</para>
+                </listitem>
+                <listitem>
+                    <para>átkonvertáljuk a helyi pxel argb színt ascii karakterbe</para>
+                </listitem>
+                <listitem>
+                    <para>karaktert printeljük az összes PrintStream-el</para>
+                </listitem>
+                <listitem>
+                    <para>Ha egy sort befejeztünk akkor printelünk az összes PrintStream-el egy új sort (OS independensen)</para>
+                </listitem>
+            </itemizedlist>
+            <para>Alább látható a kiindulási png:</para>
+            <figure>
+                <title>Emoji</title>
+                <mediaobject>
+                    <imageobject>
+                        <imagedata fileref="img/emoji.png" scale="70" />
+                    </imageobject>
+                    <textobject>
+                        <phrase>Emoji</phrase>
+                    </textobject>
+                </mediaobject>
+            </figure>
+            <para>Alább pedig az eredmény txt NotePad++-ban a kizoomolva:</para>
+            <figure>
+                <title>Emoji Ascii</title>
+                <mediaobject>
+                    <imageobject>
+                        <imagedata fileref="img/emojiascii.png" scale="70" />
+                    </imageobject>
+                    <textobject>
+                        <phrase>Emoji Ascii</phrase>
+                    </textobject>
+                </mediaobject>
+            </figure>
         </section>
     </section>
     <section>
@@ -39,7 +211,125 @@
         </section>
         <section>
             <title>Megoldás</title>
-            <para>...</para>
+            <para>Az egész feladat felfogható úgy hogy egy üzenetközlőkből álló láncon továbbtunk üzeneteket.</para>
+            <para>Az üzenetközlők transzformálhatják az üzeneteket, illetve jelezhetik a generátornak ha be lehet fejezni.</para>
+            <para>Ezek alapján lesz egy Generator és Handler-ek.</para>
+            <para>MessageGenerator indulhat, bezárulhat, illetve iterátorként viselkedik String-ekre.</para>
+            <programlisting language="java" linenumbering="numbered">
+                <textobject>
+                    <textdata fileref="prog2java/w7/caesar/src/main/java/com/rkeeves/api/MessageGenerator.java" />
+                </textobject>
+            </programlisting>
+            <para>MessageHandler indulhat, bezárulhat, jelezhet hogy terminálni kell, illetve transzformálhatja az üzenetet (vagy mellékhatást okozhat, pl print).</para>
+            <programlisting language="java" linenumbering="numbered">
+                <textobject>
+                    <textdata fileref="prog2java/w7/caesar/src/main/java/com/rkeeves/api/MessageHandler.java" />
+                </textobject>
+            </programlisting>
+            <para>Az egészet egy láncba fogjuk kötni ami egyben lesz Closeable. Mármint a Chain lesz a felelős mindenki lezárásáért.</para>
+            <para>Chain-ben az egyik trükk az, hogy mivel minden handler transzformálhatja az üzenetet ezért nem az eredeti üzenetet kell végig küldeni.</para>
+            <para>A másik apró trükk, hogy minden handler-től le kell kérdezni, hogy ugorjunk-e ki a while loop-ból.</para>
+            <para>Nem akartam forEach-elni a MessageHandler::handle-t a listán, hanem explicit for-each-et használtam az Exception-ök miatt</para>
+            <programlisting>
+                <![CDATA[
+public void run() throws IOException {
+    start();
+    boolean isRunning = true;
+    while(messageGenerator.hasNext() && isRunning){
+        String message = messageGenerator.next();
+        for (MessageHandler handler : handlers) {
+            if(handler.shouldTerminate(message)){
+                isRunning = false;
+                break;
+            }
+            message = handler.handle(message);
+        }
+    }
+}
+]]>
+            </programlisting>
+            <para>A feladat igazán érdekes része most jön: Kész vannak az építőelemek, de hogy rakjuk őket össze?</para>
+            <para>Egy valid chain 1 generátorból és 0..n handler-ből áll.</para>
+            <para>Ha csak sima Builder pattern-t használunk akkor a user tud úgy csinálni Chain-t hogy 0 generátor lesz benne.</para>
+            <para>Emiatt a StepBuilder-t használtam.</para>
+            <para>A lényeg annyi, hogy különböző lépései vannak a Builder-nek amit interface-ekkel reprezentálunk:</para>
+            <programlisting language="java" linenumbering="numbered">
+                <textobject>
+                    <textdata fileref="prog2java/w7/caesar/src/main/java/com/rkeeves/api/ChainBuilder.java" />
+                </textobject>
+            </programlisting>
+            <para>Mire jó ez az egész? Nos, alábbi screenshot-on látszik, hogy csak azon a módon lehet meghívni a methodokat ahogy mi előírtuk, különben le sem fordul.</para>
+            <figure>
+                <title>StepBuilder</title>
+                <mediaobject>
+                    <imageobject>
+                        <imagedata fileref="img/stepbuilder.png" scale="70" />
+                    </imageobject>
+                    <textobject>
+                        <phrase>StepBuilder</phrase>
+                    </textobject>
+                </mediaobject>
+            </figure>
+            <para>Az alkalmazás a Closeable miatt egyszerű, csak be kell rakodni a dolgokat a jó sorrendben és a close a try-with-resources miatt lefog zárni mindenkit.</para>
+            <programlisting>
+                <![CDATA[
+try(Chain chain = ChainBuilder
+                .builder()
+                .messageGenerator(new ConsoleMessageGenerator())
+                .chain(new Terminator("exit"))
+                .chain(new CaesarEncryptor(encryptionOffset))
+                .chain(new ConsolePrinter())
+                .chain(new FilePrinter(outputFileName))
+                .build()
+                .get())
+        {
+            chain.run();
+            System.out.println("Done");
+        } catch (FileNotFoundException fne) {
+            System.out.println("Problem during opening files");
+            fne.printStackTrace();
+        } catch (IOException e) {
+            System.out.println("Problem during operation");
+            e.printStackTrace();
+        }
+]]>
+            </programlisting> 
+           <para>IDE-n belülről akartam futtatni ezért config-olni kellett:</para>
+           <figure>
+            <title>Caesar Run Config</title>
+            <mediaobject>
+                <imageobject>
+                    <imagedata fileref="img/caesarrunconfig.png" scale="50" />
+                </imageobject>
+                <textobject>
+                    <phrase>Caesar Run Config</phrase>
+                </textobject>
+            </mediaobject>
+        </figure>
+            <para>Alábbi képen egy Caesar cipher-es futtatás eredménye:</para>
+            <figure>
+                <title>Caesar</title>
+                <mediaobject>
+                    <imageobject>
+                        <imagedata fileref="img/caesar.png" scale="50" />
+                    </imageobject>
+                    <textobject>
+                        <phrase>Caesar</phrase>
+                    </textobject>
+                </mediaobject>
+            </figure>
+            <para>Mivel csak annyi számít hogy a megfelelő szerződést betartsák a felek, azért egy Leet cipher is alárakható különösebb gond nélkül:</para>
+            <figure>
+                <title>Leet encoding</title>
+                <mediaobject>
+                    <imageobject>
+                        <imagedata fileref="img/leetchain.png" scale="50" />
+                    </imageobject>
+                    <textobject>
+                        <phrase>Leet encoding</phrase>
+                    </textobject>
+                </mediaobject>
+            </figure>
         </section>
     </section>
     <section>

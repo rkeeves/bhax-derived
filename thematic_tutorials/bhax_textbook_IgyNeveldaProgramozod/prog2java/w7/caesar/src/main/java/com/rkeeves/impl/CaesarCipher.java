@@ -1,4 +1,4 @@
-package com.rkeeves;
+package com.rkeeves.impl;
 
 import java.util.function.Function;
 import java.util.stream.Collectors;
