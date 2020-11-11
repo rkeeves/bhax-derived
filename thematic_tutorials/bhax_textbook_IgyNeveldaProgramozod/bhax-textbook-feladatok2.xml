@@ -81,4 +81,12 @@
             </para>
         </xi:fallback>
     </xi:include>
+    
+    <xi:include href="prog2-textbook-feladatok2-l08.xml">
+        <xi:fallback>
+            <para>
+                <emphasis>XInclude: prog2-textbook-feladatok2-l08.xml file not found</emphasis>
+            </para>
+        </xi:fallback>
+    </xi:include>
 </part>  
