@@ -1,0 +1,586 @@
+<chapter xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xi="http://www.w3.org/2001/XInclude" version="5.0" xml:lang="hu">
+    <info>
+        <title>Adatfolyamok kezelése, streamek, IO</title>
+        <keywordset>
+            <keyword />
+        </keywordset>
+    </info>
+    <section>
+        <title>EPAM: DI</title>
+        <section>
+            <title>Feladat</title>
+            <para>Implementálj egy alap DI (Dependency Injection) keretrendszert Java-ban annotációk és reflexió
+                használatával megvalósítva az IoC-t (Inversion Of Control). </para>
+        </section>
+        <section>
+            <title>Megoldás</title>
+            <para>A lényege a feladatnak egy minimális Inversion Of Control leprogramozása.</para>
+            <para>Évközbeni projekthez két különbözőt csináltam, mivel már azelőtt készen voltak, hogy az EPAM-os guideline-t láttam volna, ezért köszönő viszonyban sem lesz az EPAM-ossal:</para>
+            <itemizedlist>
+                <listitem>
+                    <para>
+                        <link xlink:href="https://github.com/rkeeves/tap-tap-di">Using Reflection</link>
+                    </para>
+                </listitem>
+                <listitem>
+                    <para>
+                        <link xlink:href="https://github.com/rkeeves/prog2-rpg/tree/ioc">No Reflection</link>
+                    </para>
+                </listitem>
+            </itemizedlist>
+            <section>
+                <title>tap-tap</title>
+                <para>
+                    Most
+                    <link xlink:href="https://github.com/rkeeves/tap-tap-di">erről</link>
+                    lesz szó.
+                </para>
+                <para>Az elsődleges cél az volt, hogy annyira barebones legyen amennyire csak lehet.</para>
+                <para>A másik nagyon fontos dolog, hogy ctor injection párti vagyok, és szerintem egy két edge-case-t kivéve setter injection-el inkább problémákat lehet generálni.</para>
+                <para>Ennek a hátterében az áll, hogyha tisztán ctor injected dolgokat alkalmazunk akkor ha kapunk egy bean-t akkor az JÓ KELL HOGY LEGYEN, nem kell ellenőrizni stb.</para>
+                <para>Az egész baromi egyszerű. Van egy Container, amit a kliens hívogathat, hogy megkapjon egy adott Class-ba tartozó egyedet: </para>
+                <programlisting>
+                    <![CDATA[
+public <T> T get(Class<T> cls) throws CtorException, IntermediateInjectableNotConstructableException, NoCtorForInjectionFoundOnClassException {
+    if (!providers.containsKey(cls)) {
+        register(cls);
+    }
+    return (T) providers.get(cls).get();
+}
+]]>
+                </programlisting>
+                <para>Egy map van a háttérben, a kulcsok Class objektumok, míg a tárolt értékek Provider-ek.</para>
+                <para>Egy Provider igazság szerint összefog három felelősséget:</para>
+                <itemizedlist>
+                    <listitem>
+                        <para>tárol egy T típusú instance-t</para>
+                    </listitem>
+                    <listitem>
+                        <para>tárol egy constructor T típushoz</para>
+                    </listitem>
+                    <listitem>
+                        <para>tárolja azon provider-eket melyek szükéges a constructor arg-ok előállításához.</para>
+                    </listitem>
+                </itemizedlist>
+                <para>Ez az egész azért kell, hogy lazy evaluation legyen, azaz nem csinálunk előre egyetlen instance-t sem csak "on demand".</para>
+                <para>Az egyetlen szükséges annotáció az a CtorForInjection, amivel a kliens kijelölheti, hogy melyik ctor-t kell majd használni.</para>
+                <para>
+                    Ennél a példánál az egyetlen érdekes dolog az az, hogy nincs megszabva, hogy egyetlen instance-nek kell léteznie.
+                </para>
+                <programlisting>
+                    <![CDATA[
+Container cnt = new Container()
+try {
+    Scene scene = cnt.get(Scene.class);
+    scene.say();
+    PersonService personService = cnt.get(PersonService.class);
+    System.out.println(personService.getHello());
+} catch (Exception e) {
+    e.printStackTrace();
+}
+]]>
+                </programlisting>
+                <para>A fenti példában Scene-nek van egy ctor-injected PersonService fieldje. Ha a Container-ből egy Scene objektumot kérünk, akkor annak a PersonService objektuma nem lesz azonos azzal a PersonService objektummal amit Container-ből explicit kérés után kapunk.
+                Ennek vannak előnyei/hátrányai. A lényeg az, hogyha az a use case hogy mindenkinek singleton-ként kell viselkedni, akkor vissza lehet butítani. Viszont úgy gondoltam érdekes lehet abból a szempontból hogy ezen a módon lehetne csinálni Flyweight-es Container-t.
+            </para>
+                <para> Miután ezt megírtam felmerült az igény a prog2 rpg projekt során short-term DI megoldásra.</para>
+                <para>A következő fejezetben ezzel fogok foglalkozni.</para>
+            </section>
+            <section>
+                <title>IoC for prog2-rpg</title>
+                <para>
+                    Most
+                    <link xlink:href="https://github.com/rkeeves/prog2-rpg/tree/ioc">erről</link>
+                    lesz szó.
+                </para>
+                <para>Annyi volt a lényeg, hogy minimális configgal, lehetőleg AutoWired módon menjen a dolog, és ne kelljen annotálni.</para>
+                <para>Ez amiatt lett volna jó, mert így ha később úgy döntünk más DI megoldást akarunk használni, akkor nem okozott volna változást a codebase-ben.</para>
+                <para>A Provider-es dolgot továbbra sem dobtam ki, és továbbra is ctor-injection-t támogattam csak(plusz persze Supplier&lt;T&gt;-t :). </para>
+                <para>
+                    Mivel a gyakvezér többször hangsúlyozta a tesztek fontosságát, ezért azokat is próbáltam megírni, ezek
+                    <link xlink:href="https://github.com/rkeeves/prog2-rpg/tree/ioc/src/test/java/hu/unideb/inf/ioc">itt találhatóak</link>
+                    .
+                </para>
+                <para>Az egész öt fő elemből áll:</para>
+                <itemizedlist>
+                    <listitem>
+                        <para>Factory - egy wrapper ctor vagy Supplier stb. körül</para>
+                    </listitem>
+                    <listitem>
+                        <para>Cache - objektum tárolás</para>
+                    </listitem>
+                    <listitem>
+                        <para>Provider - szolgáltatás hívó számára cache-ből, ha üres akkor cache-be rakás factory-ből.</para>
+                    </listitem>
+                    <listitem>
+                        <para>Container - API érintkezési pontja user felé. User-nek szolgáltat T instance-eket megfelelő provider megkeresésével.</para>
+                    </listitem>
+                    <listitem>
+                        <para>OnTheFly - Decorator egy valós Container fölé, User kérésének idejében automatikusan létrehoz minden szükséges dolgot, majd visszaadja a T instance-t</para>
+                    </listitem>
+                </itemizedlist>
+                <para>Elég unalmas az egész, egyedül egy dologra szeretném felhívni a figyelmet, ami érdekes lehet:</para>
+                <para>Mivel ctor injektálunk főként, ezért van egy edge case amit ki kellett védeni, mert bajokat okozhat.</para>
+                <para>Ez a körkörös dependencia.</para>
+                <para>Például az alábbi eset:</para>
+                <programlisting>
+                    <![CDATA[
+@RequiredArgsconstructor
+class A{
+
+    final B b;
+}
+
+@RequiredArgsconstructor
+class B{
+
+    final A a;
+}
+]]>
+                </programlisting>
+                <para>Ettől végtelen ciklusba kerülne, mert:</para>
+                <itemizedlist>
+                    <listitem>
+                        <para>Csinálni akarna egy Provider-t A-nak, ehhez szüksége lenne egy B Providerre</para>
+                    </listitem>
+                    <listitem>
+                        <para>Csinálni akarna egy Provider-t B-nek, ehhez szüksége lenne egy A Providerre</para>
+                    </listitem>
+                    <listitem>
+                        <para>... és így tovább</para>
+                    </listitem>
+                </itemizedlist>
+                <para>Persze ez nem feltétlen belátható ilyen gyorsan lehet A->B->C->A éleket végig kell járnunk a gráfban mire leesik hogy hurok.</para>
+                <para>Emiatt az egyetlen trükkösebb dolog, hogy "on the fly" configuration esetén megjegyezzük egy Set-ben a jelenleg "regisztrálás befejezésére" váró típusokat, és ha olyan típust kell regisztrálni ami a halmazban van akkor tudjuk, hogy valami cyclic dependency van.</para>
+                <programlisting>
+                    <![CDATA[
+private <T> void autoConfigureProvider(Set<Class<?>> typesCurrentlyUnderAutoConfig, Class<T> requiredType) {
+    if (typesCurrentlyUnderAutoConfig.contains(requiredType)) {
+        throw new CyclicDependencyException("Cyclic dependency was found for class " + requiredType);
+    }
+    ...
+]]>
+                </programlisting>
+                <para>Az annotációkat teljesen direkt hagytam ki, hiszen azt akartam hogy a lehető legkevesebb kód módosítással lehessen használni.</para>
+                <para>Emiatt azonban a ctor nem egyértelmű ezért mindig a leghosszabb argumentum listájú ctor-t választja.</para>
+                <para>
+                    Az egyik tesztfájlt úgy írtam meg, hogy egy konkrét use case legyen,
+                    <link xlink:href="https://github.com/rkeeves/prog2-rpg/blob/ioc/src/test/java/hu/unideb/inf/ioc/onthefly/OnTheFlyConfiguredContainerUseCaseTest.java">itt érhető el</link>
+                    .
+                </para>
+                <para>Egyszerűen egy Supplier-t definiálunk TestIOService interface megvalósító object visszaadására.</para>
+                <para>Innentől kezdve pedig automatikusan megy a TestPlayerService-be történő beinjektálása.</para>
+                <programlisting>
+                    <![CDATA[
+@Test
+void useCaseExample0(){
+    OnTheFlyConfiguredContainer container = new OnTheFlyConfiguredContainer(new BaseContainer());
+    container.configureSupplier(TestIOService.class,()->new TestIOServiceImpl0(), CacheStrategy.SINGLETON);
+    TestPlayerService testPlayerService = container.getProvided(TestPlayerService.class);
+    var testPlayer = testPlayerService.getTestPlayer();
+    assertEquals("a",testPlayer.getName());
+}
+]]>
+                </programlisting>
+
+            </section>
+        </section>
+    </section>
+    <section>
+        <title>EPAM: JSON szerializáció</title>
+        <section>
+            <title>Feladat</title>
+            <para>Implementálj egy JSON szerializációs könyvtárat, mely képes kezelni sztringeket, számokat, listákat
+                és beágyazott objektumokat. A megoldás meg kell feleljen az összes adott unit tesztnek.
+                Plusz feladat: a könyvtár tudjon deszerializálni</para>
+        </section>
+        <section>
+            <title>Megoldás</title>
+            <para>Mivel az volt az elfogadási kritérium, hogy a unit teszteknek meg kellett felelni, ezért olyat írtam, ami a unit-testeknek megfelelt. (Magyarul az array szerializációt megírtam, de nem volt tesztelve EPAM-os unit test-ben.)</para>
+            <para>Ennek a feladatnak két alapköve van:</para>
+            <itemizedlist>
+                <listitem>
+                    <para>Reflection API field-ekre</para>
+                </listitem>
+                <listitem>
+                    <para>Kompozit struktúrák miatt rekurzió</para>
+                </listitem>
+            </itemizedlist>
+            <para>Én úgy szerveztem a kódot hogy van egy JsonSerializer class. Kliens ezzel kerül interakcióba.</para>
+            <para>A Json szerializáció két nagy csoportra bontható:</para>
+            <itemizedlist>
+                <listitem>
+                    <para>egyszerű értékek "literálokká" alakítása</para>
+                </listitem>
+                <listitem>
+                    <para>összetett objektumok</para>
+                </listitem>
+            </itemizedlist>
+            <para>Az összetett objektumok három fő csoportba oszthatóak:</para>
+            <itemizedlist>
+                <listitem>
+                    <para>array-k (ezeket felsorolásként vesszővel elválasztva reprezentáljuk)</para>
+                </listitem>
+                <listitem>
+                    <para>listák (ezeket felsorolásként vesszővel elválasztva reprezentáljuk)</para>
+                </listitem>
+                <listitem>
+                    <para>egyéb (ezeket kulcs-érték párokként reprezentáljuk)</para>
+                </listitem>
+            </itemizedlist>
+            <para>Emiatt aztán gondoltam State pattern szerűséget fogok használni.</para>
+            <para>Alábbi kódon látható az implementáció:</para>
+            <programlisting>
+                <![CDATA[
+public String toJson(Object instance) {
+    if (instance == null) {
+        return "null";
+    }
+    var cls = instance.getClass();
+    var valueSerializer = valueSerializers.get(cls);
+    if (valueSerializer != null) {
+        return valueSerializer.toJson(instance);
+    }
+    if (cls.isArray()) {
+        return STATE_ARRAY.toJson(instance,this);
+    } else if (instance instanceof List) {
+        return STATE_LIST.toJson(instance,this);
+    } else {
+        return STATE_OBJECT.toJson(instance,this);
+    }
+}
+]]>
+            </programlisting>
+            <para>Ha egyszerű értékek akkor egy előre betárolt map-ből kikapjuk a megfelelő nagyon egyszerű ValueSerializer-t, ami tényleg annyira egyszerű, hogy gyakorlatilag egy FunctionalInterface.</para>
+<programlisting>
+<![CDATA[
+interface JsonValueSerializer {
+    String toJson(Object instance);
+}
+]]>
+</programlisting>
+        <para>A trükk inkább a Strategy-kben van. A trükközés azért szükséges, mert ha pl egy Array-t bontunk ki aminek elemei int-ek, akkor két helyen kéne megírnunk az int kezelést.
+        </para>
+        <para>Ehelyett én azt szerettem volna, ha ilyenkor az adott állapot visszaadhassa ezt a felelősséget a JsonSerializer-nek, aki majd delegálja saját belátása szerint.</para>
+<programlisting>
+<![CDATA[
+public interface JsonSerializationState {
+
+    String toJson(Object instance, JsonSerializationContext context);
+}
+
+public interface JsonSerializationContext extends JsonValueSerializer {
+
+}
+
+interface JsonValueSerializer {
+
+    String toJson(Object instance);
+}
+]]>
+</programlisting>
+    <para>Csak azért van szükség JsonSerializationContext-re hogy ne direktbe JsonValueSerializer-t fogadjunk be, hogy a típus rendszerrel kivédjük a szemantikai hibákat.</para>
+       
+       
+        <para>Amikor példul egy Array-t dolgozunk fel, olyankor lehet magát az array szerializációját a jelen State végzi, de az elemek szerializációjának felelősségét visszahárítjuk.</para>
+        <para>Így például array, lista, objektum esetén csak azért vagyunk felelősek hogy jó helyre írjuk be a context által generált json value-t.</para>
+       
+        <programlisting>
+<![CDATA[
+public class JsonSerializationStateForArray implements JsonSerializationState {
+
+    @Override
+    public String toJson(Object instance, JsonSerializationContext context) {
+        StringJoiner sj = new StringJoiner(",", "[", "]");
+        var length = Array.getLength(instance);
+        for (int i = 0; i < length; i++) {
+            sj.add(context.toJson(Array.get(instance, i)));
+        }
+        return sj.toString();
+    }
+}
+]]>
+        </programlisting>
+        <para>Listákra most nem térek, ki mert az Array-hez hasonló.</para>
+        <para>Az egyéb objektumok esetén jön be inkább a Reflection.</para>
+        <para>Az alábbi kódban látható, hogy végig megyünk a declared field-eken kiszedjük az értéket, majd a context kérjük meg annak szerializálására.</para>
+
+        <programlisting>
+    <![CDATA[
+public class JsonSerializationStateForObject implements JsonSerializationState {
+    @Override
+    public String toJson(Object instance, JsonSerializationContext context) {
+        var cls = instance.getClass();
+        StringJoiner sj = new StringJoiner(",", "{", "}");
+        for (Field field : cls.getDeclaredFields()) {
+            if (!field.canAccess(instance)) {
+                try {
+                    field.setAccessible(true);
+                } catch (Exception e) {
+                    throw new RuntimeException("Error during trying brute forcing access to field instead of looking up getters for field " + field.getName());
+                }
+            }
+            String value;
+            try {
+                value = context.toJson(field.get(instance));
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException("Error during accessing field by brute force instead of looking up getters for field " + field.getName());
+            }
+            sj.add("\"" + field.getName() + "\"" + ":" + value);
+        }
+        return sj.toString();
+    }
+}
+]]>
+    </programlisting>
+    <para>A fenti kódban két probléma van (de a tesztek ezt nem érintették).</para>
+    <para>Az első, hogy be brute-forceoljuk a field access-t. Ennél szebb de nem biztos megoldás lenne a fieldname, return type és paramtercount alapján getter-eket keresni.
+        Sajnos ez nem adna garantálhatóan jó megoldást, de sok framework/library ezt az utat követi.
+    </para>
+    <para>A másik probléma az a getDeclaredFields. Ez nem adja vissza az öröklött field-eket, ami problémás lehet.</para>
+    <para>A tesztek csak és kizárólag olyan osztályokkal foglalkoztak melyek egyenesen Object-ből származtak le, így ez nem jelentett gondot, ellenben egy gyönyörű példája annak, hogy miért érdemes library-kat használni :).</para>
+        </section>
+    </section>
+    <section>
+        <title>EPAM: Kivételkezelés</title>
+        <section>
+            <title>Feladat</title>
+            <para>Adott az alábbi kódrészlet. Mi történik, ha az input változó 1F, “string” vagy pedig null? Meghívódik
+                e minden esetben a finally ág? Válaszod indokold! </para>
+            <programlisting>
+                <![CDATA[
+private static void test(Object input) {
+    try {
+        System.out.println("Try!");
+        if (input instanceof Float) {
+            throw new ChildException();
+        } else if (input instanceof String) {
+            throw new ParentException();
+        } else {
+            throw new RuntimeException();
+        }
+    } catch (ChildException e) {
+        System.out.println("Child Exception is caught!");
+        if (e instanceof ParentException) {
+            throw new ParentException();
+        }
+    } catch (ParentException e) {
+        System.out.println("Parent Exception is caught!");
+        System.exit(1);
+    } catch (Exception e) {
+        System.out.println("Exception is caught!");
+    } finally {
+        System.out.println("Finally!\n");
+    }
+}
+    ]]>
+            </programlisting>
+        </section>
+        <section>
+            <title>Megoldás</title>
+            <para>Vizsgáljuk meg a három esetet ( 1f, "string", null).</para>
+        </section>
+        <section>
+            <title>1F</title>
+            <para>Ebben az esetben a következő a hívás forráskódja:</para>
+            <programlisting>
+                <![CDATA[
+test(1f);
+]]>
+            </programlisting>
+            <para>Ebben az esetben a float primitívünk autoboxing miatt átfog alakulni Float-á.
+                Azaz a method-ot egy olyan objektum referencia értékkel hívtuk, mely most runtime egy String típusű objektumra mutat. Most nézzük a try block-ot</para>
+            <programlisting>
+                <![CDATA[
+try {
+    System.out.println("Try!");
+    if (input instanceof Float) {
+        throw new ChildException();
+    } else if (input instanceof String) {
+        throw new ParentException();
+    } else {
+        throw new RuntimeException();
+    }
+}
+]]>
+            </programlisting>
+            <para>Látható, hogy először sysout-ra kiírjunk a "Try!" string-et a végén OS specifikus new line-al (magyarul lehet carriage return is lesz).</para>
+            <para>Miután ez meg volt elkezdünk az if-elseif-else block-on dolgozni.</para>
+            <para>Mivel már az if conditional-je true (instanceof) ezért dobi fogunk egy ChildException-t.</para>
+            <para>Mivel van catch block, ezért meg kell vizsgálnunk történik-e elkapás.</para>
+            <programlisting>
+                <![CDATA[
+} catch (ChildException e) {
+    System.out.println("Child Exception is caught!");
+    if (e instanceof ParentException) {
+        throw new ParentException();
+    }
+} catch (ParentException e) {
+    System.out.println("Parent Exception is caught!");
+    System.exit(1);
+} catch (Exception e) {
+    System.out.println("Exception is caught!");
+} finally {
+    System.out.println("Finally!\n");
+}
+]]>
+            </programlisting>
+            <para>Már az első catch elkapja a hibát hiszen ChildException-t dobtunk, és a catch pedig ChildException-öket vagy azok subclassait kaphatja el.</para>
+            <programlisting>
+                <![CDATA[
+    System.out.println("Child Exception is caught!");
+    if (e instanceof ParentException) {
+        throw new ParentException();
+    }
+]]>
+            </programlisting>
+            <para>Azaz először egy sorba kiírjuk a szöveget.</para>
+            <para>Utána pedig az if conditional-ja true-lesz, hiszen valós runtime típusunk ChildException ami subclass-a ParentException-nek.</para>
+            <para>Emiatt tehát dobi fogunk egy teljesen új hibát ParentException típussal.</para>
+            <para>Ez az exception már elfogja érni a caller-t, viszont mielőtt visszaadnánk a kontrollt a caller-nek a finally-t végrehajtjuk.</para>
+            <programlisting>
+                <![CDATA[
+            } finally {
+                System.out.println("Finally!\n");
+            }
+]]>
+            </programlisting>
+            <para>Azaz még kiírjuk a string-et, aztán a hívóhoz visszakerül a kontrol, akinek feladata lesz a ParentException típusú Exception elkapása.</para>
+        </section>
+        <section>
+            <title>"String"</title>
+            <para>Ebben az esetben String literal-t adtunk meg, tehát a method-ot egy String típusú argumentummal hívtuk.</para>
+            <programlisting>
+                <![CDATA[
+test("string");
+]]>
+            </programlisting>
+            <para>Tehát a method-ot egy olyan objektum referencia értékkel hívtuk, mely konkrétan most runtime egy String típusú onbjektumra hivatkozik. Nézzük a method body try block-ját</para>
+            <programlisting>
+                <![CDATA[
+try {
+    System.out.println("Try!");
+    if (input instanceof Float) {
+        throw new ChildException();
+    } else if (input instanceof String) {
+        throw new ParentException();
+    } else {
+        throw new RuntimeException();
+    }
+}
+]]>
+            </programlisting>
+            <para>Először kiírjuk azt hogy "Try".</para>
+            <para>Mivel az előbb tisztáztuk, hogy az argumentumunk String típusú ezért az elseif ág fog futni.</para>
+            <programlisting>
+                <![CDATA[
+    } else if (input instanceof String) {
+        throw new ParentException();
+    }
+]]>
+            </programlisting>
+            <para>
+                Azaz dobni fogunk egy hibát (ParentException típussal).
+            </para>
+            <para>Mivel van(nak) catch block(ok) ezért meg kell vizsgálni hogy eltudja-e kapni valamelyik</para>
+            <programlisting>
+                <![CDATA[
+            } catch (ChildException e) {
+                System.out.println("Child Exception is caught!");
+                if (e instanceof ParentException) {
+                    throw new ParentException();
+                }
+            } catch (ParentException e) {
+                System.out.println("Parent Exception is caught!");
+                System.exit(1);
+            } catch (Exception e) {
+                System.out.println("Exception is caught!");
+            } finally {
+                System.out.println("Finally!\n");
+            }
+]]>
+            </programlisting>
+            <para>Az első catch block-nak nem felel meg az Exception, hiszen típusa ParentException, ami subclass-a, vagy ekvivalens ChildExcpetion-el.</para>
+            <para>A második catch-nek megfelel, így azt végre hajtjuk.</para>
+            <programlisting>
+                <![CDATA[
+            } catch (ParentException e) {
+                System.out.println("Parent Exception is caught!");
+                System.exit(1);
+            }
+]]>
+            </programlisting>
+            <para>Először kinyomtatjuk a szöveget.</para>
+            <para>Ezekután azonnal termináljuk a program futását a JVM-en.</para>
+            <para>Nincs finally, nem kerül vissza a kontroll a caller-hez, azonnal termináljuk a program működését (csak ebben az esetben igaz...Miért is? Például shutdown hook-ok még meg lesznek hívva).</para>
+        </section>
+        <section>
+            <title>null</title>
+            <para>Ebben az esetben null-al hívtuk a method-ot.</para>
+            <programlisting>
+                <![CDATA[
+test(null);
+]]>
+            </programlisting>
+            <para>Tehát a method-ot egy olyan objektum referenciával hívtuk mely null. Nézzük a method body try block-ját</para>
+            <programlisting>
+                <![CDATA[
+try {
+    System.out.println("Try!");
+    if (input instanceof Float) {
+        throw new ChildException();
+    } else if (input instanceof String) {
+        throw new ParentException();
+    } else {
+        throw new RuntimeException();
+    }
+}
+]]>
+            </programlisting>
+            <para>Először kiírjuk a szöveget, majd következik az if-elseif-else.</para>
+            <para>Mindkét instanceof alapú conditional false, tehát az else ág fog futni.</para>
+            <para>Miért is? Hiszen a hivatkozott objektum konkrát runtime típusa nem Float/String és nem ezek subclass-a.</para>
+            <para>Emiatt dobni fogunk egy RuntimeException-t.</para>
+            <para>Most vizsgáljuk meg mi történik a catch blockokban (pl. eltudjuk-e egyáltalán kapni).</para>
+            <programlisting>
+                <![CDATA[
+} catch (ChildException e) {
+    System.out.println("Child Exception is caught!");
+    if (e instanceof ParentException) {
+        throw new ParentException();
+    }
+} catch (ParentException e) {
+    System.out.println("Parent Exception is caught!");
+    System.exit(1);
+} catch (Exception e) {
+    System.out.println("Exception is caught!");
+} finally {
+    System.out.println("Finally!\n");
+}
+]]>
+            </programlisting>
+            <para>RuntimeException nem ekvivalens és nem is subclass-a ChildException-nek, tehát nem hajtjuk végre.</para>
+            <para>RuntimeException nem ekvivalens és nem is subclass-a ParentException-nek, tehát nem hajtjuk végre.</para>
+            <para>RuntimeException azonban subclass-a Exception-nek, azaz ezt a catch block-ot végre fogjuk hatjani.</para>
+            <programlisting>
+                <![CDATA[
+} catch (Exception e) {
+    System.out.println("Exception is caught!");
+}
+]]>
+            </programlisting>
+
+            <para>Tehát kifogjuk írni a szöveget sysout-ra.</para>
+            <para>Mivel normális módon folytatódik tovább a futás, ezért nem adjuk még vissza a caller-nek a kontroll-t, ugyanis finally még hátra van.</para>
+            <programlisting>
+                <![CDATA[
+} finally {
+    System.out.println("Finally!\n");
+}
+]]>
+            </programlisting>
+            <para>Kiírjuk a (dupla új soros :)) szöveget, majd vissza adjuk a kontroll caller-nek.</para>
+            <para>Mivel kezeltük az Exception-t ezért caller-nél nincs szükség elkapásra ("elnyeltük a hibát").</para>
+        </section>
+    </section>
+</chapter>                

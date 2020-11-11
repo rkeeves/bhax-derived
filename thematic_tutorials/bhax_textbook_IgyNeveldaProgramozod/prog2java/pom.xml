@@ -61,6 +61,8 @@
         <module>w5/jdk-troubles</module>
         <module>w5/asm-troubles</module>
         <module>w7/streetmap</module>
+        <module>w8/json-serialization</module>
+        <module>w8/exc-handling</module>
     </modules>
 
     <dependencyManagement>

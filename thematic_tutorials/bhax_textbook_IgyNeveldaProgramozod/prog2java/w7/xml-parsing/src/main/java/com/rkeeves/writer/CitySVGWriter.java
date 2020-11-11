@@ -27,7 +27,7 @@ public class CitySVGWriter implements Closeable {
     private Map<String, String> createColorsOfStates(Set<String> stateCodes) {
         var rnd = new Random();
         return stateCodes.stream()
-                .collect(Collectors.toMap(hexColor -> hexColor, hexColor -> String.format("#%06X", rnd.nextInt(0xFFFFFF))));
+                .collect(Collectors.toMap(stateCode -> stateCode, hexColor -> String.format("#%06X", rnd.nextInt(0xFFFFFF))));
     }
 
     public void run() throws TransformerException {
